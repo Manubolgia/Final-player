@@ -28,7 +28,7 @@ import {
   zoneDef,
   zoneName,
 } from './kernel';
-import { itemHandlers } from './registry';
+import { itemHandlers, killerActionOverrides, minionDestroyed } from './registry';
 import type { Frame, GameState, KillerTarget, Minion, Src } from './state';
 import { bloodlustSpace, damageKiller, hurtFG, killerAttack, killerVulnerable, NEXT_PHASE, wrathOp } from './stats';
 import { startRoll } from './dice';
@@ -67,7 +67,7 @@ function setActorZone(g: GameState, a: string, z: ZoneId): void {
 export function enemyName(g: GameState, a: string): string {
   const p = parseActor(a);
   if (p.kind === 'killer') return K(g).name;
-  if (p.kind === 'minion') return `The ${minionName(g, p.id)}`;
+  if (p.kind === 'minion') return K(g).bodiless && !p.id.startsWith('tmp-giant') && !p.id.startsWith('tmp-clown') ? 'The birds' : `The ${minionName(g, p.id)}`;
   return 'A puppet victim';
 }
 
@@ -101,6 +101,7 @@ const minionsByDistanceToFG = (g: GameState): Minion[] => {
 
 /** Queue a killer action: minions act first, then the Killer. */
 export function pushKillerAction(g: GameState, a: KillerActionDef, src: Src): void {
+  if (killerActionOverrides.some((fn) => fn(g, a, src))) return;
   const who = a.actor ?? 'all';
   const fs: Frame[] = [];
   const mk = (actor: string): Frame => ({ t: 'killer', a, actor, step: 'target', killed: 0, src });
@@ -483,7 +484,8 @@ function attackOnce(g: GameState, f: KF): void {
   }
   if (actor.kind === 'victim') return;
   if (!vs.length) {
-    log(g, `${enemyName(g, f.actor)} attacks, but nobody is there.`);
+    if (fgHere && !canHitFG) log(g, `${enemyName(g, f.actor)} lunges at you, but can't reach you while you're awake.`);
+    else log(g, `${enemyName(g, f.actor)} attacks, but nobody is there.`);
     return;
   }
   const kinds = [...new Set(vs.map((v) => v.role ?? 'normal'))];
@@ -524,6 +526,7 @@ function reactions(g: GameState, f: AF) {
 frames.attackFG = {
   step(g, f: AF) {
     const by = enemyName(g, f.by);
+    if (parseActor(f.by).kind === 'killer' && g.film.maple) g.film.maple.attackedFG = true;
     if (attackStoppers.some((fn) => fn(g, f))) return 'done';
     if (f.damage <= 0) {
       log(g, `${by}'s attack doesn't hurt you.`, 'good');
@@ -572,10 +575,9 @@ function takeHit(g: GameState, f: AF): void {
     return;
   }
   const before = g.fg.health.hp;
-  if (parseActor(f.by).kind === 'killer' && g.film.maple) g.film.maple.attackedFG = true;
   hurtFG(g, f.damage);
   if (parseActor(f.by).kind === 'killer' && has(g, 'dp.trident') && g.fg.health.hp < before && !g.outcome) {
-    log(g, 'Trident Assault: +1 Horror.', 'bad');
+    log(g, 'Pitchfork Assault: +1 Horror.', 'bad');
     pushFx(g, [{ k: 'horror', n: 1 }], { kind: 'killer' });
   }
 }
@@ -638,11 +640,15 @@ export interface AttackOption {
   zone: ZoneId;
 }
 
+/** Weapons that only reach some spaces (Maple Lane's rifle and bow: street spaces). */
+export const targetZoneFilters: ((g: GameState, weaponUid: string, zone: ZoneId) => boolean)[] = [];
+
 /** What the Final Girl can hit at this range. ids: killer, mz:<zone>, vz:<zone>. */
-export function attackTargets(g: GameState, range: [number, number]): AttackOption[] {
+export function attackTargets(g: GameState, range: [number, number], weaponUid?: string): AttackOption[] {
   const d = distances(g, g.fg.zone, 'fg');
   const inRange = (z: ZoneId) => {
     const x = d.get(z);
+    if (weaponUid && !targetZoneFilters.every((fn) => fn(g, weaponUid, z))) return false;
     return x !== undefined && x >= range[0] && x <= range[1];
   };
   const out: AttackOption[] = [];
@@ -677,7 +683,7 @@ export function fgDealDamage(g: GameState, n: number, src: Src): void {
     }
   }
   const range = weaponRange(g, weapon?.uid);
-  let options = attackTargets(g, range);
+  let options = attackTargets(g, range, weapon?.uid);
   if (src.target) {
     const forced = options.filter((o) => o.id === src.target);
     if (forced.length) options = forced;
@@ -708,7 +714,7 @@ answers.fgHit = (g, id, data: { ctx: HitCtx; split: boolean }) => {
     applyHit(g, id, { ...data.ctx, total: 1 }, true);
     const left = data.ctx.total - 1;
     if (left > 0 && !g.outcome) {
-      const options = attackTargets(g, weaponRange(g, data.ctx.weapon));
+      const options = attackTargets(g, weaponRange(g, data.ctx.weapon), data.ctx.weapon);
       if (options.length > 1)
         choose(g, `Knives: split the damage (${left} left). Where does the next one go?`, options.map((o) => ({ id: o.id, label: o.label, zone: o.zone })), {
           id: 'fgHit',
@@ -887,6 +893,7 @@ export function damageMinions(g: GameState, zone: ZoneId, n: number): void {
       g.minions = g.minions.filter((x) => x !== m);
       if (!m.id.startsWith('tmp-')) g.minionPool.exhausted.push(m.id);
       log(g, `The ${minionName(g, m.id)} is destroyed.`, 'good');
+      for (const fn of minionDestroyed) fn(g, m);
     }
   }
 }

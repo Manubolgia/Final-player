@@ -179,6 +179,18 @@ export const Emblem = ({ name, color = '#ff4552', ...p }: P & { name: string }) 
           <path fill={color} d="M7 4l6 5H11v9H3V9H1zm10 3l6 5h-2v8h-7v-8h-2l5-4.2z" />
         </S>
       );
+    case 'bird':
+      return (
+        <S {...p}>
+          <path fill={color} d="M2 9c3-1 6 0 8 3 1-4 4-7 8-7l4 1-3 1c1 3-1 7-5 9l-2 4-1-3c-3 0-6-2-9-8z" />
+        </S>
+      );
+    case 'pitchfork':
+      return (
+        <S {...p}>
+          <path fill={color} d="M4 2h2v6a2 2 0 002 2h3V2h2v8h3a2 2 0 002-2V2h2v6a4 4 0 01-4 4h-3v10h-2V12H8a4 4 0 01-4-4z" />
+        </S>
+      );
     case 'tombstone':
       return (
         <S {...p}>

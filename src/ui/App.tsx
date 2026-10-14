@@ -58,7 +58,7 @@ export function App() {
 function Title({ prefs, saved, onContinue, onStart }: { prefs: Prefs; saved: GameState | null; onContinue: () => void; onStart: (c: Omit<GameConfig, 'seed'>) => void }) {
   const last = prefs.last ?? {};
   const [killer, setKiller] = useState(last.killer ?? FILMS[0].killer.id);
-  const [location, setLocation] = useState(last.location ?? FILMS[0].location.id);
+  const [location, setLocation] = useState(last.location ?? LOCATIONS[0].id);
   const [finalGirl, setFinalGirl] = useState(last.finalGirl ?? FILMS[0].finalGirls[0].id);
   const [board, setBoard] = useState<'normal' | 'extreme'>(last.board ?? 'normal');
   const [epic, setEpic] = useState(!!last.epicDarkPower);
@@ -66,17 +66,17 @@ function Title({ prefs, saved, onContinue, onStart }: { prefs: Prefs; saved: Gam
   const [rules, setRules] = useState(false);
   useEffect(() => {
     if (!KILLERS.some((k) => k.id === killer)) setKiller(FILMS[0].killer.id);
-    if (!LOCATIONS.some((l) => l.id === location)) setLocation(FILMS[0].location.id);
+    if (!LOCATIONS.some((l) => l.id === location)) setLocation(LOCATIONS[0].id);
     if (!FINAL_GIRLS.some((f) => f.id === finalGirl)) setFinalGirl(FILMS[0].finalGirls[0].id);
   }, [killer, location, finalGirl]);
 
   const pickFilm = (id: string) => {
     const f = FILMS.find((x) => x.id === id)!;
     setKiller(f.killer.id);
-    setLocation(f.location.id);
+    if (f.location) setLocation(f.location.id);
     setFinalGirl(f.finalGirls[0].id);
   };
-  const film = FILMS.find((f) => f.killer.id === killer && f.location.id === location);
+  const film = FILMS.find((f) => f.killer.id === killer && (!f.location || f.location.id === location));
 
   return (
     <div className="app">
@@ -95,7 +95,7 @@ function Title({ prefs, saved, onContinue, onStart }: { prefs: Prefs; saved: Gam
             <button key={f.id} className={`film-card pick ${film?.id === f.id ? 'on' : ''}`} onClick={() => pickFilm(f.id)} type="button" style={{ display: 'block' }}>
               <h3>{f.name}</h3>
               <p>
-                {f.killer.name} at {f.location.name}. {f.tagline}
+                {f.location ? `${f.killer.name} at ${f.location.name}.` : `${f.killer.name}, in any location.`} {f.tagline}
               </p>
             </button>
           ))}

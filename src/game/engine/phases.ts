@@ -15,6 +15,7 @@ import {
   K,
   L,
   log,
+  plural,
   push,
   pushFx,
   terrorDef,
@@ -196,7 +197,7 @@ frames.terror = {
     }
     if (c.minor) {
       g.killer.minors.push({ id: c.id, hp: c.minor.hp });
-      log(g, `Minor Dark Power in play${c.minor.hp ? ` (${c.minor.hp} health)` : ''}: ${c.text}`, 'killer');
+      log(g, `${c.name} stays in play as a Minor Dark Power${c.minor.hp ? ` with ${plural(c.minor.hp, 'health')}` : ''}.`, 'killer');
       pushFx(g, c.effects, { kind: 'terror', id: c.id });
       return 'done';
     }
@@ -263,7 +264,7 @@ function panicPhase(g: GameState, f: PhF) {
     if (g.mods.killedThisTurn > 0) {
       if (has(g, 'ev.frozenFear')) log(g, 'Frozen with Fear: nobody panics.', 'killer');
       else {
-        const list = g.victims.filter((v) => v.role !== 'werewolf' && ((!g.film.birds && v.zone === g.killer.zone) || minionsIn(g, v.zone).length > 0));
+        const list = g.victims.filter((v) => v.role !== 'werewolf' && ((!g.film.birds && !g.film.maple?.offBoard && v.zone === g.killer.zone) || minionsIn(g, v.zone).length > 0));
         if (list.length) {
           log(g, 'Someone died this turn: the victims with an enemy panic.');
           panicVictims(g, list);

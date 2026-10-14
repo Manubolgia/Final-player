@@ -117,6 +117,7 @@ const ROLE_NAMES: Record<string, string> = {
   ghostHunter: 'a Ghost Hunter',
   mlBoyfriend: 'your Boyfriend',
   smalley: 'a Smalley',
+  survivor: 'a hidden survivor',
 };
 export const victimName = (v: { role?: string }): string => (v.role ? ROLE_NAMES[v.role] ?? 'a special victim' : 'a victim');
 

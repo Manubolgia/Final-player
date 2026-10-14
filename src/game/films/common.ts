@@ -213,7 +213,7 @@ const bowCost = (it: ItemInst) => (it.id === 'lauriesBow' ? 1 : 2);
 itemHandlers['item.bow'] = {
   actions(g, it, d) {
     if (!d.range || (it.uses ?? 0) <= 0 || g.fg.time < bowCost(it)) return [];
-    if (!attackTargets(g, weaponRange(g, it.uid)).length) return [];
+    if (!attackTargets(g, weaponRange(g, it.uid), it.uid).length) return [];
     return [{ action: 'shoot', label: `Shoot the ${d.name} (${bowCost(it)} Time)` }];
   },
   use(g, it) {

@@ -154,7 +154,8 @@ export type SpecialRole =
   | 'werewolf'
   | 'ghostHunter'
   | 'mlBoyfriend'
-  | 'smalley';
+  | 'smalley'
+  | 'survivor';
 
 export interface EventDef {
   id: string;
@@ -235,6 +236,8 @@ export interface KillerDef {
   health: number;
   /** Can't be damaged or killed (The Poltergeist). */
   invulnerable?: boolean;
+  /** No body on the board: a flock of minions instead (the Birds). */
+  bodiless?: boolean;
   bloodlust: BloodlustSpace[];
   maxEffect: Effect[];
   maxText: string;
@@ -306,7 +309,8 @@ export interface FilmDef {
   id: string;
   name: string;
   killer: KillerDef;
-  location: LocationDef;
+  /** A vignette (the Birds) brings no location of its own. */
+  location?: LocationDef;
   finalGirls: FinalGirlDef[];
   bonusItems: ItemDef[];
   tagline: string;

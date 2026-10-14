@@ -93,14 +93,22 @@ function MainDock({ g, send }: { g: GameState; send: (i: Input) => void }) {
   const selected = sel !== null ? hand[sel] : null;
   const play = selected ? p.playable.find((x) => x.card === selected) : undefined;
   const timeEach = finalGirlDef(g.config.finalGirl).ultimate.ability === 'ult.sheila' && g.fg.ultimate ? 2 : 1;
+  const strike = p.strike;
   return (
     <div className="dock">
       <div className="row" style={{ marginBottom: 6 }}>
-        <h4 className="grow" style={{ margin: 0 }}>
-          Your move
+        <h4 className={`grow ${strike ? 'tone-killer' : ''}`} style={{ margin: 0 }}>
+          {strike ? 'Strike!' : 'Your move'}
         </h4>
         <span className="muted">{g.fg.time} Time</span>
       </div>
+      {strike ? (
+        <p className="lede">
+          {strike === 'victims'
+            ? 'You may play ONE action card that deals damage: each point kills one of the victims around you.'
+            : 'You may play action cards that deal damage against the thing in your space.'}
+        </p>
+      ) : null}
       {hand.length ? (
         <div className="hand">
           {hand.map((c, i) => (
@@ -154,9 +162,11 @@ function MainDock({ g, send }: { g: GameState; send: (i: Input) => void }) {
             ) : (
               <span className="muted grow">{card(selected).timing === 'action' ? "Can't play it here." : card(selected).timing === 'reaction' ? 'Played when you are attacked.' : 'Played after a horror roll.'}</span>
             )}
-            <button className="btn" onClick={() => send({ t: 'discardForTime', cards: [selected] })} type="button">
-              Discard +{timeEach} Time
-            </button>
+            {strike ? null : (
+              <button className="btn" onClick={() => send({ t: 'discardForTime', cards: [selected] })} type="button">
+                Discard +{timeEach} Time
+              </button>
+            )}
           </div>
         </div>
       ) : null}
@@ -187,7 +197,7 @@ function MainDock({ g, send }: { g: GameState; send: (i: Input) => void }) {
         ) : null}
         <div className="grow" />
         <button className="btn ghost" onClick={() => send({ t: 'endPhase' })} type="button">
-          End turn ▸
+          {strike ? "Don't strike" : 'End turn ▸'}
         </button>
       </div>
     </div>

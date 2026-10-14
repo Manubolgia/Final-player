@@ -164,7 +164,7 @@ export function finalToken(g: GameState, who: 'fg' | 'killer'): void {
   if (h.token === 'black') log(g, `${name}'s Final Health token is blank.`, 'phase');
   if (who === 'killer') endGame(g, 'finalGirl', `${K(g).name} is dead. ${FG(g).name} survives the night!`);
   else if (g.killer.health.hp <= 0 && !K(g).invulnerable) endGame(g, 'finalGirl', `${FG(g).name} dies taking ${K(g).name} down too. It still counts.`);
-  else endGame(g, 'killer', `${FG(g).name} is dead. ${K(g).name} wins.`);
+  else endGame(g, 'killer', `${FG(g).name} is dead. ${K(g).name} ${K(g).bodiless ? 'win' : 'wins'}.`);
 }
 
 /** +1 die each when you or the Killer are on your last health. */
@@ -190,7 +190,7 @@ export function addBloodlust(g: GameState, n: number): void {
     }
     g.killer.bloodlust++;
     const sp = k.bloodlust[g.killer.bloodlust];
-    log(g, `Bloodlust rises: attack ${sp.attack}, move ${sp.move}.`, 'killer');
+    log(g, K(g).bodiless ? `Bloodlust rises (${g.killer.bloodlust + 1}).` : `Bloodlust rises: attack ${sp.attack}, move ${sp.move}.`, 'killer');
     if (sp.effects) out.push(...sp.effects);
     if (sp.darkPower) revealDarkPower(g);
     const row = L(g).bloodlustTrack?.[g.killer.bloodlust - 1];

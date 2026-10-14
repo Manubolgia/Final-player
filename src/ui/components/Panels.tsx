@@ -2,6 +2,7 @@ import { BOARDS } from '../../game/content/core';
 import { finalGirlDef, killerDef, locationDef } from '../../game/content';
 import type { GameState } from '../../game';
 import { itemDef, terrorDef } from '../../game/engine/kernel';
+import { boilerView } from '../../game/films/maple';
 import { Boot, DieFace, Emblem, Heart, Hourglass, Knife, Mask, Person } from '../art/Icons';
 
 export function KillerPanel({ g, onOpen }: { g: GameState; onOpen: () => void }) {
@@ -20,7 +21,18 @@ export function KillerPanel({ g, onOpen }: { g: GameState; onOpen: () => void })
         </div>
       </div>
       <div className="grow" />
-      {k.invulnerable ? (
+      {k.bodiless ? (
+        <>
+          <span className="stat" title="Birds on the board">
+            <Emblem name="bird" color={k.color} />
+            {g.minions.length}
+          </span>
+          <span className="stat" title="Survivors saved">
+            <Person color="#79e2ff" />
+            {g.film.birds?.saved ?? 0}/{g.film.birds?.total ?? 2}
+          </span>
+        </>
+      ) : k.invulnerable ? (
         <span className="stat dim">∞</span>
       ) : (
         <span className="stat" title="Health">
@@ -29,14 +41,18 @@ export function KillerPanel({ g, onOpen }: { g: GameState; onOpen: () => void })
           {g.killer.health.token === 'black' ? <span className="dim" style={{ fontSize: 12 }}>+?</span> : null}
         </span>
       )}
-      <span className="stat" title="Attack">
-        <Knife />
-        {sp.attack}
-      </span>
-      <span className="stat" title="Movement">
-        <Boot />
-        {sp.move}
-      </span>
+      {k.bodiless ? null : (
+        <>
+          <span className="stat" title="Attack">
+            <Knife />
+            {sp.attack}
+          </span>
+          <span className="stat" title="Movement">
+            <Boot />
+            {sp.move}
+          </span>
+        </>
+      )}
       <div className="chips" style={{ maxWidth: 120, justifyContent: 'flex-end' }}>
         <span className={`chip ${dp.some((d) => d.revealed) ? 'dp' : ''}`}>{dp.some((d) => d.revealed) ? k.darkPowers.find((d) => d.id === dp[0].id)!.name : 'Dark Power ?'}</span>
         {g.killer.finaleRevealed ? <span className="chip fin">{fin.name}</span> : null}
@@ -45,6 +61,10 @@ export function KillerPanel({ g, onOpen }: { g: GameState; onOpen: () => void })
             {terrorDef(g, m.id).name} {m.hp ? `♥${m.hp}` : ''}
           </span>
         ))}
+        {boilerView(g) ? (
+          <span className={`chip ${g.film.maple?.asleep ? 'fin' : 'ev'}`}>{g.film.maple?.asleep ? `Asleep · ${4 - (boilerView(g)?.left ?? 0)}/4` : 'You\'re awake'}</span>
+        ) : null}
+        {g.film.maple?.blurred ? <span className="chip dp">Blurred</span> : null}
         {g.wrath.killer !== undefined ? <span className="chip fin">Wrath {g.wrath.killer}</span> : null}
         {g.wrath.divine !== undefined ? <span className="chip dp">Divine {g.wrath.divine}</span> : null}
       </div>

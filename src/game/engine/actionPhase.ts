@@ -54,7 +54,7 @@ export function weaponsFor(g: GameState, cardId: CardId): string[] {
       if (Array.isArray(d.modifies) && !d.modifies.includes(cardId)) return false;
       if (d.ability === 'item.strongmanHammer' && g.fg.health.hp < 4) return false;
       if (d.ability === 'item.charliesHammer' && g.fg.health.hp < 2) return false;
-      return attackTargets(g, weaponRange(g, it.uid)).length > 0;
+      return attackTargets(g, weaponRange(g, it.uid), it.uid).length > 0;
     })
     .map((it) => it.uid);
 }
@@ -554,7 +554,7 @@ const ROLE_EVENT: Record<string, string> = {
   werewolf: 'ev.werewolf',
   ghostHunter: 'ev.ghostHunters',
   mlBoyfriend: 'ev.mlBoyfriend',
-  smalley: 'ev.smalleys',
+  smalley: 'ev.mlSmalleys',
 };
 
 // ---- planning ---------------------------------------------------------------------

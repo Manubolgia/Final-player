@@ -7,6 +7,8 @@ import './engine/phases';
 import './films/common';
 import './films/creech';
 import './films/carnival';
+import './films/maple';
+import './films/birds';
 import './films/groves';
 import { respond } from './engine/kernel';
 import type { GameState, Input } from './engine/state';

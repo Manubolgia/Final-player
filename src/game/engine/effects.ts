@@ -19,9 +19,10 @@ import {
   runCustom,
   topOf,
   uid,
+  zoneDef,
   zoneName,
 } from './kernel';
-import { itemHandlers } from './registry';
+import { itemHandlers, placeKillerOverrides } from './registry';
 import type { Frame, GameState, Src, Victim } from './state';
 import {
   addBloodlust,
@@ -317,6 +318,8 @@ export function startSearch(g: GameState, n: number, deck?: string): void {
     log(g, 'There is nothing to search here.');
     return;
   }
+  // Maple Lane: a searched house is marked and can't be searched again.
+  if (!deck && zoneDef(g, g.fg.zone).house) g.tokens.push({ id: 'searched', zone: g.fg.zone });
   push(g, { t: 'search', deck: d, n, drawn: [] });
 }
 
@@ -445,6 +448,7 @@ answers.victimsStep = (g, to, data: { from: ZoneId }) => {
 
 /** The killer appears in a space without moving there. */
 export function placeKiller(g: GameState, zone: ZoneId): void {
+  if (placeKillerOverrides.some((fn) => fn(g, zone))) return;
   const from = g.killer.zone;
   g.killer.zone = zone;
   log(g, `${K(g).name} appears in ${zoneName(g, zone)}!`, 'killer', { kind: 'killerMove', path: from === zone ? [zone] : [from, zone] });

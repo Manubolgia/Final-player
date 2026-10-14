@@ -1,14 +1,14 @@
 import { describe, expect, it } from 'vitest';
 import { newGame } from '../src/game';
-import { FILMS, FINAL_GIRLS, KILLERS, LOCATIONS } from '../src/game/content';
+import { FILMS, FINAL_GIRLS, homeLocation, KILLERS, LOCATIONS } from '../src/game/content';
 import { playOut } from './bot';
 
 describe('whole games with a random player', () => {
   for (const film of FILMS) {
     for (const fg of film.finalGirls) {
-      it(`${film.killer.name} / ${film.location.name} / ${fg.name}`, () => {
+      it(`${film.killer.name} / ${homeLocation(film).name} / ${fg.name}`, () => {
         for (let seed = 1; seed <= 25; seed++) {
-          const g0 = newGame({ killer: film.killer.id, location: film.location.id, finalGirl: fg.id, board: seed % 5 ? 'normal' : 'extreme', seed, bonusItems: seed % 2 === 0, epicDarkPower: seed % 7 === 0 });
+          const g0 = newGame({ killer: film.killer.id, location: homeLocation(film).id, finalGirl: fg.id, board: seed % 5 ? 'normal' : 'extreme', seed, bonusItems: seed % 2 === 0, epicDarkPower: seed % 7 === 0 });
           const { g } = playOut(g0, seed * 31);
           expect(g.outcome, `seed ${seed} turn ${g.turn}`).toBeTruthy();
         }

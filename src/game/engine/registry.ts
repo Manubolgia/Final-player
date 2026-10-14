@@ -1,7 +1,7 @@
 // Extension points the film modules plug into.
 
-import type { CardId, ItemDef, ZoneId } from '../types';
-import type { Frame, GameState, ItemAction, ItemInst, MoveMode, RollPurpose, Victim } from './state';
+import type { CardId, ItemDef, KillerActionDef, ZoneId } from '../types';
+import type { Frame, GameState, ItemAction, ItemInst, Minion, MoveMode, RollPurpose, Src, Victim } from './state';
 
 export interface ItemHandler {
   /** What the item offers in the Action Phase menu. */
@@ -52,3 +52,12 @@ export const afterRoll: ((g: GameState, dice: number[], successes: number, p: Ro
 
 /** Something to ask before a Terror card resolves (e.g. a Crucifix). Return true if it pushed a question. */
 export const beforeTerror: ((g: GameState, card: string) => boolean)[] = [];
+
+/** A killer with no body (the Birds) handles killer actions its own way. Return true if handled. */
+export const killerActionOverrides: ((g: GameState, a: KillerActionDef, src: Src) => boolean)[] = [];
+
+/** "The Killer appears in…" for a killer with no body. Return true if handled. */
+export const placeKillerOverrides: ((g: GameState, zone: ZoneId) => boolean)[] = [];
+
+/** A minion was destroyed. */
+export const minionDestroyed: ((g: GameState, m: Minion) => void)[] = [];

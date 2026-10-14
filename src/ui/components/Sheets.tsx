@@ -6,6 +6,7 @@ import { eventDef, itemDef, terrorDef, zoneDef, zoneName } from '../../game/engi
 import { victimName } from '../../game/engine/board';
 import { Close } from '../art/Icons';
 import { ActionCard } from './Cards';
+import { boilerView } from '../../game/films/maple';
 
 export function Sheet({ title, onClose, children }: { title: string; onClose: () => void; children: ReactNode }) {
   return (
@@ -29,7 +30,12 @@ export function KillerSheet({ g, onClose }: { g: GameState; onClose: () => void 
   const fin = k.finales.find((f) => f.id === g.killer.finale)!;
   return (
     <Sheet title={`${k.name}${k.title ? ` ${k.title}` : ''}`} onClose={onClose}>
-      {k.invulnerable ? (
+      {k.bodiless ? (
+        <p>
+          No body to hurt: <b>{g.minions.length}</b> birds on the board. Survivors saved <b>{g.film.birds?.saved ?? 0}</b> of {g.film.birds?.total ?? 2}
+          {g.film.birds?.hidden ? ` (still hiding: ${g.film.birds.hidden})` : ''}.
+        </p>
+      ) : k.invulnerable ? (
         <p>Can't be hurt or killed.</p>
       ) : (
         <p>
@@ -41,7 +47,7 @@ export function KillerSheet({ g, onClose }: { g: GameState; onClose: () => void 
       <div className="list">
         {[...k.bloodlust].map((sp, i) => ({ sp, i })).reverse().map(({ sp, i }) => (
           <div key={i} className="opt" style={i === g.killer.bloodlust ? { borderColor: 'var(--blood-hi)', background: '#3a1118' } : i < g.killer.bloodlust ? { opacity: 0.55 } : undefined}>
-            🔪 {sp.attack} · 👢 {sp.move}
+            {k.bodiless ? `${i + 1}` : `🔪 ${sp.attack} · 👢 ${sp.move}`}
             {sp.darkPower ? ' · DARK POWER' : ''}
             {sp.effects?.length ? ` · ${sp.effects.map((e) => (e.k === 'horror' ? `+${e.n} Horror` : e.k === 'event' ? 'draw an Event' : e.k)).join(', ')}` : ''}
             {loc.bloodlustTrack?.[i - 1]?.text ? <small>{loc.name}: {loc.bloodlustTrack[i - 1].text}</small> : null}
@@ -53,7 +59,11 @@ export function KillerSheet({ g, onClose }: { g: GameState; onClose: () => void 
         </div>
       </div>
       <h4>Killer action</h4>
-      <p>{g.killer.finaleRevealed ? `Finale (${fin.name}): ${describeAction(fin.action)}` : describeAction(k.action)}</p>
+      <p>
+        {g.killer.finaleRevealed
+          ? `Finale (${fin.name}): ${describeAction([...(fin.minionAction ?? []), ...fin.action])}`
+          : describeAction([...(k.minionAction ?? []), ...k.action])}
+      </p>
       {k.minion ? (
         <>
           <h4>{k.minion.plural}</h4>
@@ -79,6 +89,7 @@ export function KillerSheet({ g, onClose }: { g: GameState; onClose: () => void 
       <p>{g.killer.finaleRevealed ? <><b>{fin.name}.</b> {fin.text ?? ''}</> : `Face down until the Terror deck runs out (${g.terrorDeck.length} cards left).`}</p>
       {g.wrath.killer !== undefined && k.wrath ? <WrathBox title={k.wrath.name} level={g.wrath.killer} levels={k.wrath.levels} /> : null}
       {g.wrath.divine !== undefined && loc.wrath ? <WrathBox title={loc.wrath.name} level={g.wrath.divine} levels={loc.wrath.levels} /> : null}
+      <BoilerRoom g={g} />
       <h4>Special rules</h4>
       <p>{k.rules}</p>
       <p>
@@ -105,6 +116,37 @@ export function KillerSheet({ g, onClose }: { g: GameState; onClose: () => void 
   );
 }
 
+function BoilerRoom({ g }: { g: GameState }) {
+  const v = boilerView(g);
+  if (!v) return null;
+  const xs = v.cells.map((c) => c.x);
+  const ys = v.cells.map((c) => c.y);
+  const minX = Math.min(...xs);
+  const minY = Math.min(...ys);
+  const w = Math.max(...xs) - minX + 1;
+  const h = Math.max(...ys) - minY + 1;
+  const S = 34;
+  return (
+    <>
+      <h4>{g.film.maple?.asleep ? `Boiler Room: ${4 - v.left} of 4 cards revealed` : 'Boiler Room (you\'re awake)'}</h4>
+      {g.film.maple?.asleep ? (
+        <svg className="boiler" viewBox={`0 0 ${w * S} ${h * S}`} width={w * S} height={h * S} role="img" aria-label="Revealed Boiler Room cards">
+          {v.cells.map((c, i) => (
+            <g key={i} transform={`translate(${(c.x - minX) * S} ${(c.y - minY) * S})`}>
+              <rect x={1} y={1} width={S - 2} height={S - 2} rx={4} fill={c.card === 0 ? '#2a2026' : c.fright ? '#5a1520' : '#1d2a22'} stroke={c.card === 0 ? '#5d4a53' : '#3c5a48'} />
+              <text x={S / 2} y={S / 2 + 5} textAnchor="middle" fontSize={c.fright ? 18 : 11} fill={c.fright ? '#ff7043' : '#8da394'}>
+                {c.card === 0 ? '' : c.fright ? '☠' : c.card}
+              </text>
+            </g>
+          ))}
+        </svg>
+      ) : (
+        <p className="muted">Fall asleep and you start sliding through its 4 cards at the end of each Killer Phase.</p>
+      )}
+    </>
+  );
+}
+
 function WrathBox({ title, level, levels }: { title: string; level: number; levels: { text: string }[] }) {
   return (
     <>
@@ -122,11 +164,21 @@ function WrathBox({ title, level, levels }: { title: string; level: number; leve
   );
 }
 
+const CUSTOM_LABEL: Record<string, string> = {
+  'tb.spawn': 'spawn birds',
+  'tb.attack': 'the birds attack',
+  'gp.spawn': 'a Puppet comes out',
+  'gr.initialWrath': 'Killer Wrath +1 if it is 1–2',
+  'cm.toYou': 'appears in your space',
+  'cm.lostDraw': 'draw a Terror card (none left: you lose)',
+  'df.killTwo': '2 victims of your choice die',
+};
+
 function describeAction(list: import('../../game/types').Effect[]): string {
   return (
     list
       .map((e) => {
-        if (e.k !== 'killer') return e.k === 'bloodlust' ? `+${e.n} Bloodlust` : e.k === 'custom' ? 'special' : e.k;
+        if (e.k !== 'killer') return e.k === 'bloodlust' ? `+${e.n} Bloodlust` : e.k === 'custom' ? CUSTOM_LABEL[e.id.split(':')[0]] ?? 'special' : e.k;
         const t = { victim: 'closest victim', finalGirl: 'Final Girl', nearest: 'nearest', victimElseFG: 'closest victim (else you)', farthestVictim: 'farthest victim' }[e.a.target];
         const who = e.a.actor === 'minions' ? 'Minions: ' : '';
         return `${who}${t}${' ▸ move'.repeat(e.a.moves)}${' ▸ attack'.repeat(e.a.attacks)}`;

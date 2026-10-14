@@ -58,7 +58,7 @@ const TOKEN_GLYPH: Record<string, { label: string; color: string }> = {
   policeCar: { label: 'POLICE', color: '#5aa9ff' },
   mlFire: { label: 'FIRE', color: '#ff8a3c' },
   barrier: { label: 'BLOCKED', color: '#ff6b6b' },
-  bike: { label: 'BIKE', color: '#9be7ff' },
+  bicycle: { label: 'BIKE', color: '#9be7ff' },
   boobyTrap: { label: 'BOOBY', color: '#c9c9c9' },
   searched: { label: '✕', color: '#ff6b6b' },
   outOfOrder: { label: 'SIGN', color: '#f4c95d' },
@@ -292,10 +292,21 @@ export function MapView({ g, selectable = [], marked = [], onTap, fx, big }: Pro
         const p = P(z);
         return (
           <g key={`m-${z.id}`} pointerEvents="none">
-            {ms.slice(0, 4).map((m, i) => (
-              <rect key={m.id} x={p.x + 0.4 + i * 1.6} y={p.y + 0.6} width={1.4} height={2.2} rx={0.4} fill="#c7a6ff" stroke="#000" strokeWidth={0.25} />
-            ))}
-            {ms.length > 4 ? (
+            {g.film.birds
+              ? ms.slice(0, 3).map((m, i) => (
+                  <path
+                    key={m.id}
+                    transform={`translate(${p.x - 5.4 + i * 3.6} ${p.y - 6.2}) scale(1.45)`}
+                    d="M0 1.2 Q0.6 0 1.2 0.9 Q1.8 0 2.4 1.2 Q1.8 0.7 1.2 1.5 Q0.6 0.7 0 1.2Z"
+                    fill="#f5f7f8"
+                    stroke="#000"
+                    strokeWidth={0.22}
+                  />
+                ))
+              : ms.slice(0, 4).map((m, i) => (
+                  <rect key={m.id} x={p.x + 0.4 + i * 1.6} y={p.y + 0.6} width={1.4} height={2.2} rx={0.4} fill="#c7a6ff" stroke="#000" strokeWidth={0.25} />
+                ))}
+            {!g.film.birds && ms.length > 4 ? (
               <text x={p.x + 7} y={p.y + 2.6} fontSize={2.2} fill="#c7a6ff">
                 ×{ms.length}
               </text>
