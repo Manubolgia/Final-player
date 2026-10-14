@@ -6,7 +6,7 @@
 
 import { BONUS_ITEMS, finalGirlDef, killerDef, locationDef } from '../content';
 import type { Effect, EventDef, FinalGirlDef, ItemDef, KillerDef, LocationDef, TerrorDef, ZoneDef, ZoneId } from '../types';
-import type { Anim, Continuation, Frame, GameState, Input, Option, Src, Tone, Victim } from './state';
+import type { Anim, Continuation, Frame, GameState, Input, Option, Snap, Src, Tone, Victim } from './state';
 
 export type Status = 'continue' | 'wait' | 'done';
 
@@ -119,8 +119,28 @@ export const pick = <T>(g: GameState, arr: T[]): T => arr[Math.floor(rand(g) * a
 
 export function log(g: GameState, text: string, tone: Tone = 'info', anim?: Anim): void {
   const n = (g.log[g.log.length - 1]?.n ?? 0) + 1;
-  g.log.push({ n, turn: g.turn, phase: g.phase, text, tone, ...(anim ? { anim } : {}) });
+  g.log.push({ n, turn: g.turn, phase: g.phase, text, tone, ...(anim ? { anim } : {}), snap: takeSnap(g) });
   if (g.log.length > 400) g.log.splice(0, g.log.length - 400);
+}
+
+/** The board right now, for playback. */
+export function takeSnap(g: GameState): Snap {
+  return {
+    fz: g.fg?.zone ?? '',
+    kz: g.killer?.zone ?? '',
+    fhp: g.fg?.health.hp ?? 0,
+    ftok: g.fg?.health.token ?? 'black',
+    ft: g.fg?.time ?? 0,
+    fh: g.fg?.horror ?? 0,
+    khp: g.killer?.health.hp ?? 0,
+    ktok: g.killer?.health.token ?? 'black',
+    bl: g.killer?.bloodlust ?? 0,
+    td: g.terrorDeck?.length ?? 0,
+    saved: g.fg?.saved ?? 0,
+    dead: g.dead?.length ?? 0,
+    vic: (g.victims ?? []).map((v) => (v.role ? [v.id, v.zone, v.role] : [v.id, v.zone])),
+    min: (g.minions ?? []).map((m) => [m.id, m.zone, m.hp]),
+  };
 }
 
 export const uid = (g: GameState, prefix: string): string => `${prefix}${g.uid++}`;

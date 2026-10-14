@@ -1,0 +1,27 @@
+// Map tokens as printed chits: a short label and a fill.
+
+export const TOKEN_CHIT: Record<string, { label: string; fill: string; ink?: string }> = {
+  bearTrap: { label: 'TRAP', fill: '#c9a46a' },
+  fireworks: { label: 'FIREWORKS', fill: '#f2c230' },
+  motorboat: { label: 'BOAT', fill: '#efe6d2' },
+  darkWaters: { label: 'DARK WATERS', fill: '#1e1a1b', ink: '#efe6d2' },
+  tunnel: { label: 'TUNNEL', fill: '#c9a46a' },
+  skull: { label: 'DEATH', fill: '#1e1a1b', ink: '#efe6d2' },
+  helicopter: { label: 'HELI', fill: '#efe6d2' },
+  brokenLadder: { label: 'BROKEN', fill: '#b3161b', ink: '#f7f1e3' },
+  ropeLadder: { label: 'ROPE', fill: '#c9a46a' },
+  padlock: { label: 'LOCK', fill: '#d4a12a' },
+  closed: { label: 'CLOSED', fill: '#b3161b', ink: '#f7f1e3' },
+  fireBrimstone: { label: 'BRIMSTONE', fill: '#e8742a' },
+  sacredGround: { label: 'SACRED', fill: '#d4a12a' },
+  acidTrap: { label: 'ACID', fill: '#a9b04a' },
+  netTrap: { label: 'NET', fill: '#c9a46a' },
+  sawTrap: { label: 'SAWS', fill: '#c9a46a' },
+  golfCart: { label: 'CART', fill: '#f2c230' },
+  policeCar: { label: 'POLICE', fill: '#3a7bd5', ink: '#f7f1e3' },
+  mlFire: { label: 'FIRE', fill: '#e8742a' },
+  barrier: { label: 'BLOCKED', fill: '#b3161b', ink: '#f7f1e3' },
+  bicycle: { label: 'BIKE', fill: '#efe6d2' },
+  boobyTrap: { label: 'BOOBY TRAP', fill: '#c9a46a' },
+  outOfOrder: { label: 'OUT OF ORDER', fill: '#d4a12a' },
+};

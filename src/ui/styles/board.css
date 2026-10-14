@@ -1,0 +1,181 @@
+/* The Location board: a printed board in a bone frame. */
+
+.board {
+  position: relative;
+  display: grid;
+  grid-template-rows: 44px minmax(0, 1fr);
+  min-height: 0;
+  min-width: 0;
+  padding: 4px;
+  background: var(--bone);
+  border: 2px solid var(--ink);
+  border-radius: 8px;
+  box-shadow: 0 3px 0 var(--bone-edge), 0 5px 0 var(--ink);
+}
+.board-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 2px 4px;
+  min-width: 0;
+}
+.board-head .chit {
+  width: 38px;
+  height: 38px;
+}
+.tape {
+  font: 400 21px/1 var(--f-vcr);
+  color: var(--ink);
+  text-transform: uppercase;
+  white-space: nowrap;
+  letter-spacing: 0.02em;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+.tape .ico {
+  width: 12px;
+  height: 12px;
+}
+.sleeves {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+  min-width: 0;
+  overflow: hidden;
+}
+.sleeve {
+  appearance: none;
+  width: 24px;
+  height: 32px;
+  border: 2px solid var(--ink);
+  border-radius: 3px;
+  padding: 0;
+  transform: rotate(-3deg);
+  box-shadow: 2px 2px 0 var(--ink);
+  cursor: pointer;
+  position: relative;
+  flex: none;
+}
+.sleeve::after {
+  content: '';
+  position: absolute;
+  inset: -8px -4px;
+}
+.sleeve.event {
+  background: var(--event, var(--kraft));
+}
+.sleeve.terror {
+  background: var(--black-stock);
+}
+.sleeve.terror::before {
+  content: '';
+  position: absolute;
+  left: -2px;
+  right: -2px;
+  top: 11px;
+  height: 6px;
+  background: var(--blood);
+  transform: rotate(-35deg);
+}
+.sleeve-more {
+  font: 700 13px/1 var(--f-narrow);
+  color: var(--ink);
+}
+.board-map {
+  position: relative;
+  min-height: 0;
+  min-width: 0;
+  overflow: hidden;
+  border: 2px solid var(--ink);
+  border-radius: 4px;
+  background: var(--ground);
+}
+.board-map.zoomed .board-svg {
+  touch-action: none;
+}
+.board-svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  touch-action: manipulation;
+  cursor: pointer;
+}
+.board-svg .zlabel text {
+  font: 700 11px/1 var(--f-narrow);
+  fill: var(--bone);
+  letter-spacing: 0.02em;
+}
+.board-svg .deck-n {
+  font: 700 11px/1 var(--f-narrow);
+  fill: var(--ink);
+}
+.board-svg .chit-t,
+.board-svg .tile-t {
+  font: 700 11px/1 var(--f-narrow);
+  fill: var(--ink);
+}
+.board-svg .lit-ring {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: lit 1.2s ease-in-out infinite alternate;
+}
+@keyframes lit {
+  from {
+    transform: scale(1);
+  }
+  to {
+    transform: scale(1.1);
+  }
+}
+.board-svg .tok {
+  transition: transform 240ms cubic-bezier(0.3, 1.25, 0.5, 1);
+}
+.board-svg .tip {
+  transform-box: fill-box;
+  transform-origin: 50% 90%;
+  animation: tip 320ms ease-in forwards;
+}
+@keyframes tip {
+  to {
+    transform: rotate(90deg);
+  }
+}
+.board-svg .trail {
+  animation: trailfade 900ms steps(3) forwards;
+}
+@keyframes trailfade {
+  0%,
+  60% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0.3;
+  }
+}
+
+/* landscape: a tool edge down the left instead of a header */
+@media (orientation: landscape) and (max-height: 560px) {
+  .board {
+    grid-template-rows: minmax(0, 1fr);
+    grid-template-columns: 46px minmax(0, 1fr);
+  }
+  .board-head {
+    flex-direction: column;
+    padding: 0 4px 0 0;
+    gap: 6px;
+    justify-content: flex-start;
+  }
+  .board-head .tape {
+    margin-top: auto;
+    flex-direction: column;
+    font-size: 18px;
+    gap: 0;
+  }
+  .board-head .sleeves {
+    flex-direction: column;
+  }
+  .board-head .spacer {
+    display: none;
+  }
+}

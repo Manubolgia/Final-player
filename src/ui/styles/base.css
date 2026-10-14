@@ -1,0 +1,123 @@
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+  height: 100%;
+  overflow: hidden;
+  overscroll-behavior: none;
+  background: #4a3324;
+}
+body {
+  margin: 0;
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  overscroll-behavior: none;
+  font: 500 16px/1.35 var(--f-ui);
+  color: var(--chalk);
+  font-synthesis: none;
+  -webkit-tap-highlight-color: transparent;
+  background: var(--table);
+}
+#root,
+.app {
+  position: fixed;
+  inset: 0;
+}
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  touch-action: manipulation;
+}
+.app,
+.app * {
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+}
+.selectable,
+.selectable * {
+  -webkit-user-select: text;
+  user-select: text;
+}
+img,
+svg {
+  -webkit-user-drag: none;
+}
+button {
+  font: inherit;
+  color: inherit;
+  margin: 0;
+}
+:focus:not(:focus-visible) {
+  outline: none;
+}
+:focus-visible {
+  outline: 3px solid var(--victim);
+  outline-offset: 2px;
+}
+h1,
+h2,
+h3,
+h4,
+p {
+  margin: 0;
+}
+.num {
+  font-variant-numeric: tabular-nums;
+}
+.scroll-y {
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  touch-action: pan-y;
+  -webkit-overflow-scrolling: touch;
+}
+.scroll-x {
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  touch-action: pan-x;
+  scrollbar-width: none;
+}
+.scroll-x::-webkit-scrollbar {
+  display: none;
+}
+:root {
+  --sa-t: var(--mnbg-safe-top, env(safe-area-inset-top, 0px));
+  --sa-r: var(--mnbg-safe-right, env(safe-area-inset-right, 0px));
+  --sa-b: var(--mnbg-safe-bottom, env(safe-area-inset-bottom, 0px));
+  --sa-l: var(--mnbg-safe-left, env(safe-area-inset-left, 0px));
+  --gut: 12px;
+  --pad-t: max(var(--sa-t), 8px);
+  --pad-b: max(var(--sa-b), 8px);
+  --pad-l: max(var(--sa-l), var(--gut));
+  --pad-r: max(var(--sa-r), var(--gut));
+  --body: 16px;
+  --tray-h4: 16px;
+}
+html[data-text='large'] {
+  --tray-h4: 18px;
+  --body: 17px;
+}
+.app {
+  background-color: var(--table);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='60'%3E%3Cpath d='M0 12c40-6 80 6 120 0s80-6 120 0M0 31c50 5 90-4 130 2s70 3 110-2M0 49c30-4 70 4 120 1s90-3 120 1' fill='none' stroke='%2357402D' stroke-width='2'/%3E%3C/svg%3E");
+  color: var(--chalk);
+}
+.app.finale {
+  background-color: var(--table-deep);
+}
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+.muted {
+  color: var(--ink-2);
+}
+.on-table .muted,
+.muted.chalk {
+  color: var(--chalk-2);
+}

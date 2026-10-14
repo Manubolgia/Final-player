@@ -27,13 +27,37 @@ export interface Prefs {
   last?: Partial<GameConfig>;
   speed: 'slow' | 'normal' | 'fast';
   seenHelp?: boolean;
+  sound: boolean;
+  haptics: boolean;
+  awake: boolean;
+  text: 'normal' | 'large';
+  hand: 'right' | 'left';
+  /** Show every panic arrow number on the board. */
+  panicAll: boolean;
+  seenSideways?: boolean;
+  seenInstall?: boolean;
+  /** Films played at least once. */
+  played: string[];
+  /** First-run tips already shown. */
+  tips: string[];
 }
 
-export function loadPrefs(): Prefs {
+const reducedMotion = (): boolean => {
   try {
-    return { speed: 'normal', ...(JSON.parse(localStorage.getItem(PREFS) ?? '{}') as Partial<Prefs>) };
+    return matchMedia('(prefers-reduced-motion: reduce)').matches;
   } catch {
-    return { speed: 'normal' };
+    return false;
+  }
+};
+
+export const DEFAULT_PREFS: Prefs = { speed: 'normal', sound: true, haptics: true, awake: true, text: 'normal', hand: 'right', panicAll: false, played: [], tips: [] };
+
+export function loadPrefs(): Prefs {
+  const base = { ...DEFAULT_PREFS, speed: reducedMotion() ? 'fast' : 'normal' } as Prefs;
+  try {
+    return { ...base, ...(JSON.parse(localStorage.getItem(PREFS) ?? '{}') as Partial<Prefs>) };
+  } catch {
+    return base;
   }
 }
 

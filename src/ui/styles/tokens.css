@@ -1,0 +1,50 @@
+:root {
+  /* the table */
+  --table: #4a3324;
+  --table-grain: #57402d;
+  --table-deep: #2e2017;
+  --chalk: #f3ebdd;
+  --chalk-2: #cbbfa8;
+
+  /* print and stock */
+  --ink: #141213;
+  --ink-2: #5b524a;
+  --bone: #efe6d2;
+  --bone-2: #dccfb4;
+  --bone-edge: #c8bc9f;
+  --paper: #f7f1e3;
+  --paper-edge: #d8cdb5;
+  --black-stock: #1e1a1b;
+  --black-stock-2: #2c2627;
+  --on-black: #efe6d2;
+  --on-black-2: #a89f8e;
+  --kraft: #c9a46a;
+  --kraft-edge: #94733f;
+
+  /* components */
+  --blood: #b3161b;
+  --blood-edge: #6e0b0f;
+  --killer: #c1272d;
+  --girl: #6e46a0;
+  --girl-edge: #432a63;
+  --victim: #f2c230;
+  --victim-edge: #a8821a;
+  --sv-white: #f4f1ea;
+  --sv-orange: #e8742a;
+  --sv-blue: #3a7bd5;
+  --sv-green: #5e9c4a;
+  --time: #2f6db5;
+  --gold: #d4a12a;
+  --wrench: #e8742a;
+  --exit: #3e7a3a;
+  --dp: #7a0e12;
+  --scrim: rgb(20 18 19 / 0.55);
+
+  /* fonts */
+  --f-display: 'Anton', Impact, 'Arial Narrow Bold', sans-serif;
+  --f-ui: 'Archivo', system-ui, sans-serif;
+  --f-narrow: 'Archivo Narrow', 'Arial Narrow', sans-serif;
+  --f-script: 'Courier Prime', 'Courier New', monospace;
+  --f-marker: 'Permanent Marker', 'Comic Sans MS', cursive;
+  --f-vcr: 'VT323', ui-monospace, monospace;
+}

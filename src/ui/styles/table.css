@@ -1,0 +1,206 @@
+/* The game table: one grid, two orientations. Nothing remounts on rotation;
+   only the grid areas move. The board never changes size during play. */
+
+.game {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  gap: 6px;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: 62px minmax(0, 1fr) 70px 252px;
+  grid-template-areas: 'killer' 'board' 'girl' 'tray';
+  padding: calc(var(--pad-t) + 2px) var(--pad-r) var(--pad-b) var(--pad-l);
+}
+.game > .panel.killer {
+  grid-area: killer;
+}
+.game > .board {
+  grid-area: board;
+}
+.game > .panel.girl {
+  grid-area: girl;
+}
+.dock {
+  display: contents;
+}
+.dock > .tray {
+  grid-area: tray;
+  min-height: 0;
+  min-width: 0;
+  display: grid;
+  grid-template-rows: 26px minmax(0, 1fr) 54px;
+  gap: 8px;
+  position: relative;
+  z-index: 6;
+}
+.dock > .stage {
+  grid-area: board;
+  position: relative;
+  z-index: 5;
+  pointer-events: none;
+  min-height: 0;
+  min-width: 0;
+}
+.dock > .stage > * {
+  pointer-events: auto;
+}
+
+@media (orientation: portrait) and (max-height: 700px) {
+  .game {
+    grid-template-rows: 58px minmax(0, 1fr) 66px 226px;
+  }
+}
+@media (orientation: portrait) and (min-height: 900px) {
+  .game {
+    grid-template-rows: 66px minmax(0, 1fr) 74px 272px;
+  }
+}
+
+@media (orientation: landscape) and (max-height: 560px) {
+  .game {
+    grid-template-columns: minmax(0, 1fr) clamp(286px, 37vw, 360px);
+    grid-template-rows: 66px 66px minmax(0, 1fr);
+    grid-template-areas: 'board killer' 'board girl' 'board tray';
+    column-gap: 10px;
+    row-gap: 6px;
+    padding: 6px var(--pad-r) max(var(--sa-b), 6px) var(--pad-l);
+  }
+  .game.left-handed {
+    grid-template-columns: clamp(286px, 37vw, 360px) minmax(0, 1fr);
+    grid-template-areas: 'killer board' 'girl board' 'tray board';
+  }
+  .dock > .tray {
+    grid-template-rows: 22px minmax(0, 1fr) 50px;
+    gap: 6px;
+  }
+}
+@media (min-width: 900px) and (min-height: 561px) {
+  .game {
+    grid-template-columns: minmax(0, 1fr) 400px;
+    grid-template-rows: 74px 78px minmax(0, 1fr);
+    grid-template-areas: 'board killer' 'board girl' 'board tray';
+    column-gap: 14px;
+  }
+}
+
+/* tray parts */
+.tray > .tray-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+.tray > .tray-head h4 {
+  font: 600 var(--tray-h4) / 1.1 var(--f-ui);
+  color: var(--chalk);
+  flex: 1;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.tray > .tray-head .meta {
+  font: 500 14px/1 var(--f-ui);
+  color: var(--chalk-2);
+  white-space: nowrap;
+}
+.tray > .tray-area {
+  min-height: 0;
+  min-width: 0;
+  position: relative;
+}
+.tray > .keys {
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+  min-width: 0;
+}
+.tray > .keys .grow,
+.grow {
+  flex: 1;
+  min-width: 0;
+}
+.tray > .keys .btn {
+  flex: none;
+}
+.tray > .keys .btn.primary {
+  flex: 1 1 auto;
+  max-width: 260px;
+  margin-left: auto;
+}
+.tray.merged {
+  grid-template-rows: 26px minmax(0, 1fr);
+}
+@media (orientation: landscape) and (max-height: 560px) {
+  .tray.merged {
+    grid-template-rows: 22px minmax(0, 1fr);
+  }
+  .tray > .tray-head h4 {
+    font-size: 15px;
+  }
+  .tray > .keys .btn {
+    min-height: 44px;
+    font-size: 14px;
+  }
+  .tray > .keys .btn.primary {
+    min-height: 48px;
+    font-size: 16px;
+  }
+}
+
+.hint {
+  font: 500 14px/1.3 var(--f-ui);
+  color: var(--chalk-2);
+}
+
+/* a pressed-down shake when you get hit */
+.game.shake {
+  animation: shake 300ms steps(6) both;
+}
+@keyframes shake {
+  0%,
+  100% {
+    transform: translate(0, 0);
+  }
+  20% {
+    transform: translate(-6px, 2px);
+  }
+  40% {
+    transform: translate(5px, -2px);
+  }
+  60% {
+    transform: translate(-4px, 1px);
+  }
+  80% {
+    transform: translate(3px, 0);
+  }
+}
+
+/* the stage: things lifted off the table, over the board */
+.stage .scrim {
+  position: absolute;
+  inset: 0;
+  background: var(--scrim);
+  border-radius: 8px;
+}
+.stage .mat {
+  position: absolute;
+  inset: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+}
+.slip {
+  background: var(--paper);
+  color: var(--ink);
+  border: 2px solid var(--ink);
+  border-radius: 4px;
+  box-shadow: 3px 3px 0 var(--ink);
+  font: 400 15px/1.35 var(--f-script);
+  padding: 10px 12px;
+}
+.slip b,
+.slip strong {
+  font-weight: 700;
+}

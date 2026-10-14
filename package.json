@@ -17,8 +17,13 @@
     "sim:smart": "tsx scripts/smartsim.ts"
   },
   "dependencies": {
-    "@fontsource/barlow-condensed": "^5.3.0",
-    "@fontsource/creepster": "^5.3.0",
+    "@fontsource/anton": "5.3.0",
+    "@fontsource/archivo": "5.3.0",
+    "@fontsource/archivo-narrow": "5.3.0",
+    "@fontsource/courier-prime": "5.3.0",
+    "@fontsource/permanent-marker": "5.3.0",
+    "@fontsource/vt323": "5.3.0",
+    "ios-haptics": "3.2.0",
     "react": "^19.2.0",
     "react-dom": "^19.2.0"
   },

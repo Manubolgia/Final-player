@@ -83,6 +83,24 @@ export type Anim =
   | { kind: 'victimDie'; zone: ZoneId }
   | { kind: 'card'; deck: 'terror' | 'event' | 'darkPower' | 'finale' | 'item'; id: string };
 
+/** The board as it stood right after a log entry, so playback can show each moment. */
+export interface Snap {
+  fz: ZoneId;
+  kz: ZoneId;
+  fhp: number;
+  ftok: 'black' | 'white';
+  ft: number;
+  fh: number;
+  khp: number;
+  ktok: 'black' | 'white';
+  bl: number;
+  td: number;
+  saved: number;
+  dead: number;
+  vic: [string, ZoneId, SpecialRole?][];
+  min: [string, ZoneId, number][];
+}
+
 export interface LogEntry {
   n: number;
   turn: number;
@@ -90,6 +108,8 @@ export interface LogEntry {
   text: string;
   tone: Tone;
   anim?: Anim;
+  /** Only on the entries the latest input produced. */
+  snap?: Snap;
 }
 
 export interface Option {

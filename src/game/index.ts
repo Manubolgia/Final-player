@@ -20,6 +20,8 @@ export type * from './engine/state';
 /** Apply one player input to a copy of the state. */
 export function act(g: GameState, inp: Input): GameState {
   const next = structuredClone(g);
+  // Only the entries this input produces keep their snapshots (for playback).
+  for (const e of next.log) delete e.snap;
   respond(next, inp);
   return next;
 }
