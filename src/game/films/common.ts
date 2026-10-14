@@ -6,7 +6,7 @@ import { distances, exits, killVictim, moveVictim, shortestPaths, victimsIn } fr
 import { attackTargets, pushKillerAction, weaponRange } from '../engine/combat';
 import { rollDone, startRoll } from '../engine/dice';
 import { discardItem, spendUse } from '../engine/effects';
-import { answers, choose, customs, gotoPhase, has, hooks, itemDef, K, L, log, plural, push, pushFx, terrorDef, zoneDef, zoneName } from '../engine/kernel';
+import { answers, choose, customs, gotoPhase, has, hooks, itemDef, K, L, log, plural, push, pushFx, terrorDef, theItem, zoneDef, zoneName } from '../engine/kernel';
 import { assignRole, eventSetups } from '../engine/phases';
 import { itemHandlers, ultimates } from '../engine/registry';
 import type { GameState, ItemInst } from '../engine/state';
@@ -89,11 +89,11 @@ itemHandlers['item.map'] = {
       if (!deck?.length) continue;
       if (!deck[0].up) {
         deck[0].up = true;
-        log(g, `Map: ${zoneName(g, d)} shows the ${itemDef(g, deck[0].id).name}.`, 'info', { kind: 'card', deck: 'item', id: deck[0].id });
+        log(g, `Map: ${zoneName(g, d)} shows ${theItem(g, deck[0].id)}.`, 'info', { kind: 'card', deck: 'item', id: deck[0].id });
       } else if (deck.length > 1) {
         choose(
           g,
-          `Map: remove the ${itemDef(g, deck[0].id).name} from ${zoneName(g, d)} and turn up the next one?`,
+          `Map: remove ${theItem(g, deck[0].id)} from ${zoneName(g, d)} and turn up the next one?`,
           [
             { id: 'yes', label: 'Yes' },
             { id: 'no', label: 'No' },
@@ -111,7 +111,7 @@ answers.mapRemove = (g, id, data: { deck: string }) => {
   if (out) g.itemDiscard.push(out.id);
   if (deck[0]) {
     deck[0].up = true;
-    log(g, `Map: the ${itemDef(g, out!.id).name} is gone; ${zoneName(g, data.deck)} now shows the ${itemDef(g, deck[0].id).name}.`, 'info', { kind: 'card', deck: 'item', id: deck[0].id });
+    log(g, `Map: ${theItem(g, out!.id)} is gone; ${zoneName(g, data.deck)} now shows ${theItem(g, deck[0].id)}.`, 'info', { kind: 'card', deck: 'item', id: deck[0].id });
   }
 };
 
@@ -218,7 +218,7 @@ itemHandlers['item.bow'] = {
   },
   use(g, it) {
     addTime(g, -bowCost(it));
-    log(g, `You loose an arrow with the ${itemDef(g, it.id).name}.`);
+    log(g, `You loose an arrow with ${theItem(g, it.id)}.`);
     spendUse(g, it.uid);
     pushFx(g, [{ k: 'damage', n: itemDef(g, it.id).damage ?? 1 }], { kind: 'item', id: it.id, weapon: it.uid });
   },

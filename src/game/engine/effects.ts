@@ -4,6 +4,7 @@ import { closestVictims, distances, killVictim, moveVictim, panicVictims, placeV
 import { fgDealDamage, pushKillerAction } from './combat';
 import {
   answers,
+  cap,
   choose,
   customs,
   d6,
@@ -17,6 +18,7 @@ import {
   plural,
   push,
   runCustom,
+  theItem,
   topOf,
   uid,
   zoneDef,
@@ -258,7 +260,7 @@ export function discardItem(g: GameState, uidv: string): void {
   for (const guard of discardGuards) if (guard(g, it)) return;
   g.fg.items = g.fg.items.filter((i) => i !== it);
   g.itemDiscard.push(it.id);
-  log(g, `The ${itemDef(g, it.id).name} is discarded.`);
+  log(g, `${cap(theItem(g, it.id))} is discarded.`);
   runCustom(g, 'itemDiscarded', { id: it.id }, { kind: 'system' });
 }
 
@@ -336,9 +338,9 @@ frames.search = {
       const trap = f.drawn.find((id) => itemDef(g, id).trap);
       if (trap) {
         f.drawn = f.drawn.filter((id) => id !== trap);
-        if (has(g, 'ult.asami')) log(g, `Asami spots the ${itemDef(g, trap).name} and leaves it.`, 'good');
+        if (has(g, 'ult.asami')) log(g, `Asami spots ${theItem(g, trap)} and leaves it.`, 'good');
         else if (f.zappo) {
-          log(g, `Zappo sets off the ${itemDef(g, trap).name} and runs off screaming. The trap does nothing.`, 'bad');
+          log(g, `Zappo sets off ${theItem(g, trap)} and runs off screaming. The trap does nothing.`, 'bad');
           const z = g.fg.items.find((i) => i.id === 'zappo');
           if (z) discardItem(g, z.uid);
         } else runCustom(g, 'cn.trapItem', { id: trap }, { kind: 'system' });
@@ -380,7 +382,7 @@ frames.arrange = {
     if (chosen.reduce((s, i) => s + itemDef(g, i.id).hands, 0) > 2) throw new Error('You only have two hands');
     for (const it of [...g.fg.items]) {
       if (itemDef(g, it.id).noBackpack && !inp.inHands.includes(it.uid) && itemDef(g, it.id).hands > 0) {
-        log(g, `The ${itemDef(g, it.id).name} won't fit in a backpack: it's discarded.`, 'bad');
+        log(g, `${cap(theItem(g, it.id))} won't fit in a backpack: it's discarded.`, 'bad');
         discardItem(g, it.uid);
       }
     }

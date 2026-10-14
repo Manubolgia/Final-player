@@ -7,7 +7,7 @@ import { beforePlay, onUltimate, panicMoves, rescuable } from '../engine/actionP
 import { adjacent, closestVictims, distances, exits, killVictim, moveVictim, panicVictims, shortestPaths, victimsIn } from '../engine/board';
 import { attackStoppers, damageMinions } from '../engine/combat';
 import { discardGuards, discardItem, drawTerror, gainItem, placeKiller } from '../engine/effects';
-import { answers, choose, customs, d6, endGame, FG, has, hooks, itemDef, K, L, log, pick, plural, push, pushFx, shuffle, terrorDef, usableItems, zoneDef, zoneName } from '../engine/kernel';
+import { answers, choose, customs, d6, endGame, FG, has, hooks, itemDef, K, L, log, pick, plural, push, pushFx, shuffle, terrorDef, theItem, usableItems, zoneDef, zoneName } from '../engine/kernel';
 import { eventSetups } from '../engine/phases';
 import { afterRoll, beforeTerror, costMods, diceMods, itemHandlers, moveFilters, rescueSpaces } from '../engine/registry';
 import { setupHooks } from '../engine/setup';
@@ -276,7 +276,7 @@ customs['cm.nothing'] = (g) => {
     if (!deck.length) continue;
     const cards = shuffle(g, deck.map((c) => c.id));
     g.itemDecks[d] = cards.map((c, i) => ({ id: c, up: i === 0 }));
-    log(g, `The ${zoneName(g, d)} deck is shuffled: the ${itemDef(g, cards[0]).name} is on top.`, 'killer', { kind: 'card', deck: 'item', id: cards[0] });
+    log(g, `The ${zoneName(g, d)} deck is shuffled: ${theItem(g, cards[0])} is on top.`, 'killer', { kind: 'card', deck: 'item', id: cards[0] });
     if (cards[0] === 'carolyn' || cards[0] === 'mrFloppy') found = true;
   }
   if (found) {
@@ -360,7 +360,7 @@ customs['cm.fake'] = (g) => {
     return;
   }
   const it = pick(g, its);
-  log(g, `It was fake: the ${itemDef(g, it.id).name} is discarded.`, 'bad');
+  log(g, `It was fake: ${theItem(g, it.id)} is discarded.`, 'bad');
   discardItem(g, it.uid);
 };
 
@@ -709,7 +709,7 @@ function rifle(discard: number): import('../engine/registry').ItemHandler {
     actions(g, it) {
       if (g.mods.usedThisTurn.includes(it.uid) || g.fg.hand.length < discard) return [];
       const enemiesHere = (!K(g).invulnerable && g.killer.zone === g.fg.zone) || g.minions.some((m) => m.zone === g.fg.zone);
-      return enemiesHere ? [{ action: 'shoot', label: `Fire the ${itemDef(g, it.id).name} (discard ${plural(discard, 'card')})` }] : [];
+      return enemiesHere ? [{ action: 'shoot', label: `Fire ${theItem(g, it.id)} (discard ${plural(discard, 'card')})` }] : [];
     },
     use(g, it) {
       g.mods.usedThisTurn.push(it.uid);

@@ -86,6 +86,12 @@ export function zoneDef(g: GameState, id: ZoneId): ZoneDef {
 export const zoneName = (g: GameState, id: ZoneId): string =>
   L(g).zones.find((z) => z.id === id)?.name ?? L(g).deckNames?.[id] ?? id;
 
+/** An item's name with "the" in front, unless it's someone (Carolyn) or someone's (Laurie's Bow). */
+export function theItem(g: GameState, id: string): string {
+  const name = itemDef(g, id).name;
+  return /'s |^(Carolyn|Mr\. Floppy|Zappo)/.test(name) ? name : `the ${name}`;
+}
+
 export const killerName = (g: GameState): string => K(g).name;
 export const fgName = (g: GameState): string => FG(g).name;
 

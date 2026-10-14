@@ -7,7 +7,7 @@ import { adjacent, closestVictims, placeVictims as placeVictimsAt, distances, di
 import { damageMinions } from '../engine/combat';
 import { rollDone, startRoll } from '../engine/dice';
 import { discardItem, drawTerror, placeKiller } from '../engine/effects';
-import { answers, choose, customs, d6, has, hooks, itemDef, K, L, log, pick, plural, push, pushFx, shuffle, terrorDef, uid, usableItems, zoneName } from '../engine/kernel';
+import { answers, cap, choose, customs, d6, has, hooks, itemDef, K, L, log, pick, plural, push, pushFx, shuffle, terrorDef, theItem, uid, usableItems, zoneName } from '../engine/kernel';
 import { assignRole, eventSetups, turnEnd } from '../engine/phases';
 import { afterRoll, beforeTerror, diceMods, extraActions, extraUses, itemHandlers, ultimates } from '../engine/registry';
 import type { GameState, Victim } from '../engine/state';
@@ -98,7 +98,7 @@ customs['cn.trapItem'] = (g, data: { id: string }) => {
   if (tape) {
     choose(
       g,
-      `Discard the Found Footage to cancel the ${itemDef(g, id).name}?`,
+      `Discard the Found Footage to cancel ${theItem(g, id)}?`,
       [
         { id: 'yes', label: 'Yes' },
         { id: 'no', label: 'No: it goes off' },
@@ -218,7 +218,7 @@ customs['cn.support'] = (g) => {
   const mine = g.fg.items.filter((i) => i.id !== 'carolyn');
   if (mine.length) {
     const it = pick(g, mine);
-    log(g, `It was a prop: the ${itemDef(g, it.id).name} falls apart.`, 'bad');
+    log(g, `It was a prop: ${theItem(g, it.id)} falls apart.`, 'bad');
     return discardItem(g, it.uid);
   }
   const d = distances(g, g.fg.zone, 'fg');
@@ -234,7 +234,7 @@ function burnTop(g: GameState, deck: string): void {
   if (!c) return;
   g.itemDiscard.push(c.id);
   if (g.itemDecks[deck][0]) g.itemDecks[deck][0].up = true;
-  log(g, `The ${itemDef(g, c.id).name} from ${zoneName(g, deck)} is discarded.`, 'bad');
+  log(g, `${cap(theItem(g, c.id))} from ${zoneName(g, deck)} is discarded.`, 'bad');
 }
 answers.cnDeckTop = (g, d) => burnTop(g, d);
 
