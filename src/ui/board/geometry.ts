@@ -104,17 +104,66 @@ export function segDist(p: Pt, a: Pt, b: Pt): number {
   return Math.hypot(p.x - (a.x + t * dx), p.y - (a.y + t * dy));
 }
 
-let measureCtx: CanvasRenderingContext2D | null = null;
-/** Width of text in screen px for a CSS font shorthand. */
-export function textWidth(text: string, font: string): number {
-  try {
-    measureCtx ??= document.createElement('canvas').getContext('2d');
-    if (measureCtx) {
-      measureCtx.font = font;
-      return measureCtx.measureText(text).width;
-    }
-  } catch {
-    // no canvas (tests): estimate
+/**
+ * Advance widths of Archivo Narrow 700 at 1px (measured from the bundled
+ * font). Text is measured from this table, not a canvas, so the layout is
+ * the same in the browser and in tests, before or after the font loads.
+ */
+const NARROW: Record<string, number> = {
+  A: 0.59, B: 0.59, C: 0.59, D: 0.59, E: 0.55, F: 0.5, G: 0.64, H: 0.59, I: 0.23, J: 0.46, K: 0.59, L: 0.5, M: 0.68,
+  N: 0.59, O: 0.64, P: 0.55, Q: 0.64, R: 0.59, S: 0.55, T: 0.5, U: 0.59, V: 0.55, W: 0.77, X: 0.55, Y: 0.55, Z: 0.5,
+  ' ': 0.23, "'": 0.19, '(': 0.27, ')': 0.27, '-': 0.27, ',': 0.23, '.': 0.23, '&': 0.59, '+': 0.48, '/': 0.23,
+};
+
+/** Width in screen px of UPPER-CASE Archivo Narrow 700 text at `size` px, with `track` em letter-spacing. */
+export function textWidth(text: string, size = 11, track = 0.02): number {
+  let w = 0;
+  for (const ch of text) w += NARROW[ch] ?? (ch >= '0' && ch <= '9' ? 0.46 : 0.55);
+  return (w + track * text.length) * size;
+}
+
+/** A closed (or open) Catmull-Rom spline through the points, as an SVG path. */
+export function smoothPath(pts: Pt[], closed = true, tension = 0.5): string {
+  const n = pts.length;
+  if (n < 3) return pts.map((p, i) => `${i ? 'L' : 'M'}${f(p.x)} ${f(p.y)}`).join('') + (closed ? 'Z' : '');
+  const at = (i: number) => (closed ? pts[(i + n) % n] : pts[Math.max(0, Math.min(n - 1, i))]);
+  let d = `M${f(pts[0].x)} ${f(pts[0].y)}`;
+  const last = closed ? n : n - 1;
+  for (let i = 0; i < last; i++) {
+    const p0 = at(i - 1);
+    const p1 = at(i);
+    const p2 = at(i + 1);
+    const p3 = at(i + 2);
+    const k = tension / 3;
+    d += `C${f(p1.x + (p2.x - p0.x) * k)} ${f(p1.y + (p2.y - p0.y) * k)} ${f(p2.x - (p3.x - p1.x) * k)} ${f(p2.y - (p3.y - p1.y) * k)} ${f(p2.x)} ${f(p2.y)}`;
   }
-  return text.length * 6.2;
+  return d + (closed ? 'Z' : '');
+}
+
+/** A polygon as an SVG path. */
+export const polyPath = (pts: Pt[], closed = true): string => pts.map((p, i) => `${i ? 'L' : 'M'}${f(p.x)} ${f(p.y)}`).join('') + (closed ? 'Z' : '');
+
+const f = (n: number) => (Math.round(n * 100) / 100).toString();
+
+/** Is the point inside the polygon? */
+export function inPoly(p: Pt, poly: Pt[]): boolean {
+  let inside = false;
+  for (let i = 0, j = poly.length - 1; i < poly.length; j = i++) {
+    const a = poly[i];
+    const b = poly[j];
+    if (a.y > p.y !== b.y > p.y && p.x < ((b.x - a.x) * (p.y - a.y)) / (b.y - a.y) + a.x) inside = !inside;
+  }
+  return inside;
+}
+
+/** Where segments ab and cd cross, if they do. */
+export function segCross(a: Pt, b: Pt, c: Pt, d: Pt): { p: Pt; t: number } | null {
+  const r = { x: b.x - a.x, y: b.y - a.y };
+  const s = { x: d.x - c.x, y: d.y - c.y };
+  const den = r.x * s.y - r.y * s.x;
+  if (Math.abs(den) < 1e-9) return null;
+  const t = ((c.x - a.x) * s.y - (c.y - a.y) * s.x) / den;
+  const v = ((c.x - a.x) * r.y - (c.y - a.y) * r.x) / den;
+  if (t < 0 || t > 1 || v < 0 || v > 1) return null;
+  return { p: { x: a.x + r.x * t, y: a.y + r.y * t }, t };
 }
