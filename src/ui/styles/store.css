@@ -290,6 +290,7 @@
   transition: transform 200ms cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 90ms cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 .vs-spine:active {
+  translate: 2px 2px;
   box-shadow: 1px 1px 0 var(--ink);
 }
 /* the tape you picked slides out of the stack */
@@ -963,6 +964,7 @@
   box-shadow: 3px 0 0 var(--ink);
 }
 .store.wide .vs-spine:active {
+  translate: 2px 0;
   box-shadow: 1px 0 0 var(--ink);
 }
 .store.wide .vs-spine.on {
@@ -1054,6 +1056,9 @@
   text-align: right;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+.vs-mix-alt {
+  display: none;
 }
 .store.wide .vs-vcr {
   flex: 1;
@@ -1246,6 +1251,66 @@
   .bb-mix {
     font-size: 13px;
     padding: 0 10px;
+  }
+}
+
+/* narrow landscape phones (iPhone SE sideways): a smaller logo, kickers
+   dropped from thin spines, and Mix & match moves to the shelf's key row */
+@media (orientation: landscape) and (max-height: 560px) and (max-width: 740px) {
+  .store.wide .logo {
+    font-size: 32px;
+  }
+  .store.wide .vs-brand {
+    padding-right: 80px;
+  }
+  .store.wide .vs-fan {
+    top: 4px;
+    font-size: 12px;
+    padding: 3px 6px 2px;
+  }
+  .store.wide .vs-spines {
+    gap: 6px;
+  }
+  .store.wide .vs-keys .vs-aisle-note,
+  .store.wide .bb-mix,
+  .store.wide .vs-vcr-slot {
+    display: none;
+  }
+  .store.wide .vs-keys .vs-mix-alt {
+    display: inline-flex;
+  }
+  .store.wide .vs-keys .btn {
+    padding: 0 12px;
+    font-size: 14px;
+  }
+}
+@container (max-width: 46px) {
+  .vs-kicker {
+    display: none;
+  }
+}
+
+/* tall tablets in portrait: bigger tapes, and the whole store sits centred */
+@media (orientation: portrait) and (min-width: 600px) and (min-height: 960px) {
+  .vs-front {
+    justify-content: center;
+    gap: 16px;
+  }
+  .vs-shelf {
+    flex: 0 0 auto;
+  }
+  .vs-spines {
+    max-height: none;
+    gap: 8px;
+  }
+  .vs-spine {
+    flex: 0 0 84px;
+  }
+  .vs-main {
+    font-size: 30px;
+  }
+  .vs-kicker {
+    font-size: 14px;
   }
 }
 

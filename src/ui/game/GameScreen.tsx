@@ -280,8 +280,8 @@ export function GameScreen({ g, startAt, setG, prefs, setPrefs, onQuit, onRestar
             : null;
 
   return (
-    <div className={`app game-app${g.killer.finaleRevealed ? ' finale' : ''}`}>
-      <div className={`game${shake ? ' shake' : ''}${opening ? ' opening' : ''}${waiting ? ' waiting' : ''}${prefs.hand === 'left' ? ' left-handed' : ''}`} style={boardVars(g)} data-phase={g.phase}>
+    <div className={`app game-app${g.killer.finaleRevealed ? ' finale' : ''}`} style={boardVars(g)}>
+      <div className={`game${shake ? ' shake' : ''}${opening ? ' opening' : ''}${waiting ? ' waiting' : ''}${prefs.hand === 'left' ? ' left-handed' : ''}`} data-phase={g.phase}>
         <KillerStrip g={g} view={view} onOpen={() => setSheet('killer')} />
         <div className="board">
           <div className="board-head">

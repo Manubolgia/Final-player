@@ -180,6 +180,10 @@ export function VideoStore({ prefs, setPrefs, saved, onContinue, onStart }: Vide
                   {showCoach ? <Coach compact onDismiss={dismissCoach} /> : inLibrary ? null : <span className="vs-aisle-note">{FILMS.length} tapes · 1 night</span>}
                 </>
               )}
+              {/* narrow landscape phones: the box back has no room for this key */}
+              <button type="button" className="btn vs-mix-alt" onClick={openMix}>
+                Mix &amp; match
+              </button>
               {inLibrary ? (
                 <button type="button" className="btn small dark vs-lib" onClick={backToLibrary}>
                   Back to the library
