@@ -13,7 +13,7 @@ export function Chev({ className = 'chev' }: { className?: string }) {
   );
 }
 
-const STEP = '▸';
+const STEP = '\u25B8'; // the step marker in the content text
 
 /** Rules text from the content files, with its step markers printed as chevrons. */
 export function Rich({ text }: { text: string }) {

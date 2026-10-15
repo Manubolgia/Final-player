@@ -547,7 +547,10 @@ html[data-text='large'] .sheet {
 }
 .sheet .coin.inl {
   display: inline-grid;
-  vertical-align: -6px;
+  width: 21px;
+  height: 21px;
+  margin: -4px 1px;
+  vertical-align: -1px;
 }
 
 /* the cube marker (Bloodlust, Wrath) */
@@ -1008,6 +1011,16 @@ html[data-text='large'] .sheet {
   justify-self: end;
   margin-right: 4px;
 }
+/* a flock has no attack or move numbers: no stats column */
+.sheet .bl-row:not(:has(> .bl-stats)) {
+  grid-template-columns: 38px minmax(0, 1fr) auto;
+}
+.sheet .bl-row:not(:has(> .bl-stats)) > .bl-fx {
+  grid-column: 2;
+}
+.sheet .bl-row:not(:has(> .bl-stats)) > .here {
+  grid-column: 3;
+}
 
 /* the Killer action, a mini card */
 .sheet .kcard {
@@ -1189,6 +1202,21 @@ html[data-text='large'] .sheet {
   display: flex;
   flex-direction: column;
   gap: 8px;
+}
+.sheet button.crow.tap {
+  padding-right: 34px;
+}
+.sheet button.crow.tap::after {
+  content: '';
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  margin-top: -7px;
+  width: 0;
+  height: 0;
+  border-top: 7px solid transparent;
+  border-bottom: 7px solid transparent;
+  border-left: 9px solid var(--s-ink-2);
 }
 .sheet .crow.tap.ev {
   border-left: 8px solid var(--event, #c9b98f);
