@@ -481,7 +481,7 @@ function MovePrompt({ g, p, send, bring, setBring, setPressed }: { g: GameState;
               <span className="hint">Nobody here to bring.</span>
             )}
           </div>
-          <div className="goto scroll-x">
+          <div className="goto scroll-y">
             {p.to.map((z) => (
               <button
                 key={z}
@@ -499,9 +499,6 @@ function MovePrompt({ g, p, send, bring, setBring, setPressed }: { g: GameState;
           </div>
         </div>
       </Tray>
-      <div className="stage">
-        <div className="moves-chip">MOVES LEFT {p.remaining}</div>
-      </div>
     </>
   );
 }

@@ -281,7 +281,12 @@ export function GameScreen({ g, startAt, setG, prefs, setPrefs, onQuit, onRestar
 
   return (
     <div className={`app game-app${g.killer.finaleRevealed ? ' finale' : ''}`} style={boardVars(g)}>
-      <div className={`game${shake ? ' shake' : ''}${opening ? ' opening' : ''}${waiting ? ' waiting' : ''}${prefs.hand === 'left' ? ' left-handed' : ''}`} data-phase={g.phase}>
+      <div
+        className={`game${shake ? ' shake' : ''}${opening ? ' opening' : ''}${waiting ? ' waiting' : ''}${prefs.hand === 'left' ? ' left-handed' : ''}`}
+        data-phase={g.phase}
+        // a tip peels off with your first real tap, which still goes through
+        onPointerDownCapture={tip ? () => setPrefs({ ...prefs, tips: [...seen, tip] }) : undefined}
+      >
         <KillerStrip g={g} view={view} onOpen={() => setSheet('killer')} />
         <div className="board">
           <div className="board-head">
@@ -329,10 +334,9 @@ export function GameScreen({ g, startAt, setG, prefs, setPrefs, onQuit, onRestar
         <GirlStrip g={g} view={view} onOpen={() => setSheet('girl')} />
         <Dock g={g} send={send} busy={playback} bring={bring} setBring={setBring} setPressed={setPressed} />
         {tip ? (
-          <button type="button" className={`tip-sticker ${tip}`} onClick={() => setPrefs({ ...prefs, tips: [...seen, tip] })}>
+          <div className={`tip-sticker ${tip}`} role="note">
             {TIPS[tip]}
-            <span className="tip-ok">Got it</span>
-          </button>
+          </div>
         ) : null}
       </div>
 

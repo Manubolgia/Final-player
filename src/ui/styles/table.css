@@ -264,55 +264,52 @@
   font: 700 12px/1 var(--f-narrow);
 }
 
-/* first-run tips: yellow paper stickers slapped on the table, tap to peel off */
+/* first-run tips: yellow paper stickers slapped on the table; the first real tap peels them off */
 .tip-sticker {
   z-index: 9;
   position: relative;
-  max-width: 250px;
-  padding: 9px 12px 8px;
+  height: max-content;
+  max-width: 230px;
+  padding: 7px 11px 6px;
   background: var(--victim);
   color: var(--ink);
   border: 2px solid var(--ink);
   border-radius: 4px;
   box-shadow: 3px 3px 0 var(--ink);
-  font: 400 17px/1.15 var(--f-marker);
+  font: 400 15px/1.15 var(--f-marker);
   text-align: left;
   transform: rotate(-2.5deg);
+  pointer-events: none;
   animation: slap 260ms cubic-bezier(0.2, 0.9, 0.3, 1.3) 200ms both;
-}
-.tip-sticker .tip-ok {
-  display: block;
-  margin-top: 4px;
-  font: 700 11px/1 var(--f-ui);
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
 }
 .tip-sticker::after {
   content: '';
   position: absolute;
-  width: 14px;
-  height: 14px;
+  width: 12px;
+  height: 12px;
   background: inherit;
   border: 2px solid var(--ink);
   border-top: 0;
   border-left: 0;
 }
+/* over the tray's title line, pointing down at the hand */
 .tip-sticker.hand {
   grid-area: tray;
   align-self: start;
   justify-self: center;
-  margin-top: 30px;
+  margin-top: -6px;
 }
 .tip-sticker.hand::after {
-  left: calc(50% - 7px);
-  bottom: -9px;
+  left: calc(50% - 6px);
+  bottom: -8px;
   transform: rotate(45deg);
 }
+/* top of the map, clear of the lit spaces near you */
 .tip-sticker.move {
   grid-area: board;
-  align-self: end;
+  align-self: start;
   justify-self: center;
-  margin-bottom: 14px;
+  margin-top: 52px;
 }
 .tip-sticker.move::after {
   display: none;
@@ -321,13 +318,13 @@
   grid-area: killer;
   align-self: end;
   justify-self: end;
-  margin: 0 8px -64px 0;
-  max-width: 220px;
+  margin: 0 8px -44px 0;
+  max-width: 210px;
   transform: rotate(2deg);
 }
 .tip-sticker.deck::after {
-  right: 24px;
-  top: -9px;
+  right: 22px;
+  top: -8px;
   transform: rotate(-135deg);
 }
 @keyframes slap {
@@ -337,10 +334,10 @@
   }
 }
 @media (orientation: landscape) and (max-height: 560px) {
-  .tip-sticker.hand {
-    margin-top: 22px;
+  .tip-sticker.move {
+    margin-top: 10px;
   }
   .tip-sticker.deck {
-    margin-bottom: -60px;
+    margin-bottom: -40px;
   }
 }
