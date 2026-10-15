@@ -14,9 +14,9 @@ export default defineConfig({
   plugins: [
     react(),
     VitePWA({
-      registerType: 'autoUpdate',
+      registerType: 'prompt',
       injectRegister: null,
-      includeAssets: ['icon-192.png', 'icon-512.png', 'icon-maskable.png', 'icon.svg'],
+      includeAssets: ['icon-192.png', 'icon-512.png', 'icon-maskable.png', 'icon.svg', 'apple-touch-icon.png'],
       workbox: {
         globPatterns: ['**/*.{js,css,html,woff2,png,svg,webmanifest}'],
         navigateFallback: 'index.html',
@@ -29,9 +29,9 @@ export default defineConfig({
         start_url: '.',
         scope: '.',
         display: 'standalone',
-        orientation: 'portrait',
-        background_color: '#0b0507',
-        theme_color: '#0b0507',
+        orientation: 'any',
+        background_color: '#4a3324',
+        theme_color: '#4a3324',
         icons: [
           { src: 'icon-192.png', sizes: '192x192', type: 'image/png' },
           { src: 'icon-512.png', sizes: '512x512', type: 'image/png' },

@@ -1,0 +1,648 @@
+/* The tray (under your thumb) and the stage (things held up over the board). */
+
+.hand {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  touch-action: none;
+}
+.hand .acard {
+  transition: transform 160ms cubic-bezier(0.2, 0.9, 0.3, 1.2), left 200ms ease;
+}
+.hand.passive {
+  pointer-events: none;
+}
+.hand.dim .acard {
+  background: var(--bone-2);
+  color: var(--ink-2);
+}
+.hand.dim .acard .spine {
+  background: var(--ink-2);
+}
+.empty-hand {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+}
+.tplus {
+  display: inline-flex;
+  align-items: center;
+  font: 400 20px/1 var(--f-display);
+}
+.tplus .glyph {
+  color: var(--time);
+}
+.vcr-title {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font: 400 20px/1 var(--f-vcr);
+  text-transform: uppercase;
+  color: var(--chalk);
+}
+.vcr-title .ico {
+  width: 13px;
+  height: 13px;
+}
+.script {
+  height: 100%;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: 3px;
+  padding: 8px 12px;
+}
+.script .sl {
+  color: var(--ink-2);
+  font: 400 15px/1.3 var(--f-script);
+}
+.script .sl.now {
+  color: var(--ink);
+}
+.script .sl.t-killer,
+.script .sl.t-bad {
+  font-weight: 700;
+}
+.script .sl.t-phase {
+  font-weight: 700;
+  text-transform: uppercase;
+}
+@media (orientation: landscape) and (max-height: 560px) {
+  .script .sl {
+    font-size: 14px;
+  }
+}
+
+/* lifted card */
+.mat.lifted {
+  inset: 10px;
+  justify-content: center;
+  gap: 12px;
+}
+.mat.lifted .side {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-width: 136px;
+  min-width: 0;
+}
+.mat.lifted .slip {
+  font-size: 14px;
+  padding: 8px 10px;
+}
+.dice-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
+  margin-top: 6px;
+}
+.dice-row .dn {
+  font: 400 22px/1 var(--f-display);
+  margin-left: 4px;
+}
+.notes {
+  margin-top: 6px;
+  font: 500 12px/1.25 var(--f-ui);
+  color: var(--ink-2);
+}
+.weapons {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.weapons .lab,
+.bring .lab {
+  font: 400 15px/1 var(--f-display);
+  text-transform: uppercase;
+  color: var(--chalk);
+}
+.itab-btn {
+  appearance: none;
+  min-height: 44px;
+  padding: 6px 10px;
+  border: 2px solid var(--ink);
+  border-radius: 6px;
+  background: var(--kraft);
+  color: var(--ink);
+  font: 700 14px/1.1 var(--f-narrow);
+  text-transform: uppercase;
+  box-shadow: 0 3px 0 var(--ink);
+  text-align: left;
+  cursor: pointer;
+}
+.itab-btn.on {
+  background: var(--victim);
+  border-width: 3px;
+  transform: translateY(-2px);
+}
+@media (orientation: portrait) {
+  .mat.lifted {
+    flex-direction: row;
+    align-items: center;
+  }
+}
+
+/* items mat */
+.mat.items {
+  inset: 10px;
+  justify-content: flex-start;
+  align-items: center;
+  overflow-x: auto;
+  padding: 10px 4px 14px;
+}
+.ic-acts {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 0 8px;
+  margin-top: auto;
+}
+.ic-act {
+  appearance: none;
+  min-height: 44px;
+  padding: 6px 8px;
+  background: var(--bone);
+  color: var(--ink);
+  border: 2px solid var(--ink);
+  border-radius: 6px;
+  box-shadow: 0 3px 0 var(--ink);
+  font: 600 13px/1.15 var(--f-ui);
+  text-align: left;
+  cursor: pointer;
+}
+.ic-act:active {
+  transform: translateY(3px);
+  box-shadow: none;
+}
+
+.slip.pinned {
+  position: absolute;
+  left: 10px;
+  right: 10px;
+  bottom: 10px;
+  max-height: 46%;
+  overflow: auto;
+}
+
+/* rolling */
+.mat.rollmat {
+  inset: 10px;
+  flex-wrap: wrap;
+  align-content: center;
+}
+.mat.rollmat .acard.ref {
+  pointer-events: none;
+}
+.dicetray {
+  background: var(--black-stock);
+  color: var(--on-black);
+  border: 2px solid var(--ink);
+  border-radius: 10px;
+  box-shadow: 0 3px 0 #000, 0 5px 0 var(--ink);
+  padding: 14px 12px 12px;
+  min-width: 170px;
+  max-width: 230px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+.dicetray .dice {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+}
+.dicetray .succ {
+  font: 600 13px/1 var(--f-ui);
+  color: var(--on-black-2);
+  letter-spacing: 0.04em;
+}
+.dicetray .succ b {
+  font: 400 36px/1 var(--f-display);
+  color: var(--bone);
+  vertical-align: -6px;
+  margin-right: 4px;
+}
+.dt-hint {
+  font: 500 13px/1.25 var(--f-ui);
+  color: var(--on-black-2);
+  text-align: center;
+}
+.mods {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: center;
+  width: 100%;
+}
+@media (orientation: landscape) and (max-height: 560px) {
+  .mat.rollmat .acard.mid {
+    --cw: 130px;
+  }
+}
+
+/* moving */
+.movearea {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  height: 100%;
+  justify-content: center;
+}
+.bring {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.btn.vt {
+  text-transform: none;
+  font: 700 14px/1 var(--f-narrow);
+  padding: 0 10px;
+}
+.btn.vt .row1 {
+  gap: 5px;
+}
+.goto {
+  display: flex;
+  gap: 8px;
+  padding-bottom: 6px;
+}
+.goto .opt {
+  flex: none;
+  white-space: nowrap;
+}
+.moves-chip {
+  position: absolute;
+  top: 54px;
+  right: 14px;
+  font: 400 20px/1 var(--f-vcr);
+  background: var(--black-stock);
+  color: var(--bone);
+  border: 2px solid var(--ink);
+  border-radius: 4px;
+  padding: 4px 8px 2px;
+  box-shadow: 2px 2px 0 var(--ink);
+  pointer-events: none;
+}
+@media (orientation: landscape) and (max-height: 560px) {
+  .moves-chip {
+    top: 10px;
+    left: 60px;
+    right: auto;
+  }
+}
+
+/* choices */
+.options {
+  height: 100%;
+  display: grid;
+  gap: 8px;
+  align-content: start;
+}
+.options.pair {
+  grid-template-columns: 1fr 1fr;
+  align-content: center;
+}
+.options.pair .opt {
+  min-height: 72px;
+  font-size: 17px;
+  font-weight: 700;
+}
+.options.grid {
+  grid-template-columns: 1fr 1fr;
+}
+.options.grid .opt small {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.options.list {
+  grid-template-columns: 1fr;
+  padding-bottom: 8px;
+}
+.options.list .opt {
+  min-height: 52px;
+}
+
+/* planning: the action tableau */
+.mat.tableau {
+  inset: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: stretch;
+  gap: 10px;
+  padding: 10px;
+}
+.tab-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-height: 0;
+  padding-right: 2px;
+}
+.tab-h {
+  font: 400 18px/1 var(--f-display);
+  text-transform: uppercase;
+}
+.tab-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.tab-cost {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font: 400 14px/1 var(--f-display);
+  border-bottom: 2px solid var(--ink);
+  padding-bottom: 2px;
+}
+.tab-cost .ico {
+  color: var(--time);
+}
+.acard.pile {
+  width: 100%;
+  aspect-ratio: auto;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 8px 0 0;
+  grid-template-columns: none;
+  overflow: visible;
+}
+.acard.pile .pspine {
+  width: 8px;
+  align-self: stretch;
+  background: var(--ink);
+  border-radius: 4px 0 0 4px;
+}
+.acard.pile[data-timing='reaction'] .pspine {
+  background: var(--blood);
+}
+.acard.pile[data-timing='afterRoll'] .pspine {
+  background: var(--girl);
+}
+.acard.pile .pname {
+  flex: 1;
+  font: 700 14px/1 var(--f-narrow);
+  text-transform: uppercase;
+}
+.acard.pile .pcount {
+  font: 400 15px/1 var(--f-display);
+}
+.acard.pile .pcost {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: 2px solid var(--ink);
+  background: var(--time);
+  color: var(--paper);
+  font: 400 14px/20px var(--f-display);
+  text-align: center;
+}
+.acard.pile.on {
+  border-width: 3px;
+  transform: translateX(6px);
+  background: var(--victim);
+}
+.acard.pile.off {
+  border-style: dashed;
+}
+.tab-detail {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 150px;
+}
+.hint.dark {
+  color: var(--ink-2);
+  max-width: 140px;
+}
+
+/* attacked */
+.attack-band {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 42%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 12px;
+  background: var(--black-stock);
+  border-top: 3px solid var(--ink);
+  border-bottom: 3px solid var(--ink);
+  font: 400 26px/1 var(--f-display);
+  text-transform: uppercase;
+  color: var(--bone);
+  text-shadow: 2px 2px 0 var(--blood);
+  pointer-events: none;
+}
+.hp-chit {
+  position: absolute;
+  left: 50%;
+  top: calc(42% + 70px);
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  pointer-events: none;
+}
+.hp-chit b {
+  font: 400 30px/1 var(--f-display);
+}
+.hp-chit .ico {
+  width: 24px;
+  height: 24px;
+  color: var(--blood);
+}
+
+/* rescue */
+.vtoggles {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-content: center;
+  height: 100%;
+}
+.rescue-card {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: min(360px, calc(100% - 20px));
+  padding: 0 0 12px;
+  overflow: hidden;
+}
+.rc-head {
+  background: var(--girl);
+  color: var(--paper);
+  font: 400 18px/1 var(--f-display);
+  text-transform: uppercase;
+  padding: 8px 12px 6px;
+  border-bottom: 2px solid var(--ink);
+}
+.slots {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  padding: 12px;
+}
+.slot {
+  appearance: none;
+  min-height: 64px;
+  border: 2px dashed var(--ink-2);
+  border-radius: 6px;
+  background: var(--bone-2);
+  color: var(--ink);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 4px;
+  cursor: pointer;
+}
+.slot .sn {
+  font: 400 18px/1 var(--f-display);
+}
+.slot .sr {
+  font: 600 11px/1.15 var(--f-narrow);
+  text-align: center;
+}
+.slot.next {
+  border: 3px solid var(--victim-edge);
+  background: var(--victim);
+}
+.slot.full {
+  border-style: solid;
+  background: var(--paper);
+  cursor: default;
+}
+.rc-hint {
+  font: 500 13px/1.3 var(--f-ui);
+  color: var(--ink-2);
+  padding: 0 12px;
+}
+.rc-ult {
+  padding: 12px;
+  font: 500 14px/1.35 var(--f-ui);
+}
+.rc-ult b {
+  font: 400 22px/1 var(--f-display);
+  text-transform: uppercase;
+  color: var(--girl);
+}
+.rc-ult p {
+  margin-top: 6px;
+}
+
+/* search */
+.mat.search {
+  inset: 10px;
+  gap: 14px;
+  padding-top: 14px;
+}
+.keepwrap {
+  position: relative;
+}
+.keep-stamp {
+  position: absolute;
+  top: -18px;
+  right: -6px;
+  font: 400 22px/1 var(--f-marker);
+  text-transform: uppercase;
+  color: var(--blood);
+  transform: rotate(-8deg);
+  background: var(--paper);
+  border: 2px solid var(--blood);
+  padding: 3px 8px 1px;
+  border-radius: 4px;
+  pointer-events: none;
+}
+
+/* arrange */
+.mat.arrange {
+  inset: 10px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  padding: 12px;
+  align-items: stretch;
+}
+.ar-col {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+.ar-h {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font: 400 16px/1 var(--f-display);
+  text-transform: uppercase;
+}
+.ar-box {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 8px;
+  border: 2px dashed var(--ink-2);
+  border-radius: 8px;
+  overflow: auto;
+}
+.ar-box.pack {
+  background: var(--kraft);
+  border-style: solid;
+  border-color: var(--ink);
+}
+.atab {
+  appearance: none;
+  min-height: 44px;
+  padding: 6px 8px;
+  background: var(--kraft);
+  color: var(--ink);
+  border: 2px solid var(--ink);
+  border-radius: 6px;
+  box-shadow: 0 3px 0 var(--ink);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 3px;
+  cursor: pointer;
+  text-align: left;
+}
+.ar-box.pack .atab {
+  background: var(--bone);
+}
+.atab .an {
+  font: 700 14px/1.1 var(--f-narrow);
+  text-transform: uppercase;
+}
+.atab .ah {
+  display: inline-flex;
+  align-items: center;
+  font: 600 12px/1 var(--f-narrow);
+}
+.atab .ah .ico {
+  width: 13px;
+  height: 13px;
+}
+.atab:disabled {
+  cursor: default;
+  box-shadow: none;
+}
+.atab.shake {
+  animation: shake 300ms steps(6);
+}

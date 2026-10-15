@@ -1,0 +1,484 @@
+/* Action cards: spine + face, like a VHS spine in a crowded fan. */
+
+.acard {
+  --cw: 112px;
+  --sp: 26px;
+  appearance: none;
+  position: relative;
+  width: var(--cw);
+  aspect-ratio: 63 / 88;
+  padding: 0;
+  text-align: left;
+  display: grid;
+  grid-template-columns: var(--sp) minmax(0, 1fr);
+  overflow: hidden;
+  background: var(--paper);
+  color: var(--ink);
+  border: 2px solid var(--ink);
+  border-radius: 6px;
+  box-shadow: 0 2px 0 var(--paper-edge), 0 4px 0 var(--ink);
+  transition: transform 160ms cubic-bezier(0.2, 0.9, 0.3, 1.2);
+  cursor: pointer;
+  flex: none;
+}
+.acard .spine {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  justify-items: center;
+  gap: 4px;
+  padding: 5px 0;
+  background: var(--ink);
+  color: var(--bone);
+  min-height: 0;
+}
+.acard[data-timing='reaction'] .spine {
+  background: var(--blood);
+}
+.acard[data-timing='afterRoll'] .spine {
+  background: var(--girl);
+}
+.acard .sg {
+  width: 15px;
+  height: 15px;
+}
+.acard .vname {
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+  white-space: nowrap;
+  overflow: hidden;
+  font: 700 12px/1 var(--f-narrow);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  min-height: 0;
+}
+.acard .cost {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 1.5px solid var(--bone);
+  background: var(--time);
+  color: var(--paper);
+  font: 400 12px/17px var(--f-display);
+  text-align: center;
+}
+.acard .cost.zero {
+  background: var(--gold);
+  color: var(--ink);
+}
+.acard .face {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 5px 5px 4px 6px;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+}
+.acard .title {
+  font: 700 13px/1.05 var(--f-narrow);
+  text-transform: uppercase;
+  margin-bottom: 2px;
+}
+.acard .ctag {
+  font: 700 11px/1 var(--f-narrow);
+  color: var(--ink-2);
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+.acard .row {
+  display: grid;
+  grid-template-columns: 17px minmax(0, 1fr);
+  gap: 4px;
+  align-items: start;
+  border-top: 1.5px solid var(--ink);
+  padding: 2px 1px 1px 0;
+  font: 700 12px/1.15 var(--f-narrow);
+}
+.acard .row.hit {
+  background: var(--victim);
+}
+.acard .lbl {
+  width: 17px;
+  height: 17px;
+  border-radius: 4px;
+  background: var(--killer);
+  color: var(--paper);
+  border: 1.5px solid var(--ink);
+  display: grid;
+  place-items: center;
+}
+.acard .lbl .ico {
+  width: 13px;
+  height: 13px;
+}
+.acard .lines {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+}
+.acard .ln {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  flex-wrap: wrap;
+}
+.acard .or {
+  font: 700 11px/1 var(--f-narrow);
+  background: var(--bone-2);
+  padding: 1px 3px;
+  border-radius: 2px;
+  text-transform: uppercase;
+}
+.acard .ctext {
+  font: 500 12px/1.2 var(--f-ui);
+}
+.fxline {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 1px 5px;
+  align-items: center;
+}
+.fx {
+  display: inline-flex;
+  align-items: center;
+  gap: 1px;
+  white-space: nowrap;
+}
+.fx .ico {
+  width: 1.1em;
+  height: 1.1em;
+}
+.fx.time .ico {
+  color: var(--time);
+}
+.fx.blood .ico {
+  color: var(--blood);
+}
+.fx.txt {
+  white-space: normal;
+  font-weight: 700;
+}
+.tag {
+  font: 700 11px/1 var(--f-narrow);
+  text-transform: uppercase;
+  background: var(--ink);
+  color: var(--bone);
+  padding: 2px 4px;
+  border-radius: 2px;
+}
+.acard .count {
+  position: absolute;
+  right: 4px;
+  bottom: 4px;
+  font: 400 16px/1 var(--f-display);
+}
+.acard.sel {
+  transform: translateY(-16px);
+  z-index: 5;
+}
+.acard.hover {
+  transform: translateY(-12px);
+  z-index: 4;
+}
+.acard.off {
+  background: var(--bone-2);
+  color: var(--ink-2);
+}
+.acard.off .spine {
+  background: var(--ink-2);
+}
+.acard.marked {
+  transform: translateY(-14px);
+}
+.acard .xmark {
+  position: absolute;
+  inset: 22% 14%;
+  width: 72%;
+  height: 56%;
+  color: var(--blood);
+}
+.acard .notnow {
+  position: absolute;
+  left: -10%;
+  right: -10%;
+  top: 42%;
+  transform: rotate(-18deg);
+  background: var(--bone-2);
+  border-top: 2px solid var(--ink);
+  border-bottom: 2px solid var(--ink);
+  text-align: center;
+  font: 400 16px/1.4 var(--f-marker);
+  text-transform: uppercase;
+  color: var(--ink);
+}
+.acard.mid {
+  --cw: 150px;
+  --sp: 30px;
+}
+.acard.mid .title {
+  font-size: 15px;
+}
+.acard.mid .row {
+  font-size: 14px;
+  grid-template-columns: 20px minmax(0, 1fr);
+}
+.acard.mid .lbl {
+  width: 20px;
+  height: 20px;
+}
+.acard.big {
+  --cw: 214px;
+  --sp: 38px;
+  cursor: pointer;
+}
+.acard.big .title {
+  font: 400 23px/1 var(--f-display);
+  margin-bottom: 0;
+}
+.acard.big .row {
+  font-size: 16px;
+  grid-template-columns: 24px minmax(0, 1fr);
+  padding: 4px 1px;
+}
+.acard.big .lbl {
+  width: 24px;
+  height: 24px;
+}
+.acard.big .lbl .ico {
+  width: 18px;
+  height: 18px;
+}
+.acard.big .vname {
+  font-size: 15px;
+}
+.acard.big .sg {
+  width: 20px;
+  height: 20px;
+}
+.acard.big .cost {
+  width: 28px;
+  height: 28px;
+  font-size: 16px;
+  line-height: 25px;
+}
+.acard.big .ctext {
+  font-size: 15px;
+}
+@media (orientation: landscape) and (max-height: 560px) {
+  .acard {
+    --cw: 88px;
+    --sp: 22px;
+  }
+  .acard .title {
+    font-size: 12px;
+  }
+  .acard .row {
+    font-size: 11px;
+    grid-template-columns: 15px minmax(0, 1fr);
+  }
+  .acard .lbl {
+    width: 15px;
+    height: 15px;
+  }
+  .acard .vname {
+    font-size: 11px;
+  }
+  .acard .cost {
+    width: 18px;
+    height: 18px;
+    font-size: 11px;
+    line-height: 15px;
+  }
+  .acard.big {
+    --cw: 190px;
+    --sp: 34px;
+  }
+  .acard.big .row {
+    font-size: 14px;
+  }
+  .acard.mid {
+    --cw: 140px;
+  }
+}
+@media (orientation: portrait) and (max-height: 700px) {
+  .acard {
+    --cw: 94px;
+    --sp: 22px;
+  }
+}
+
+/* big reveal faces */
+.reveal-card {
+  width: 240px;
+  min-height: 300px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 0 0 16px;
+  border: 2.5px solid var(--ink);
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 4px 0 #000, 0 7px 0 var(--ink);
+  background: var(--black-stock);
+  color: var(--on-black);
+}
+.reveal-card .band {
+  font: 400 20px/1 var(--f-vcr);
+  text-transform: uppercase;
+  background: var(--blood);
+  color: var(--bone);
+  padding: 6px 12px 4px;
+  letter-spacing: 0.04em;
+}
+.reveal-card .rc-title {
+  font: 400 26px/1.05 var(--f-display);
+  text-transform: uppercase;
+  padding: 0 14px;
+  text-shadow: 2px 2px 0 var(--blood);
+}
+.reveal-card .rc-text {
+  font: 400 15px/1.4 var(--f-script);
+  padding: 0 14px;
+}
+.reveal-card.k-event {
+  background: var(--event, var(--kraft));
+  color: var(--event-ink, var(--ink));
+}
+.reveal-card.k-event .band {
+  background: var(--ink);
+}
+.reveal-card.k-event .rc-title {
+  text-shadow: none;
+}
+.reveal-card.k-darkPower,
+.reveal-card.k-minor {
+  background: var(--dp);
+  color: var(--bone);
+}
+.reveal-card.k-darkPower .band,
+.reveal-card.k-minor .band {
+  background: var(--ink);
+}
+.reveal-card.k-darkPower .rc-text,
+.reveal-card.k-minor .rc-text {
+  font-family: var(--f-ui);
+}
+.reveal-card.k-finale .rc-text {
+  font-family: var(--f-ui);
+}
+.reveal-card.k-item {
+  background: var(--kraft);
+  color: var(--ink);
+}
+.reveal-card.k-item .band {
+  background: var(--ink);
+}
+.reveal-card.k-item .rc-title {
+  text-shadow: none;
+}
+.reveal-card.k-item .rc-text {
+  font-family: var(--f-ui);
+}
+@media (orientation: landscape) and (max-height: 560px) {
+  .reveal-card {
+    width: 210px;
+    min-height: 0;
+    max-height: calc(100% - 24px);
+  }
+  .reveal-card .rc-title {
+    font-size: 22px;
+  }
+  .reveal-card .rc-text {
+    font-size: 14px;
+  }
+}
+.istats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  padding: 0 14px;
+}
+.ist {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  font: 700 12px/1 var(--f-narrow);
+  text-transform: uppercase;
+  background: var(--bone);
+  color: var(--ink);
+  border: 1.5px solid var(--ink);
+  border-radius: 10px;
+  padding: 3px 7px;
+}
+.ist .ico {
+  width: 13px;
+  height: 13px;
+}
+
+/* kraft item cards */
+.icard {
+  width: 150px;
+  min-height: 190px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding-bottom: 8px;
+  background: var(--kraft);
+  color: var(--ink);
+  border: 2px solid var(--ink);
+  border-radius: 8px;
+  box-shadow: 0 3px 0 var(--kraft-edge), 0 5px 0 var(--ink);
+  overflow: hidden;
+  transition: transform 160ms cubic-bezier(0.2, 0.9, 0.3, 1.2);
+  flex: none;
+}
+.icard[role='button'] {
+  cursor: pointer;
+}
+.icard.sel {
+  transform: translateY(-14px);
+  outline: 3px solid var(--ink);
+}
+.icard .ic-band {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: var(--ink);
+  color: var(--bone);
+  font: 400 16px/1 var(--f-vcr);
+  text-transform: uppercase;
+  padding: 4px 8px 3px;
+}
+.icard .ic-band .ico {
+  width: 13px;
+  height: 13px;
+}
+.icard .ic-title {
+  font: 400 18px/1.05 var(--f-display);
+  text-transform: uppercase;
+  padding: 0 8px;
+}
+.icard .istats {
+  padding: 0 8px;
+}
+.icard .ic-text {
+  font: 500 13px/1.3 var(--f-ui);
+  padding: 0 8px;
+}
+.icard.small {
+  width: 128px;
+  min-height: 0;
+}
+.icard.small .ic-text {
+  font-size: 12px;
+}
+@media (orientation: landscape) and (max-height: 560px) {
+  .icard {
+    width: 132px;
+    min-height: 0;
+  }
+  .icard .ic-text {
+    font-size: 12px;
+  }
+}

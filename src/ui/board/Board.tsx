@@ -5,7 +5,7 @@ import type { LocationDef, ZoneDef } from '../../game/types';
 import { boardInk, victimHex, type BoardInk } from '../film';
 import type { BoardFx, DisplayView } from '../game/display';
 import { edgesOf, fitView, isBlocked, visibleZones, type View } from './geometry';
-import { layoutBoard, type BoardLayout } from './layout';
+import { layoutBoard, panicArrows, placeTiles, type BoardLayout } from './layout';
 import { TOKEN_CHIT } from './tokens';
 
 interface Props {
@@ -50,7 +50,12 @@ export function Board(props: Props) {
   const svg = useRef<SVGSVGElement>(null);
   const size = useSize(wrap);
   const zones = useMemo(() => visibleZones(g, loc), [loc, g.tokens.some((t) => t.id === 'helicopter')]); // eslint-disable-line react-hooks/exhaustive-deps
-  const base = useMemo(() => fitView(zones, loc.aspect), [zones, loc.aspect]);
+  // the printed map is schematic: stretch it (a little) to fill the space it's given,
+  // so a wide manor gets taller rows on a portrait phone and a tall camp gets wider ones sideways
+  const natural = useMemo(() => fitView(zones, loc.aspect), [zones, loc.aspect]);
+  const k = size.w && size.h ? Math.round(Math.min(2, Math.max(0.6, size.h / size.w / (natural.h / natural.w))) * 20) / 20 : 1;
+  const aspect = loc.aspect / k;
+  const base = useMemo(() => fitView(zones, aspect), [zones, aspect]);
   const edges = useMemo(() => edgesOf(zones), [zones]);
 
   // zoom: a smaller window centred on the Final Girl, pannable with one finger
@@ -62,15 +67,15 @@ export function Board(props: Props) {
     const w = base.w / 1.7;
     const h = base.h / 1.7;
     const cx = (fz ? fz.x : base.x0 + base.w / 2) + pan.dx;
-    const cy = (fz ? fz.y / loc.aspect : base.y0 + base.h / 2) + pan.dy;
+    const cy = (fz ? fz.y / aspect : base.y0 + base.h / 2) + pan.dy;
     const x0 = Math.min(Math.max(cx - w / 2, base.x0), base.x0 + base.w - w);
     const y0 = Math.min(Math.max(cy - h / 2, base.y0), base.y0 + base.h - h);
     return { x0, y0, w, h };
-  }, [zoom, base, pan, view.fz, loc]);
+  }, [zoom, base, pan, view.fz, loc, aspect]);
 
   const rawPpu = size.w && size.h ? Math.min(size.w / win.w, size.h / win.h) : 0;
   const ppu = Math.round(rawPpu * 20) / 20;
-  const layout = useMemo(() => (ppu ? layoutBoard(loc, zones, edges, ppu) : null), [loc, zones, edges, ppu]);
+  const layout = useMemo(() => (ppu ? layoutBoard(loc, zones, edges, ppu, aspect) : null), [loc, zones, edges, ppu, aspect]);
 
   // pointer: tap a target / inspect a space, long-press to inspect, drag to pan when zoomed
   const press = useRef<{ x: number; y: number; t: number; moved: boolean; timer: number; pan0: { dx: number; dy: number }; long: boolean } | null>(null);
@@ -152,7 +157,7 @@ export function Board(props: Props) {
         >
           <rect x={base.x0 - 200} y={base.y0 - 200} width={base.w + 400} height={base.h + 400} fill="var(--ground)" />
           <StaticLayer g={g} loc={loc} layout={layout} ink={ink} sig={staticSig(g)} />
-          <PanicLayer g={g} layout={layout} view={view} panicAll={props.panicAll} inspect={props.inspect ?? null} edge={fx.panicEdge} />
+          <PanicLayer layout={layout} view={view} panicAll={props.panicAll} inspect={props.inspect ?? null} edge={fx.panicEdge} />
           {fx.trail && fx.trail.length > 1 ? <Trail layout={layout} path={fx.trail} /> : null}
           {targets.length ? <Targets layout={layout} base={base} targets={targets} pressed={props.pressed ?? null} loc={loc} /> : null}
           <TokenLayer g={g} layout={layout} view={view} fx={fx} splats={props.splats} />
@@ -222,13 +227,18 @@ const StaticLayer = memo(
     for (const [id, zl] of layout.zones) {
       const z = zl.z;
       const r = zl.r * u;
+      // water spaces get a lake rim, like the shoreline printed round them on the board
       if (z.water)
         out.push(
           <g key={`w${id}`}>
-            <ellipse cx={zl.p.x} cy={zl.p.y} rx={r * 2.3} ry={r * 1.7} fill={ink.water} stroke={INK} strokeWidth={1.5} vectorEffect="non-scaling-stroke" />
-            {[-0.6, 0.15, 0.85].map((k) => (
-              <path key={k} d={`M${zl.p.x - r * 1.1} ${zl.p.y + r * k * 1.1 - r * 0.2} q${r * 0.28} ${-r * 0.25} ${r * 0.55} 0 t${r * 0.55} 0 t${r * 0.55} 0`} fill="none" stroke="#efe6d2" strokeWidth={1.5} vectorEffect="non-scaling-stroke" />
-            ))}
+            <circle cx={zl.p.x} cy={zl.p.y} r={r + 7 * u} fill={ink.water} stroke={INK} strokeWidth={1.5} vectorEffect="non-scaling-stroke" />
+            <path
+              d={`M${zl.p.x - r - 3.5 * u} ${zl.p.y + 3 * u} q${2 * u} ${-2.5 * u} ${4 * u} 0 M${zl.p.x + r - 0.5 * u} ${zl.p.y + 3 * u} q${2 * u} ${-2.5 * u} ${4 * u} 0`}
+              fill="none"
+              stroke="#efe6d2"
+              strokeWidth={1.4}
+              vectorEffect="non-scaling-stroke"
+            />
           </g>,
         );
       if (loc.id === 'carnivalOfBlood' && z.landmark) out.push(<circle key={`t${id}`} cx={zl.p.x} cy={zl.p.y} r={r * 1.9} fill="url(#tentStripes)" stroke={INK} strokeWidth={1.5} vectorEffect="non-scaling-stroke" />);
@@ -383,12 +393,17 @@ const StaticLayer = memo(
   (a, b) => a.sig === b.sig && a.layout === b.layout && a.ink === b.ink && a.loc === b.loc,
 );
 
-function PanicLayer({ g, layout, view, panicAll, inspect, edge }: { g: GameState; layout: BoardLayout; view: DisplayView; panicAll: boolean; inspect: string | null; edge?: [string, string] }) {
+function PanicLayer({ layout, view, panicAll, inspect, edge }: { layout: BoardLayout; view: DisplayView; panicAll: boolean; inspect: string | null; edge?: [string, string] }) {
   const u = 1 / layout.ppu;
+  // only the tiles on show are placed, so they can spread out
   const withVictims = new Set(view.victims.map((v) => v.zone));
-  const shown = layout.tiles.filter((t) => panicAll || withVictims.has(t.from) || inspect === t.from || (edge && edge[0] === t.from && edge[1] === t.to));
+  const want = (from: string, to: string) => panicAll || withVictims.has(from) || inspect === from || (!!edge && edge[0] === from && edge[1] === to);
+  const key = panicAll ? 'all' : layout.tiles.filter((t) => want(t.from, t.to)).map((t) => `${t.from}>${t.to}`).join(',');
+  const shown = useMemo(
+    () => (panicAll ? layout.tiles : placeTiles(layout, panicArrows(layout.edges).filter((a) => key.split(',').includes(`${a.from.id}>${a.to.id}`)))),
+    [layout, key, panicAll], // eslint-disable-line react-hooks/exhaustive-deps
+  );
   if (!shown.length) return null;
-  void g;
   return (
     <g pointerEvents="none">
       {shown.map((t) => {

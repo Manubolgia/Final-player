@@ -1,24 +1,11 @@
-// STUB — replaced by the sheets implementation. Component names and props are fixed.
-import type { GameState } from '../../game';
-import type { DisplayView } from '../game/display';
-import type { Prefs } from '../persistence';
-import { Sheet } from './Sheet';
+// The sheets: slid over the table for detail (tap a strip, a space, the log,
+// the menu). Each one is a printed component; see ./Sheet for the container.
 
-export function KillerSheet({ g, onClose }: { g: GameState; view: DisplayView; onClose: () => void; onReveal: (deck: 'terror' | 'event', id: string) => void }) {
-  return <Sheet title={g.config.killer} onClose={onClose}>…</Sheet>;
-}
-export function GirlSheet({ g, onClose }: { g: GameState; view: DisplayView; onClose: () => void }) {
-  return <Sheet title={g.config.finalGirl} onClose={onClose}>…</Sheet>;
-}
-export function ZoneSheet({ zone, onClose }: { g: GameState; view: DisplayView; zone: string; onClose: () => void }) {
-  return <Sheet title={zone} onClose={onClose}>…</Sheet>;
-}
-export function LogSheet({ onClose }: { g: GameState; onClose: () => void }) {
-  return <Sheet title="Log" onClose={onClose}>…</Sheet>;
-}
-export function MenuSheet({ onClose }: { prefs: Prefs; setPrefs: (p: Prefs) => void; onClose: () => void; onRules: () => void; onRestart: () => void; onQuit: () => void }) {
-  return <Sheet title="Paused" onClose={onClose}>…</Sheet>;
-}
-export function RulesSheet({ onClose }: { onClose: () => void }) {
-  return <Sheet title="How to play" onClose={onClose}>…</Sheet>;
-}
+export { Sheet, SheetFrame } from './Sheet';
+export type { SheetProps, SheetFrameProps } from './Sheet';
+export { KillerSheet } from './KillerSheet';
+export { GirlSheet } from './GirlSheet';
+export { ZoneSheet } from './ZoneSheet';
+export { LogSheet } from './LogSheet';
+export { MenuSheet } from './MenuSheet';
+export { RulesSheet } from './RulesSheet';

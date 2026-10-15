@@ -12,6 +12,11 @@ export default defineConfig({
     viewport: { width: 390, height: 844 },
     launchOptions: process.env.PLAYWRIGHT_CHROMIUM ? { executablePath: process.env.PLAYWRIGHT_CHROMIUM } : {},
   },
+  projects: [
+    { name: 'portrait' },
+    // the sideways table: two films are enough to catch layout-only breakage
+    { name: 'landscape', use: { viewport: { width: 844, height: 390 } }, grep: /Happy Trails|Creech/ },
+  ],
   webServer: {
     // Bind the loopback address explicitly so the server and Playwright agree on IPv4.
     command: 'npm run preview -- --port 4174 --strictPort --host 127.0.0.1',

@@ -1,0 +1,1311 @@
+/* The title screen: a late-night video store's horror shelf on the walnut table.
+   Flat ink, 2px outlines, hard offset edges. No gradients, glows or blur. */
+
+.store {
+  overflow: hidden;
+}
+.vs-floor {
+  position: absolute;
+  inset: 0;
+  overflow-x: hidden;
+  display: flex;
+  flex-direction: column;
+  padding: calc(var(--pad-t) + 6px) var(--pad-r) calc(var(--pad-b) + 4px) var(--pad-l);
+}
+.vs-front {
+  flex: 1 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+  max-width: 520px;
+  margin: 0 auto;
+}
+
+/* ---- logo row ---------------------------------------------------------- */
+
+.vs-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  padding-top: 2px;
+}
+.vs-brand {
+  position: relative;
+  min-width: 0;
+  padding: 0 6px 16px 0;
+}
+.store .logo {
+  font: 400 48px/0.95 var(--f-display);
+  text-transform: uppercase;
+  letter-spacing: 0.01em;
+  color: var(--chalk);
+  text-shadow: 3px 3px 0 var(--blood);
+  white-space: nowrap;
+}
+.vs-fan {
+  position: absolute;
+  right: -10px;
+  bottom: 0;
+  font-size: 13px;
+  transform: rotate(-6deg);
+}
+.vs-help {
+  margin-top: 4px;
+}
+
+/* ---- install coach ------------------------------------------------------ */
+
+.vs-coach {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 6px 8px 10px;
+  background: var(--paper);
+  color: var(--ink);
+  border: 2px solid var(--ink);
+  border-radius: 4px;
+  box-shadow: 3px 3px 0 var(--ink);
+  transform: rotate(-1deg);
+}
+.vs-coach p {
+  flex: 1;
+  min-width: 0;
+  font: 400 15px/1.3 var(--f-script);
+}
+.vs-coach b {
+  font-weight: 700;
+}
+.vs-coach-ico {
+  flex: none;
+  width: 38px;
+  height: 38px;
+  display: grid;
+  place-items: center;
+  border: 2px solid var(--ink);
+  border-radius: 8px;
+  background: var(--bone);
+  color: var(--time);
+}
+.vs-coach-ico svg {
+  width: 24px;
+  height: 24px;
+}
+.vs-coach.compact {
+  flex: 1;
+  min-width: 0;
+  gap: 8px;
+  padding: 4px 4px 4px 6px;
+  transform: rotate(-1.5deg);
+}
+.vs-coach.compact p {
+  font-size: 12px;
+  line-height: 1.12;
+}
+.vs-coach.compact .vs-coach-ico {
+  width: 30px;
+  height: 30px;
+  border-radius: 6px;
+}
+.vs-coach.compact .vs-coach-ico svg {
+  width: 18px;
+  height: 18px;
+}
+/* a 36px dismiss chit; its ::after (pieces.css) widens the hit area to 44px */
+.vs-x {
+  width: 36px;
+  height: 36px;
+}
+.vs-x svg {
+  width: 18px;
+  height: 18px;
+}
+
+/* ---- the VCR ------------------------------------------------------------ */
+
+.vs-vcr {
+  appearance: none;
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  min-height: 56px;
+  padding: 6px 8px 6px 7px;
+  background: var(--black-stock);
+  color: var(--on-black);
+  border: 2.5px solid var(--ink);
+  border-radius: 8px;
+  box-shadow: 0 3px 0 #000, 0 5px 0 var(--ink);
+  cursor: pointer;
+  text-align: left;
+  transition: transform 90ms cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 90ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.vs-vcr:active {
+  transform: translateY(4px);
+  box-shadow: 0 1px 0 #000;
+}
+.vs-vcr-play {
+  flex: none;
+  width: 40px;
+  height: 40px;
+  display: grid;
+  place-items: center;
+  background: var(--blood);
+  color: var(--paper);
+  border: 2px solid var(--ink);
+  border-radius: 6px;
+  box-shadow: 0 3px 0 var(--blood-edge);
+}
+.vs-vcr-play svg {
+  width: 20px;
+  height: 20px;
+}
+.vs-vcr-lbl {
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font: 700 15px/1 var(--f-ui);
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+.vs-vcr-slot {
+  display: block;
+  width: 76px;
+  height: 8px;
+  border-radius: 2px;
+  background: #000;
+  border: 2px solid var(--black-stock-2);
+  box-shadow: 0 0 0 1.5px var(--on-black-2);
+}
+.vs-vcr-lcd {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  padding: 3px 9px 1px;
+  background: #0d0b0b;
+  border: 2px solid #000;
+  box-shadow: 0 0 0 1.5px var(--black-stock-2);
+  border-radius: 4px;
+  font: 400 22px/1.1 var(--f-vcr);
+  color: var(--victim);
+  white-space: nowrap;
+  overflow: hidden;
+}
+.vs-vcr-lcd .t {
+  color: var(--wrench);
+}
+.vs-vcr-lcd .who {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ---- the shelf ---------------------------------------------------------- */
+
+/* The shelf takes the spare height: tapes grow a little, then the rest
+   collects under the plank so the keys stay down in the thumb zone. */
+.vs-shelf {
+  flex: 1 0 auto;
+  display: flex;
+  flex-direction: column;
+}
+.vs-aisle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+.vs-aisle-tag {
+  display: inline-block;
+  font: 400 16px/1 var(--f-display);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 5px 12px 4px;
+  background: var(--bone);
+  color: var(--ink);
+  border: 2px solid var(--ink);
+  border-radius: 3px;
+  box-shadow: 2px 2px 0 var(--ink);
+  transform: rotate(-2deg);
+}
+.vs-aisle-note {
+  font: 400 20px/1 var(--f-vcr);
+  text-transform: uppercase;
+  color: var(--chalk-2);
+  white-space: nowrap;
+}
+.vs-spines {
+  flex: 1 0 auto;
+  max-height: calc(6 * 76px + 5 * 6px);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.vs-plank {
+  position: relative;
+  flex: none;
+  height: 16px;
+  margin: 8px -4px 0;
+  background: var(--bone-edge);
+  border: 2px solid var(--ink);
+  border-radius: 2px;
+  box-shadow: 0 5px 0 var(--table-deep);
+}
+.vs-plank::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 4px;
+  background: var(--bone);
+  border-bottom: 2px solid var(--ink);
+}
+
+/* ---- a VHS spine (lying flat in portrait) -------------------------------- */
+
+.vs-spine {
+  appearance: none;
+  position: relative;
+  flex: 1 0 60px;
+  display: flex;
+  align-items: stretch;
+  width: calc(100% - 24px);
+  min-height: 60px;
+  padding: 0;
+  background: var(--sp-bg);
+  color: var(--sp-ink);
+  border: 2px solid var(--ink);
+  border-radius: 4px;
+  box-shadow: 3px 3px 0 var(--ink);
+  text-align: left;
+  cursor: pointer;
+  transition: transform 200ms cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 90ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.vs-spine:active {
+  box-shadow: 1px 1px 0 var(--ink);
+}
+/* the tape you picked slides out of the stack */
+.vs-spine.on {
+  transform: translateX(24px);
+  z-index: 1;
+  box-shadow: 4px 4px 0 var(--ink);
+}
+.vs-cap {
+  flex: none;
+  width: 56px;
+  display: grid;
+  place-items: center;
+  border-right: 2px solid var(--ink);
+}
+.vs-spine.tent .vs-cap {
+  background-color: var(--sp-bg);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24'%3E%3Crect width='12' height='24' fill='%23F4E9D0'/%3E%3C/svg%3E");
+}
+.vs-disc {
+  width: 40px;
+  height: 40px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--sp-ink);
+  color: var(--sp-bg);
+  border: 2px solid var(--ink);
+}
+.vs-spine.tent .vs-disc {
+  background: var(--sp-bg);
+  color: #f4e9d0;
+}
+.vs-emblem {
+  width: 22px;
+  height: 22px;
+}
+.vs-stripe {
+  flex: none;
+  width: 8px;
+  background: var(--sp-stripe);
+  border-right: 2px solid var(--ink);
+}
+.vs-title {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 2px;
+  padding: 0 8px 0 12px;
+  container-type: size;
+  overflow: hidden;
+}
+.vs-kicker {
+  display: block;
+  font: 700 12px/1 var(--f-narrow);
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.vs-main {
+  display: block;
+  font: 400 24px/1.02 var(--f-display);
+  font-size: clamp(17px, calc(100cqw * 2.1 / var(--len, 14)), 25px);
+  text-transform: uppercase;
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.vs-label {
+  flex: none;
+  align-self: center;
+  margin-right: 10px;
+  padding: 3px 5px 2px;
+  background: var(--paper);
+  color: var(--ink);
+  border: 2px solid var(--ink);
+  border-radius: 3px;
+  font: 700 14px/1 var(--f-script);
+  transform: rotate(-4deg);
+}
+.vs-flag {
+  position: absolute;
+  z-index: 2;
+  top: -9px;
+  right: 50px;
+  font-size: 13px;
+  padding: 3px 7px 2px;
+  transform: rotate(var(--tilt, 5deg));
+  pointer-events: none;
+}
+
+/* ---- best played sideways ------------------------------------------------ */
+
+.vs-sideways {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+.vs-sideways .sticker {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 16px;
+  padding: 7px 12px 6px;
+  transform: rotate(-3deg);
+}
+.vs-sideways .sticker .ico {
+  width: 20px;
+  height: 20px;
+}
+
+/* ---- keys and small print ------------------------------------------------ */
+
+.vs-keys {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+.vs-keys .btn {
+  min-width: 0;
+}
+.vs-foot {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+.vs-foot p {
+  font: 500 12px/1.3 var(--f-ui);
+  color: var(--chalk-2);
+  text-align: center;
+}
+
+/* ---- chips (girls, killers, places) -------------------------------------- */
+
+.vs-chip {
+  appearance: none;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 52px;
+  min-width: 0;
+  padding: 4px 10px 4px 5px;
+  background: var(--bone);
+  color: var(--ink);
+  border: 2px solid var(--ink);
+  border-radius: 8px;
+  box-shadow: 0 3px 0 var(--ink);
+  font: 700 16px/1.05 var(--f-narrow);
+  text-transform: uppercase;
+  text-align: left;
+  cursor: pointer;
+}
+.vs-chip:active {
+  transform: translateY(3px);
+  box-shadow: none;
+}
+.vs-chip .tok {
+  flex: none;
+  width: 36px;
+  height: 36px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--paper);
+  color: var(--ink);
+  border: 2px solid var(--ink);
+}
+.vs-chip .tok .ico {
+  width: 20px;
+  height: 20px;
+  vertical-align: 0;
+}
+.vs-chip .nm {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.vs-chip .nm small {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  font: 700 12px/1 var(--f-narrow);
+  text-transform: none;
+  color: var(--ink-2);
+}
+.vs-chip .nm small .ico {
+  width: 12px;
+  height: 12px;
+  color: var(--blood);
+}
+.vs-chip .hp {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font: 400 19px/1 var(--f-display);
+}
+.vs-chip .hp .ico {
+  width: 16px;
+  height: 16px;
+  color: var(--blood);
+  vertical-align: 0;
+}
+.vs-chip[aria-pressed='true'] {
+  border-width: 3px;
+  padding: 3px 9px 3px 4px;
+  background: var(--girl);
+  color: var(--paper);
+  box-shadow: 0 3px 0 var(--girl-edge), 0 5px 0 var(--ink);
+}
+.vs-chip.killer[aria-pressed='true'] {
+  background: var(--blood);
+  box-shadow: 0 3px 0 var(--blood-edge), 0 5px 0 var(--ink);
+}
+.vs-chip.loc[aria-pressed='true'] {
+  background: var(--black-stock);
+  box-shadow: 0 3px 0 #000, 0 5px 0 var(--ink);
+}
+.vs-chip[aria-pressed='true'] .nm small {
+  color: var(--bone-2);
+}
+.vs-chip[aria-pressed='true'] .nm small .ico,
+.vs-chip[aria-pressed='true'] .hp .ico {
+  color: var(--paper);
+}
+.vs-chip[aria-pressed='true']:active {
+  transform: translateY(3px);
+  box-shadow: 0 0 0 var(--ink);
+}
+
+/* ---- the box back -------------------------------------------------------- */
+
+.boxback {
+  display: flex;
+  flex-direction: column;
+  color: var(--ink);
+  min-width: 0;
+  min-height: 0;
+}
+.boxback.stock {
+  overflow: hidden;
+}
+.bb-head {
+  position: relative;
+  flex: none;
+  background: var(--sp-bg);
+  color: var(--sp-ink);
+  border-bottom: 2px solid var(--ink);
+  padding: 10px 64px 20px 14px;
+  min-height: 64px;
+  display: flex;
+  align-items: center;
+}
+.bb-head::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 5px;
+  height: 7px;
+  background: var(--sp-stripe);
+  border-block: 2px solid var(--ink);
+}
+.bb-name {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+.bb-name .k {
+  font: 700 12px/1 var(--f-narrow);
+  text-transform: uppercase;
+}
+.bb-name .m {
+  font: 400 26px/1 var(--f-display);
+  text-transform: uppercase;
+  letter-spacing: 0.01em;
+  text-wrap: balance;
+}
+.bb-disc {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  margin-top: -29px;
+  width: 44px;
+  height: 44px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--sp-ink);
+  color: var(--sp-bg);
+  border: 2px solid var(--ink);
+  box-shadow: 2px 2px 0 var(--ink);
+}
+.bb-emblem {
+  width: 26px;
+  height: 26px;
+}
+
+.bb-body {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 12px 14px 4px;
+}
+.bb-tag {
+  font: 400 15px/1.3 var(--f-script);
+}
+.bb-match {
+  font: 700 14px/1.25 var(--f-narrow);
+  text-transform: uppercase;
+  color: var(--ink-2);
+}
+.bb-match b {
+  color: var(--ink);
+}
+.bb-row {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+}
+.bb-h {
+  font: 400 16px/1 var(--f-display);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+.bb-cast {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+.bb-cast .vs-chip {
+  min-height: 56px;
+}
+.bb-locs {
+  display: flex;
+  gap: 8px;
+  padding: 2px 2px 7px;
+  margin: -2px -2px -7px;
+}
+.bb-locs .vs-chip {
+  flex: none;
+  min-height: 48px;
+}
+
+/* the rating: a segmented key, with the UNRATED sticker slapped on its corner */
+.vs-seg {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  border: 2.5px solid var(--ink);
+  border-radius: 10px;
+  background: var(--ink);
+  box-shadow: 0 3px 0 var(--ink);
+}
+.vs-seg button {
+  appearance: none;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 48px;
+  padding: 4px 10px;
+  border: 0;
+  background: var(--bone);
+  color: var(--ink);
+  font: 700 14px/1.05 var(--f-ui);
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+}
+.vs-seg button:first-child {
+  border-radius: 7px 0 0 7px;
+}
+.vs-seg button + button {
+  border-left: 2.5px solid var(--ink);
+  border-radius: 0 7px 7px 0;
+}
+.vs-seg button[aria-pressed='true'] {
+  background: var(--ink);
+  color: var(--bone);
+}
+.vs-seg .lbl {
+  text-align: center;
+}
+.vs-rated {
+  flex: none;
+  display: inline-grid;
+  place-items: center;
+  min-width: 24px;
+  height: 26px;
+  padding: 0 4px;
+  border: 2px solid currentColor;
+  border-radius: 3px;
+  font: 400 18px/1 var(--f-display);
+}
+.vs-unrated {
+  position: absolute;
+  z-index: 1;
+  top: -11px;
+  right: -6px;
+  padding: 3px 6px 2px;
+  background: var(--blood);
+  color: var(--paper);
+  border: 2px solid var(--ink);
+  border-radius: 3px;
+  box-shadow: 2px 2px 0 var(--ink);
+  font: 400 12px/1 var(--f-marker);
+  text-transform: uppercase;
+  letter-spacing: 0;
+  transform: rotate(6deg);
+}
+
+.bb-toggles {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+.vs-toggle {
+  appearance: none;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 52px;
+  min-width: 0;
+  padding: 5px 8px 5px 7px;
+  background: var(--bone);
+  color: var(--ink);
+  border: 2px solid var(--ink);
+  border-radius: 8px;
+  box-shadow: 0 3px 0 var(--ink);
+  text-align: left;
+  cursor: pointer;
+}
+.vs-toggle:active:not(:disabled) {
+  transform: translateY(3px);
+  box-shadow: none;
+}
+.vs-toggle[aria-pressed='true'] {
+  background: var(--victim);
+}
+.vs-toggle:disabled {
+  background: var(--bone-2);
+  color: var(--ink-2);
+  border-style: dashed;
+  box-shadow: none;
+  cursor: default;
+}
+.vs-tickbox {
+  flex: none;
+  width: 26px;
+  height: 26px;
+}
+.vs-toggle .txt {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+.vs-toggle .lbl {
+  font: 700 14px/1.1 var(--f-ui);
+}
+.vs-toggle small {
+  font: 700 12px/1.1 var(--f-narrow);
+  color: var(--ink-2);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.bb-foot {
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 12px 14px 14px;
+}
+.bb-keys {
+  display: flex;
+  gap: 10px;
+}
+.bb-mix {
+  flex: none;
+}
+.bb-start {
+  flex: 1;
+  min-width: 0;
+  min-height: 56px;
+}
+.bb-start .glyph {
+  width: 18px;
+  height: 18px;
+}
+.bb-fine {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font: 700 11px/1.2 var(--f-narrow);
+  text-transform: uppercase;
+  color: var(--ink-2);
+}
+.vs-barcode {
+  flex: none;
+  width: 78px;
+  height: 24px;
+  padding: 2px 3px;
+  background: var(--paper);
+  border: 1.5px solid var(--ink);
+  box-sizing: content-box;
+}
+
+/* in a sheet: the sheet is the box, a band across the top is the spine.
+   The sheet body doesn't scroll itself (scroll={false}): our own body scrolls
+   and the keys stay pinned at the bottom, in reach on the smallest phones. */
+.vs-sheet .sheet-body {
+  --vs-sx: 16px;
+  --vs-sl: 16px;
+}
+.boxback.in-sheet {
+  flex: 1 1 auto;
+}
+.boxback.in-sheet .bb-head {
+  min-height: 0;
+  height: 20px;
+  padding: 0;
+  margin: 14px var(--vs-sx) 0 var(--vs-sl);
+  border: 2px solid var(--ink);
+  border-radius: 4px;
+  overflow: visible;
+}
+.boxback.in-sheet .bb-head::after {
+  bottom: 3px;
+  height: 8px;
+}
+.boxback.in-sheet .bb-disc {
+  right: 14px;
+  width: 40px;
+  height: 40px;
+  margin-top: -20px;
+}
+.boxback.in-sheet .bb-emblem {
+  width: 24px;
+  height: 24px;
+}
+.boxback.in-sheet .bb-body {
+  padding: 20px var(--vs-sx) 14px var(--vs-sl);
+}
+.boxback.in-sheet .bb-fine {
+  margin-top: 4px;
+}
+.boxback.in-sheet .bb-foot {
+  margin: 0 var(--vs-sx) 0 var(--vs-sl);
+  padding: 10px 0 4px;
+  border-top: 2px solid var(--ink);
+}
+
+/* ---- mix & match --------------------------------------------------------- */
+
+.mix {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  color: var(--ink);
+}
+.mix-scroll {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  padding: 12px var(--vs-sx) 18px var(--vs-sl);
+}
+.mix-sec {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.mix-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+.mix .vs-chip {
+  font-size: 15px;
+}
+.mix .vs-chip .nm {
+  white-space: normal;
+  text-wrap: balance;
+}
+.mix-blurb {
+  margin-top: 4px;
+  transform: rotate(-0.6deg);
+}
+.mix-foot {
+  flex: none;
+  margin: 0 var(--vs-sx) 0 var(--vs-sl);
+  padding: 10px 0 4px;
+  border-top: 2px solid var(--ink);
+}
+
+/* ---- landscape: the shelf on the left, the box back on the right --------- */
+
+.store.wide .vs-floor {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) clamp(330px, 47%, 420px);
+  column-gap: 16px;
+  align-items: stretch;
+  padding: var(--pad-t) var(--pad-r) var(--pad-b) var(--pad-l);
+}
+.store.wide .vs-front {
+  max-width: none;
+  min-height: 0;
+  gap: 6px;
+}
+.store.wide .vs-top {
+  align-items: center;
+  padding-top: 0;
+}
+.store.wide .vs-brand {
+  padding: 0 96px 0 0;
+}
+.store.wide .vs-fan {
+  right: 0;
+  bottom: auto;
+  top: 8px;
+}
+.store.wide .vs-help {
+  margin-top: 0;
+}
+.store.wide .vs-shelf {
+  flex: 1 1 auto;
+  min-height: 170px;
+}
+.store.wide .vs-aisle {
+  display: none;
+}
+
+/* standing up: spines side by side, read top to bottom */
+.store.wide .vs-spines {
+  flex: 1 1 auto;
+  max-height: none;
+  min-height: 0;
+  flex-direction: row;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 8px;
+  padding: 16px 2px 0;
+}
+.store.wide .vs-spine {
+  flex: 1 1 0;
+  max-width: 64px;
+  width: auto;
+  min-height: 0;
+  height: 100%;
+  max-height: 300px;
+  flex-direction: column;
+  box-shadow: 3px 0 0 var(--ink);
+}
+.store.wide .vs-spine:active {
+  box-shadow: 1px 0 0 var(--ink);
+}
+.store.wide .vs-spine.on {
+  transform: translateY(-14px);
+  box-shadow: 3px 0 0 var(--ink);
+}
+.store.wide .vs-cap {
+  width: auto;
+  height: 48px;
+  padding-top: 6px;
+  border-right: 0;
+  border-bottom: 2px solid var(--ink);
+}
+.store.wide .vs-disc {
+  width: 34px;
+  height: 34px;
+}
+.store.wide .vs-emblem {
+  width: 20px;
+  height: 20px;
+}
+.store.wide .vs-stripe {
+  width: auto;
+  height: 8px;
+  border-right: 0;
+  border-bottom: 2px solid var(--ink);
+}
+.store.wide .vs-title {
+  writing-mode: vertical-rl;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 3px;
+  padding: 9px 0 6px;
+}
+.store.wide .vs-kicker {
+  font-size: 11px;
+}
+/* one line when it fits; long titles break into two balanced columns */
+.store.wide .vs-main {
+  font-size: clamp(16px, calc(100cqh * 1.85 / var(--len, 14)), 21px);
+  line-height: 0.98;
+  letter-spacing: 0.02em;
+  white-space: normal;
+  text-wrap: balance;
+  overflow: visible;
+}
+.store.wide .vs-label {
+  align-self: center;
+  margin: 0 0 7px;
+  padding: 2px 3px 1px;
+  font-size: 12px;
+}
+.store.wide .vs-flag {
+  top: -9px;
+  right: auto;
+  left: 50%;
+  translate: -50% 0;
+  font-size: 12px;
+  padding: 3px 5px 2px;
+}
+.store.wide .vs-plank {
+  height: 22px;
+  margin: 0 -2px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding: 0 8px 1px;
+}
+.vs-plank-lbl {
+  position: relative;
+  font: 500 11px/1 var(--f-ui);
+  color: var(--ink);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.store.wide .vs-keys {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 10px;
+}
+.store.wide .vs-keys .btn {
+  flex: none;
+}
+.store.wide .vs-keys .vs-aisle-note {
+  flex: 1;
+  text-align: right;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.store.wide .vs-vcr {
+  flex: 1;
+  min-width: 0;
+  min-height: 48px;
+  padding: 3px 6px;
+}
+.store.wide .vs-vcr-play {
+  width: 36px;
+  height: 36px;
+}
+.store.wide .vs-vcr-slot {
+  width: 64px;
+}
+.store.wide .vs-back {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  padding-bottom: 5px;
+}
+.store.wide .vs-back .boxback {
+  flex: 1;
+}
+
+/* landscape phones: everything tightens to fit 390pt of height */
+@media (orientation: landscape) and (max-height: 560px) {
+  .vs-sheet .sheet-body {
+    --vs-sx: 14px;
+    --vs-sl: 26px;
+  }
+  .store .logo {
+    font-size: 40px;
+  }
+  .vs-vcr-lcd {
+    font-size: 20px;
+  }
+  .vs-vcr-lbl {
+    font-size: 14px;
+  }
+  .bb-head {
+    min-height: 0;
+    padding: 8px 56px 17px 12px;
+  }
+  .bb-name {
+    display: block;
+    line-height: 1;
+  }
+  .bb-name .k {
+    font-size: 12px;
+    margin-right: 6px;
+  }
+  .bb-name .m {
+    font-size: 24px;
+  }
+  .bb-disc {
+    width: 36px;
+    height: 36px;
+    right: 10px;
+    margin-top: -24px;
+  }
+  .bb-emblem {
+    width: 22px;
+    height: 22px;
+  }
+  .bb-body {
+    gap: 6px;
+    padding: 7px 12px 6px;
+  }
+  .bb-tag {
+    font-size: 14px;
+    line-height: 1.18;
+  }
+  .bb-match .ttl {
+    display: none;
+  }
+  /* the rating needs no caption here: the R and UNRATED badges say it */
+  .boxback:not(.in-sheet) .bb-rating .bb-h {
+    display: none;
+  }
+  .boxback:not(.in-sheet) .vs-unrated {
+    position: static;
+    flex: none;
+    transform: rotate(-5deg);
+  }
+  .bb-match {
+    font-size: 13px;
+    line-height: 1.2;
+  }
+  .boxback:not(.in-sheet) .bb-row {
+    flex-direction: row;
+    align-items: center;
+    gap: 8px;
+  }
+  .boxback:not(.in-sheet) .bb-h {
+    flex: none;
+    width: 60px;
+    font-size: 14px;
+  }
+  .boxback:not(.in-sheet) .bb-row > :last-child {
+    flex: 1;
+    min-width: 0;
+  }
+  .bb-cast {
+    gap: 8px;
+  }
+  /* compact chips: the hit points tuck under the name */
+  .boxback:not(.in-sheet) .vs-chip.girl {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    grid-template-rows: auto auto;
+    column-gap: 6px;
+    row-gap: 2px;
+    align-content: center;
+    min-height: 44px;
+    padding: 2px 6px 2px 4px;
+    font-size: 15px;
+  }
+  .boxback:not(.in-sheet) .vs-chip.girl[aria-pressed='true'] {
+    padding: 1px 5px 1px 3px;
+  }
+  .boxback:not(.in-sheet) .vs-chip.girl .tok {
+    grid-row: 1 / span 2;
+    align-self: center;
+  }
+  .boxback:not(.in-sheet) .vs-chip.girl .hp {
+    font: 700 12px/1 var(--f-narrow);
+    gap: 2px;
+  }
+  .boxback:not(.in-sheet) .vs-chip.girl .hp .ico {
+    width: 12px;
+    height: 12px;
+  }
+  .bb-locs .vs-chip {
+    min-height: 44px;
+    font-size: 15px;
+  }
+  .vs-chip .tok {
+    width: 32px;
+    height: 32px;
+  }
+  .vs-chip .tok .ico {
+    width: 18px;
+    height: 18px;
+  }
+  .vs-seg button {
+    min-height: 44px;
+    font-size: 13px;
+    gap: 6px;
+    padding: 3px 8px;
+  }
+  .vs-rated {
+    height: 24px;
+    min-width: 22px;
+    font-size: 16px;
+  }
+  .vs-unrated {
+    font-size: 11px;
+  }
+  .bb-toggles {
+    gap: 8px;
+  }
+  .vs-toggle {
+    min-height: 44px;
+    padding: 2px 6px;
+    gap: 6px;
+  }
+  .vs-toggle .lbl {
+    font-size: 13px;
+  }
+  .vs-toggle small {
+    font-size: 11px;
+  }
+  .vs-tickbox {
+    width: 24px;
+    height: 24px;
+  }
+  .bb-foot {
+    padding: 7px 12px 9px;
+    border-top: 2px solid var(--ink);
+  }
+  .bb-start {
+    min-height: 48px;
+    padding: 0 10px;
+    font-size: 16px;
+  }
+  .bb-start .glyph {
+    width: 16px;
+    height: 16px;
+  }
+  .bb-mix {
+    font-size: 13px;
+    padding: 0 10px;
+  }
+}
+
+/* short portrait screens (iPhone SE): a tighter shelf so the keys stay in reach */
+@media (orientation: portrait) and (max-height: 700px) {
+  .vs-front {
+    gap: 10px;
+  }
+  .store .logo {
+    font-size: 44px;
+  }
+  .vs-brand {
+    padding-bottom: 14px;
+  }
+  .vs-aisle {
+    margin-bottom: 10px;
+  }
+  .vs-aisle-tag {
+    font-size: 15px;
+  }
+  .vs-spines {
+    gap: 5px;
+  }
+  .vs-spine {
+    flex-basis: 52px;
+    min-height: 52px;
+  }
+  .vs-disc {
+    width: 36px;
+    height: 36px;
+  }
+  .vs-emblem {
+    width: 20px;
+    height: 20px;
+  }
+  .vs-cap {
+    width: 52px;
+  }
+  .vs-vcr {
+    min-height: 52px;
+    padding-block: 4px;
+  }
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .vs-spine:hover:not(.on) {
+    transform: translateX(6px);
+  }
+  .store.wide .vs-spine:hover:not(.on) {
+    transform: translateY(-5px);
+  }
+  .vs-chip:hover:not([aria-pressed='true']),
+  .vs-toggle:hover:not(:disabled):not([aria-pressed='true']),
+  .vs-seg button:hover:not([aria-pressed='true']) {
+    background: var(--paper);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .vs-spine {
+    transition: none;
+  }
+}

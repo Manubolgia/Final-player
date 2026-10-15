@@ -44,6 +44,16 @@
 .dock > .stage > * {
   pointer-events: auto;
 }
+/* lifted things sit over the map, never over the board's own header */
+.dock > .stage {
+  margin-top: 48px;
+}
+@media (orientation: landscape) and (max-height: 560px) {
+  .dock > .stage {
+    margin-top: 0;
+    margin-left: 50px;
+  }
+}
 
 @media (orientation: portrait) and (max-height: 700px) {
   .game {
@@ -203,4 +213,134 @@
 .slip b,
 .slip strong {
   font-weight: 700;
+}
+
+/* opening: the boards drop onto the table */
+.game.opening > .panel.killer {
+  animation: dropTop 360ms cubic-bezier(0.2, 0.9, 0.3, 1.2) 300ms both;
+}
+.game.opening > .board {
+  animation: thunk 420ms steps(3) 480ms both;
+}
+.game.opening > .panel.girl,
+.game.opening > .dock > .tray {
+  animation: dropBottom 360ms cubic-bezier(0.2, 0.9, 0.3, 1.2) 340ms both;
+}
+@keyframes dropTop {
+  from {
+    transform: translateY(-120%);
+  }
+}
+@keyframes dropBottom {
+  from {
+    transform: translateY(120%);
+  }
+}
+@keyframes thunk {
+  0% {
+    transform: scale(0.92);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.02);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+.game.waiting > .dock > .tray {
+  pointer-events: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .game.opening > * {
+    animation-duration: 1ms !important;
+  }
+  .game.shake {
+    animation: none;
+  }
+}
+.chit.panic-t b {
+  font: 700 12px/1 var(--f-narrow);
+}
+
+/* first-run tips: yellow paper stickers slapped on the table, tap to peel off */
+.tip-sticker {
+  z-index: 9;
+  position: relative;
+  max-width: 250px;
+  padding: 9px 12px 8px;
+  background: var(--victim);
+  color: var(--ink);
+  border: 2px solid var(--ink);
+  border-radius: 4px;
+  box-shadow: 3px 3px 0 var(--ink);
+  font: 400 17px/1.15 var(--f-marker);
+  text-align: left;
+  transform: rotate(-2.5deg);
+  animation: slap 260ms cubic-bezier(0.2, 0.9, 0.3, 1.3) 200ms both;
+}
+.tip-sticker .tip-ok {
+  display: block;
+  margin-top: 4px;
+  font: 700 11px/1 var(--f-ui);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+.tip-sticker::after {
+  content: '';
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  background: inherit;
+  border: 2px solid var(--ink);
+  border-top: 0;
+  border-left: 0;
+}
+.tip-sticker.hand {
+  grid-area: tray;
+  align-self: start;
+  justify-self: center;
+  margin-top: 30px;
+}
+.tip-sticker.hand::after {
+  left: calc(50% - 7px);
+  bottom: -9px;
+  transform: rotate(45deg);
+}
+.tip-sticker.move {
+  grid-area: board;
+  align-self: end;
+  justify-self: center;
+  margin-bottom: 14px;
+}
+.tip-sticker.move::after {
+  display: none;
+}
+.tip-sticker.deck {
+  grid-area: killer;
+  align-self: end;
+  justify-self: end;
+  margin: 0 8px -64px 0;
+  max-width: 220px;
+  transform: rotate(2deg);
+}
+.tip-sticker.deck::after {
+  right: 24px;
+  top: -9px;
+  transform: rotate(-135deg);
+}
+@keyframes slap {
+  from {
+    transform: scale(1.4) rotate(-8deg);
+    opacity: 0;
+  }
+}
+@media (orientation: landscape) and (max-height: 560px) {
+  .tip-sticker.hand {
+    margin-top: 22px;
+  }
+  .tip-sticker.deck {
+    margin-bottom: -60px;
+  }
 }

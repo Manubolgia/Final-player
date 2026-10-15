@@ -71,6 +71,9 @@ export function enemyName(g: GameState, a: string): string {
   return 'A puppet victim';
 }
 
+/** "The birds" → "the birds" mid-sentence; names stay capitalised. */
+const inSentence = (name: string): string => name.replace(/^(The|A) /, (m) => m.toLowerCase());
+
 export function minionName(g: GameState, id: string, many = false): string {
   if (id.startsWith('tmp-giant')) return 'Giant';
   if (id.startsWith('tmp-clown')) return 'Clown Doll';
@@ -185,7 +188,7 @@ function findTarget(g: GameState, f: KF): KillerTarget | 'tie' {
   if (tied.length === 1) return { kind: 'zone', zone: tied[0], who };
   choose(
     g,
-    `Tie: where does ${enemyName(g, f.actor).toLowerCase()} go?`,
+    `Tie: where does ${inSentence(enemyName(g, f.actor))} go?`,
     tied.map((z) => ({ id: z, label: zoneLabel(g, z), zone: z })),
     { id: 'killerTargetZone', data: { who } },
   );
@@ -375,7 +378,7 @@ frames.killer = {
         if (paths.length > 1) {
           choose(
             g,
-            `Tie: which way does ${enemyName(g, f.actor).toLowerCase()} go?`,
+            `Tie: which way does ${inSentence(enemyName(g, f.actor))} go?`,
             paths.map((p, i) => ({ id: String(i), label: p.length ? p.map((z) => zoneName(g, z)).join(' → ') : 'Stays put', zone: p[p.length - 1] })),
             { id: 'killerPath', data: { paths } },
           );
