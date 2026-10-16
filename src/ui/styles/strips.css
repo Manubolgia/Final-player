@@ -390,3 +390,15 @@
     font-size: 15px;
   }
 }
+
+/* the Dark Power card says what it is */
+.dpcard .dpmark,
+.dpcard:not(.up) .dpmark {
+  width: auto;
+  height: auto;
+  transform: none;
+  border: 0;
+  background: none;
+  font: 400 12px/1 var(--f-display);
+  color: var(--bone);
+}
