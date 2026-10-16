@@ -1,18 +1,22 @@
+import { useLayoutEffect, type CSSProperties } from 'react';
 import type { GameState } from '../../game';
 import { BOARDS } from '../../game/content/core';
 import { finalGirlDef, killerDef } from '../../game/content';
 import { diceCount } from '../../game/engine/dice';
 import { itemDef } from '../../game/engine/kernel';
 import type { DisplayView } from '../game/display';
-import { Backpack, Boot, Crow, Emblem, Hand, Heart, HeartOutline, Hourglass, Knife } from '../pieces/icons';
+import { Backpack, Bolt, Boot, Crow, Hand, Heart, HeartBroken, HeartOutline, Hourglass, Knife, MeepleIcon } from '../pieces/icons';
+import { KillerArt, setTableKiller } from '../art';
 
+/** The cards under the top one: one hard edge per two cards left, up to five. */
 const deckStack = (n: number) =>
-  Array.from({ length: Math.min(6, Math.ceil(n / 2)) }, (_, i) => `${i + 1}px ${i + 1}px 0 ${i % 2 ? '#141213' : '#3a3334'}`).join(',') || 'none';
+  Array.from({ length: Math.min(5, Math.ceil(n / 2)) }, (_, i) => `${(i + 1) * 2}px ${(i + 1) * 2}px 0 ${i % 2 ? '#141213' : '#5b524a'}`).join(',') || 'none';
 
+/** The Final Health token: a black coin with a heart (face down), or a spent white one. */
 export function FinalCoin({ token }: { token: 'black' | 'white' }) {
   return (
-    <span className={`coin ${token}`} title={token === 'black' ? 'Final Health token: face down' : 'Final Health token: already used'}>
-      {token === 'black' ? '?' : '0'}
+    <span className={`coin fh ${token}`} title={token === 'black' ? 'Final Health token: face down' : 'Final Health token: already used'}>
+      {token === 'black' ? <Heart className="fh-i" /> : <HeartBroken className="fh-i" />}
     </span>
   );
 }
@@ -38,10 +42,13 @@ export function KillerStrip({ g, view, onOpen }: { g: GameState; view: DisplayVi
   const dpDef = dp ? k.darkPowers.find((d) => d.id === dp.id) : null;
   const fin = k.finales.find((f) => f.id === g.killer.finale)!;
   const sticker = filmSticker(g, view);
+  // pieces that are not handed the game (reveal cards, title cards) print this killer
+  useLayoutEffect(() => setTableKiller(k.id), [k.id]);
+  const n = k.bloodlust.length;
   return (
     <button type="button" className="panel killer" onClick={onOpen} aria-label="Killer board">
       <span className="emb">
-        <Emblem name={k.icon} className="emb-i" />
+        <KillerArt id={k.id} crop="bust" />
       </span>
       <span className="k-main">
         <span className="k-row">
@@ -65,11 +72,6 @@ export function KillerStrip({ g, view, onOpen }: { g: GameState; view: DisplayVi
           )}
         </span>
         <span className="k-row">
-          <span className="ladder" aria-label={`Bloodlust ${view.bl + 1} of ${k.bloodlust.length}`}>
-            {k.bloodlust.map((s, i) => (
-              <span key={i} className={`rung${i < view.bl ? ' full' : ''}${i === view.bl ? ' here' : ''}${s.darkPower ? ' dp' : ''}${s.effects?.length ? ' fx' : ''}`} />
-            ))}
-          </span>
           {k.bodiless ? null : (
             <>
               <span className="stat sm">
@@ -82,13 +84,20 @@ export function KillerStrip({ g, view, onOpen }: { g: GameState; view: DisplayVi
               </span>
             </>
           )}
+          <span className="ladder" style={{ '--cols': n > 6 ? Math.ceil(n / 2) : n } as CSSProperties} aria-label={`Bloodlust ${view.bl + 1} of ${n}`}>
+            {k.bloodlust.map((st, i) => (
+              <span key={i} className={`rung${i < view.bl ? ' full' : ''}${i === view.bl ? ' here' : ''}${st.darkPower ? ' dp' : ''}${st.effects?.length ? ' fx' : ''}`} />
+            ))}
+          </span>
         </span>
       </span>
       <span className={`dpcard${dpDef ? ' up' : ''}`} title={dpDef ? `Dark Power: ${dpDef.name}` : 'Dark Power: face down'}>
+        <Bolt className="dp-bolt" />
         <span className="dpmark">DP</span>
       </span>
       <span className={`tdeck${g.killer.finaleRevealed ? ' fin' : view.td <= 3 ? ' soon' : ''}`} style={{ boxShadow: g.killer.finaleRevealed ? undefined : deckStack(view.td) }} title={g.killer.finaleRevealed ? `Finale: ${fin.name}` : `${view.td} Terror cards left${view.td <= 3 ? ', the Finale is near' : ''}`}>
-        <span className="tnum">{g.killer.finaleRevealed ? 'FIN' : view.td}</span>
+        <span className="tback" aria-hidden="true" />
+        <span className="tnum num">{g.killer.finaleRevealed ? 'FIN' : view.td}</span>
       </span>
       {sticker ? <span className={`sticker sm film-st ${sticker.cls}`}>{sticker.text}</span> : null}
     </button>
@@ -139,6 +148,13 @@ function statusStickers(g: GameState): { text: string; cls: string }[] {
   return out;
 }
 
+/** An empty rescue slot: a meeple-shaped hole printed in dashes. */
+const EmptySlot = () => (
+  <svg viewBox="-1 -1 27 27" width={15} height={15} className="rslot-m" aria-hidden="true">
+    <use href="#meeple" width={24} height={24} fill="#dccfb4" stroke="#5b524a" strokeWidth={1.8} strokeDasharray="3 2.2" />
+  </svg>
+);
+
 export function GirlStrip({ g, view, onOpen }: { g: GameState; view: DisplayView; onOpen: () => void }) {
   const fg = finalGirlDef(g.config.finalGirl);
   const max = g.fg.health.max;
@@ -152,8 +168,10 @@ export function GirlStrip({ g, view, onOpen }: { g: GameState; view: DisplayView
       <span className="g-main">
         <span className="g-row">
           <span className={`g-name${g.fg.ultimate ? ' ult' : ''}`}>{fg.name}</span>
-          <span className="hearts" aria-label={`${view.fhp} of ${max} health`}>
-            {max <= 7 ? Array.from({ length: max }, (_, i) => (i < view.fhp ? <Heart key={i} className="ico red" /> : <HeartOutline key={i} className="ico" />)) : (
+          <span className="hearts" data-n={max} aria-label={`${view.fhp} of ${max} health`}>
+            {max <= 7 ? (
+              <span className="hp-track">{Array.from({ length: max }, (_, i) => (i < view.fhp ? <Heart key={i} className="ico red" /> : <HeartOutline key={i} className="ico" />))}</span>
+            ) : (
               <>
                 <Heart className="ico red" />
                 <b className="num">{view.fhp}</b>
@@ -188,11 +206,11 @@ export function GirlStrip({ g, view, onOpen }: { g: GameState; view: DisplayView
               <b>{pack.length}</b>
             </span>
           </span>
-          <span className="saved" aria-label={`${view.saved} saved`}>
+          <span className="saved" aria-label={g.fg.ultimate ? 'Ultimate unlocked' : `${slots.filter(Boolean).length} of ${slots.length} rescue slots filled`}>
             {g.fg.ultimate ? (
               <span className="sticker purple sm">Ultimate</span>
             ) : (
-              slots.map((s, i) => <span key={i} className={`pip${s ? ' on' : ''}`} />)
+              slots.map((s, i) => (s ? <MeepleIcon key={i} color="var(--victim)" size={15} className="rslot-m on" /> : <EmptySlot key={i} />))
             )}
           </span>
           {st.slice(0, 2).map((s) => (
