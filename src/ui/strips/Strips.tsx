@@ -12,7 +12,7 @@ const deckStack = (n: number) =>
 export function FinalCoin({ token }: { token: 'black' | 'white' }) {
   return (
     <span className={`coin ${token}`} title={token === 'black' ? 'Final Health token: face down' : 'Final Health token: already used'}>
-      {token === 'black' ? '+?' : '0'}
+      {token === 'black' ? '?' : '0'}
     </span>
   );
 }

@@ -141,7 +141,9 @@
   position: absolute;
   inset: 0;
   z-index: 35;
-  background: var(--black-stock);
+  /* the lights are down on the same walnut table */
+  background-color: var(--table-deep);
+  background-image: inherit;
   color: var(--on-black);
   display: flex;
   flex-direction: column;
