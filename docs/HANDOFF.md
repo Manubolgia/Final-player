@@ -93,6 +93,16 @@ Then run the full critic workflow (`critic-workflow.js`) for the final grade.
 - **Header and strip.** The EVENT and TERROR chits are labelled, and the Dark Power card reads "DP".
 - **Test fix.** The e2e test now reads `.end-screen .outcome`; the old summary line was replaced by recap rows.
 
+**After the round-3 review** (merge `ae60c55`):
+- The tray's prompt sits on a printed bone slip, and loose hints are paper slips. The duplicate move hint is gone.
+- Planning names wrap.
+- Landscape move keys get the full width.
+- Rescue rewards are clamped.
+- The ON tokens use the palette red.
+- Six hearts fit in landscape.
+
+**Tried and reverted: penalising a plate for covering its own space's meeple spot.** It pushed plates into each other on Camp and Groves, which the overlap test caught. Meeples on labels needs the pawn-pad approach: a fixed spot for pieces on each space, opposite its plate, that both the token layer and the solver use.
+
 **Round-3 review:** [`review-r3-lead.md`](redesign/review-r3-lead.md). The biggest remaining gaps, in order:
 1. Illustration. The `r2-art` WIP doesn't compile and isn't usable; start fresh.
 2. Meeples sitting on labels. The fix is a pawn pad per space included in the solver.
