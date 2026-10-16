@@ -275,7 +275,7 @@ export const ROLE_HEX: Record<string, string> = {
   smalley: '#e8742a',
   tourGuide: '#5e9c4a',
 };
-export const victimHex = (role?: string): string => (role ? ROLE_HEX[role] ?? '#f4f1ea' : '#f2c230');
+export const victimHex = (role?: string): string => (role ? (ROLE_HEX[role] ?? '#f4f1ea') : '#f2c230');
 
 export type Glyph = 'shield' | 'knife' | 'boot' | 'eye' | 'heart' | 'wrench' | 'hourglass' | 'card';
 

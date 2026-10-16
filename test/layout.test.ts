@@ -71,7 +71,7 @@ const SIZES: [string, number, number, number][] = [
  * portrait frames; they may shrink, never grow. Pads have none: pieces never
  * stand on a name or another space.
  */
-const KNOWN: Record<string, number> = { 'mapleLane portrait': 1, 'mapleLane portrait 393': 1, 'sacredGroves portrait 393': 2, 'creechManor landscape SE': 3 };
+const KNOWN: Record<string, number> = { 'mapleLane landscape SE': 1 };
 
 describe('board name plates and pawn pads', () => {
   for (const loc of LOCATIONS)

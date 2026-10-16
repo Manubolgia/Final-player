@@ -235,7 +235,7 @@ export function layoutBoard(loc: LocationDef, zones: ZoneDef[], edges: Edge[], p
   }));
   const home = pts.map((q) => ({ ...q.p }));
   relax(pts, view, ppu);
-  // board percent → board units, carried along with the nearest spaces where they were spread apart
+  // board percent to board units, carried along with the nearest spaces where they were spread apart
   const warp = (x: number, y: number): Pt => {
     const p = { x, y: y / aspect };
     let sw = 0;
@@ -729,9 +729,16 @@ export function placeTiles(lay: Pick<BoardLayout, 'zones' | 'ppu' | 'ob'>, arrow
  * Spread crowded spaces apart a little so plates and tiles have room. The
  * printed boards are schematic, so a nudge of a few px reads the same.
  */
-function relax(pts: { p: Pt; r: number }[], view: View, ppu: number) {
+function relax(pts: { z: ZoneDef; p: Pt; r: number }[], view: View, ppu: number) {
   const home = pts.map((q) => ({ ...q.p }));
-  const gap = 36 / ppu;
+  const gap = 40 / ppu;
+  // streets stay straight: a space on a straight street only slides along it
+  const ids = new Map(pts.map((q, i) => [q.z.id, i]));
+  const lock = pts.map((q) => {
+    if (!q.z.street) return { x: false, y: false };
+    const nb = q.z.panic.map((a) => ids.get(a.to)).filter((j): j is number => j != null && !!pts[j].z.street);
+    return { x: nb.some((j) => Math.abs(home[j].x - q.p.x) < 0.5), y: nb.some((j) => Math.abs(home[j].y - q.p.y) < 0.5) };
+  });
   for (let it = 0; it < 80; it++) {
     for (let i = 0; i < pts.length; i++) {
       for (let j = i + 1; j < pts.length; j++) {
@@ -748,10 +755,10 @@ function relax(pts: { p: Pt; r: number }[], view: View, ppu: number) {
         const want = (pts[i].r + pts[j].r) / ppu + gap;
         if (d >= want) continue;
         const push = ((want - d) / 2) * 0.4;
-        a.x -= (dx / d) * push;
-        a.y -= (dy / d) * push;
-        b.x += (dx / d) * push;
-        b.y += (dy / d) * push;
+        if (!lock[i].x) a.x -= (dx / d) * push;
+        if (!lock[i].y) a.y -= (dy / d) * push;
+        if (!lock[j].x) b.x += (dx / d) * push;
+        if (!lock[j].y) b.y += (dy / d) * push;
       }
     }
     for (const [i, q] of pts.entries()) {

@@ -30,7 +30,7 @@ export interface LandmarkSet {
 interface Ctx {
   loc: LocationDef;
   view: View;
-  /** Board percent → board units, following the spaces. */
+  /** Board percent to board units, following the spaces. */
   warp: (x: number, y: number) => Pt;
   /** Where each space ended up, in board units. */
   at: (id: string) => Pt | undefined;
@@ -132,7 +132,21 @@ function groves(c: Ctx): Shape[] {
   woods.forEach(([x, y, rx, ry], i) => out.push({ k: 'area', pts: ring(c, x, y, rx, ry, 9, 70 + i * 7, 0.12), fill: 'forest', edge: 'crowns', line: 1.5 }));
   // a spring west of the Bridge, its stream running under it and off the board
   out.push({ k: 'area', pts: ring(c, 63, 76.5, 4.2, 3.2, 10, 91, 0.1), fill: 'water', edge: 'smooth', line: 2 });
-  out.push({ k: 'band', pts: poly(c, [[64, 77.5], [68.5, 82.5], [74, 88], [76, 94], [77, 100], [78, 110]]), w: 3.6, fill: 'water', line: 2, smooth: true });
+  out.push({
+    k: 'band',
+    pts: poly(c, [
+      [64, 77.5],
+      [68.5, 82.5],
+      [74, 88],
+      [76, 94],
+      [77, 100],
+      [78, 110],
+    ]),
+    w: 3.6,
+    fill: 'water',
+    line: 2,
+    smooth: true,
+  });
   // the temple ruin the Sacred Shrine stands in: a stepped stone floor and broken columns
   const sh = c.at('shrine');
   if (sh) {
@@ -305,11 +319,30 @@ function creech(c: Ctx): Shape[] {
         line: 2,
       });
       // floorboards
-      for (let y = yB - 1.6; y > yT + 0.8; y -= 2.4) out.push({ k: 'line', pts: [{ x: a + 0.8, y }, { x: b - 0.8, y }], px: 1, ink: 'house' });
+      for (let y = yB - 1.6; y > yT + 0.8; y -= 2.4)
+        out.push({
+          k: 'line',
+          pts: [
+            { x: a + 0.8, y },
+            { x: b - 0.8, y },
+          ],
+          px: 1,
+          ink: 'house',
+        });
     }
   });
   // the house's outer walls, heavier
-  out.push({ k: 'line', pts: [{ x: x0, y: roofBase }, { x: x0, y: bot(0) }, { x: x1, y: bot(0) }, { x: x1, y: roofBase }], px: 3.5, ink: 'ink' });
+  out.push({
+    k: 'line',
+    pts: [
+      { x: x0, y: roofBase },
+      { x: x0, y: bot(0) },
+      { x: x1, y: bot(0) },
+      { x: x1, y: roofBase },
+    ],
+    px: 3.5,
+    ink: 'ink',
+  });
   return out;
 }
 
@@ -353,8 +386,24 @@ function wires(c: Ctx): Shape[] {
       out.push({ k: 'line', pts, px: 1.4, ink: 'ink' });
     }
     for (const p of poles.slice(1, -1)) {
-      out.push({ k: 'line', pts: [{ x: p.x, y: p.y - 2.6 }, { x: p.x, y: p.y + 4.5 }], px: 3, ink: 'ink' });
-      out.push({ k: 'line', pts: [{ x: p.x - 2, y: p.y - 0.4 }, { x: p.x + 2, y: p.y - 0.4 }], px: 2, ink: 'ink' });
+      out.push({
+        k: 'line',
+        pts: [
+          { x: p.x, y: p.y - 2.6 },
+          { x: p.x, y: p.y + 4.5 },
+        ],
+        px: 3,
+        ink: 'ink',
+      });
+      out.push({
+        k: 'line',
+        pts: [
+          { x: p.x - 2, y: p.y - 0.4 },
+          { x: p.x + 2, y: p.y - 0.4 },
+        ],
+        px: 2,
+        ink: 'ink',
+      });
     }
     // crows on the wire
     for (let i = 0; i < 7; i++) {
