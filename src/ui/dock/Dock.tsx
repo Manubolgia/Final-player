@@ -196,11 +196,11 @@ function MainPrompt({ g, p, send }: { g: GameState; p: P<'main'>; send: (i: Inpu
     keys = (
       <>
         {strike ? null : (
-          <Key label="Discard for Time" onClick={() => setMode('discard')} glyph={<Hourglass className="glyph" />} sub="for Time">
+          <Key label="Discard for Time" onClick={() => setMode('discard')} glyph={<Hourglass className="glyph" />}>
             Discard
           </Key>
         )}
-        {p.items.length && !strike ? <Key onClick={() => setMode(mode === 'items' ? 'play' : 'items')} kind={mode === 'items' ? 'dark' : 'plain'}>Items {p.items.length}</Key> : null}
+        {p.items.length && !strike ? <Key label={`Items (${p.items.length})`} onClick={() => setMode(mode === 'items' ? 'play' : 'items')} kind={mode === 'items' ? 'dark' : 'plain'} glyph={<Backpack className="glyph" />}>{p.items.length}</Key> : null}
         {p.canRescue ? (
           <Key kind="good" onClick={() => send({ t: 'rescue' })}>
             Save victims
@@ -467,9 +467,10 @@ function MovePrompt({ g, p, send, bring, setBring, setPressed }: { g: GameState;
         }
       >
         <div className="movearea">
+          {followers.length ? (
           <div className="bring">
             <span className="lab">Bring along</span>
-            {followers.length ? (
+            {(
               followers.map((v) => (
                 <button key={v.id} type="button" className={`btn small vt${bring.includes(v.id) ? ' good' : ''}`} onClick={() => toggle(v.id)} ref={haptic}>
                   <span className="row1">
@@ -479,10 +480,9 @@ function MovePrompt({ g, p, send, bring, setBring, setPressed }: { g: GameState;
                   </span>
                 </button>
               ))
-            ) : (
-              <span className="hint">Nobody here to bring.</span>
             )}
           </div>
+          ) : null}
           <div className="goto scroll-y">
             {p.to.map((z) => (
               <button
