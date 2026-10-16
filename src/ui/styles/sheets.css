@@ -2140,7 +2140,7 @@ html[data-text='large'] .sheet .script {
   color: var(--ink-2);
 }
 .sheet .switch.on {
-  background: var(--exit);
+  background: var(--blood);
   box-shadow: inset 0 3px 0 #2c5a29;
 }
 .sheet .switch.on .knob {
@@ -2415,7 +2415,7 @@ html[data-text='large'] .sheet .script {
   color: var(--ink-2);
 }
 .sheet .switch.on {
-  background: var(--exit);
+  background: var(--blood);
   transform: rotateY(180deg) rotate(-6deg);
 }
 .sheet .switch.on .sw-t {

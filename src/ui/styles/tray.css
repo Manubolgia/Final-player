@@ -734,3 +734,30 @@
     line-height: 1;
   }
 }
+
+/* planning names wrap to two lines instead of being cut off */
+.acard.pile .pname {
+  white-space: normal;
+  line-height: 1.05;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+/* rescue rewards stay inside their slot */
+.tray .rescue-card .sr {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  overflow-wrap: anywhere;
+}
+@media (orientation: landscape) and (max-height: 560px) {
+  /* the rail is narrow: one destination per row so names are never cut */
+  .goto {
+    grid-template-columns: 1fr;
+  }
+  .tray .rescue-card .sr {
+    -webkit-line-clamp: 2;
+  }
+}
