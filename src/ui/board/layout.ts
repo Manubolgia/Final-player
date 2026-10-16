@@ -652,6 +652,19 @@ export function layoutBoard(loc: LocationDef, zones: ZoneDef[], edges: Edge[], p
   return { view, ppu, zones: zl, edges, tiles, decor, ob, lm };
 }
 
+const cache = new Map<string, BoardLayout>();
+/** layoutBoard, remembered for the last few frame sizes (zooming in and out again is instant). */
+export function layoutBoardCached(loc: LocationDef, zones: ZoneDef[], edges: Edge[], ppu: number, aspect: number, opts: LayoutOpts = {}): BoardLayout {
+  const key = [loc.id, zones.map((z) => z.id).join(','), ppu, aspect, !!opts.birds].join('|');
+  let lay = cache.get(key);
+  if (!lay) {
+    lay = layoutBoard(loc, zones, edges, ppu, aspect, opts);
+    cache.set(key, lay);
+    if (cache.size > 8) cache.delete(cache.keys().next().value!);
+  }
+  return lay;
+}
+
 export interface Arrow {
   from: ZoneDef;
   to: ZoneDef;

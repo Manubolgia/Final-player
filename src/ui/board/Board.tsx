@@ -5,7 +5,7 @@ import type { LocationDef, ZoneDef } from '../../game/types';
 import { boardInk, victimHex, type BoardInk } from '../film';
 import type { BoardFx, DisplayView } from '../game/display';
 import { edgesOf, fitView, isBlocked, textWidth, visibleZones, type View } from './geometry';
-import { LABEL_FONT, layoutBoard, panicArrows, PITCH, placeTiles, type BoardLayout, type ZoneLayout } from './layout';
+import { LABEL_FONT, layoutBoardCached, panicArrows, PITCH, placeTiles, type BoardLayout, type ZoneLayout } from './layout';
 import { landmarkEls } from './Landmarks';
 import { placeGlyph } from './places';
 import { BIRD, TOKEN_CHIT } from './tokens';
@@ -80,7 +80,7 @@ export function Board(props: Props) {
   const rawPpu = size.w && size.h ? Math.min(size.w / win.w, size.h / win.h) : 0;
   const ppu = Math.round(rawPpu * 20) / 20;
   const birds = g.config.killer === 'birds';
-  const layout = useMemo(() => (ppu ? layoutBoard(loc, zones, edges, ppu, aspect, { birds }) : null), [loc, zones, edges, ppu, aspect, birds]);
+  const layout = useMemo(() => (ppu ? layoutBoardCached(loc, zones, edges, ppu, aspect, { birds }) : null), [loc, zones, edges, ppu, aspect, birds]);
 
   // pointer: tap a target / inspect a space, long-press to inspect, drag to pan when zoomed
   const press = useRef<{ x: number; y: number; t: number; moved: boolean; timer: number; pan0: { dx: number; dy: number }; long: boolean } | null>(null);
