@@ -12,7 +12,7 @@ import { ActionCard, EffectLine, ItemCard, matchRow, rowsOf } from '../cards/Car
 import { victimHex } from '../film';
 import { haptic } from '../fx/haptics';
 import { sfx } from '../fx/sound';
-import { Backpack, DieFace, FastFwd, Hand as HandIcon, Heart, Hourglass, MeepleIcon, Play, Skip, Tick } from '../pieces/icons';
+import { Backpack, DieFace, FastFwd, Hand as HandIcon, Hourglass, MeepleIcon, Play, Skip, Tick } from '../pieces/icons';
 import { Hand } from './Hand';
 import { Key, Tray } from './parts';
 
@@ -229,7 +229,7 @@ function MainPrompt({ g, p, send }: { g: GameState; p: P<'main'>; send: (i: Inpu
           <>
             <div className="scrim" onClick={() => setSel(null)} />
             <div className="mat lifted">
-              <ActionCard id={selCard} size="big" g={g} onClick={play ? doPlay : () => setSel(null)} notNow={play ? undefined : 'Not now'} />
+              <ActionCard id={selCard} size="mid" g={g} onClick={play ? doPlay : () => setSel(null)} notNow={play ? undefined : 'Not now'} />
               <div className="side">
                 {play && preview ? (
                   <div className="slip">
@@ -660,13 +660,7 @@ function ReactPrompt({ g, p, send }: { g: GameState; p: P<'react'>; send: (i: In
         <div className="attack-band">
           <span>{p.by} attacks</span>
           <span className="sticker red">{p.damage} damage</span>
-        </div>
-        <div className="hp-chit stock">
-          <Heart className="ico red" />
-          <b>
-            {hp} → {after}
-          </b>
-          {after <= 0 ? <span className="sticker red sm">Final Health token!</span> : null}
+          {after <= 0 ? <span className="sticker yellow sm">Final Health token!</span> : null}
         </div>
       </div>
     </>
@@ -683,47 +677,50 @@ function RescuePrompt({ g, p, send }: { g: GameState; p: P<'rescue'>; send: (i: 
   return (
     <>
       <Tray title={`Save victims · ${vs.length} here`} keys={<Key onClick={() => send({ t: 'rescueDone' })}>Done</Key>}>
-        <div className="vtoggles">
-          {vs.map((v) => (
-            <button
-              key={v.id}
-              type="button"
-              className={`btn small vt${who === v.id ? ' good' : ''}`}
-              ref={haptic}
-              onClick={() => (p.ultimate ? send({ t: 'rescueOne', victim: v.id, slot: 0 }) : setWho(v.id))}
-            >
-              <span className="row1">
-                <MeepleIcon color={victimHex(v.role)} size={22} />
-                {v.role ? victimName(v).replace(/^(a|the|your) /, '') : 'Victim'}
-              </span>
-            </button>
-          ))}
+        {/* the rescue card sits in the tray, so the board stays in view */}
+        <div className="rescue-tray">
+          {vs.length > 1 || p.ultimate ? (
+          <div className="vtoggles">
+            {vs.map((v) => (
+              <button
+                key={v.id}
+                type="button"
+                className={`btn small vt${who === v.id ? ' good' : ''}`}
+                ref={haptic}
+                onClick={() => (p.ultimate ? send({ t: 'rescueOne', victim: v.id, slot: 0 }) : setWho(v.id))}
+              >
+                <span className="row1">
+                  <MeepleIcon color={victimHex(v.role)} size={22} />
+                  {v.role ? victimName(v).replace(/^(a|the|your) /, '') : 'Victim'}
+                </span>
+              </button>
+            ))}
+          </div>
+          ) : null}
+          <div className={`rescue-card stock${p.ultimate ? ' ult' : ''}`}>
+            <div className="rc-head">{fg.name} · rescue card</div>
+            {p.ultimate ? (
+              <div className="rc-ult">
+                <b>Ultimate</b>
+                <p>{fg.ultimate.text}</p>
+                <p>Each save: {fg.extraText}. Tap a victim to save them.</p>
+              </div>
+            ) : (
+              <>
+                <div className="slots">
+                  {g.fg.slots.map((full, i) => (
+                    <button key={i} type="button" className={`slot${full ? ' full' : ''}${i === nextFree ? ' next' : ''}`} disabled={full} ref={haptic} onClick={() => who && send({ t: 'rescueOne', victim: who, slot: i })}>
+                      {full ? <span className="sticker gold sm">Saved</span> : <span className="sn">{i + 1}</span>}
+                      <span className="sr">{fg.slots[i].text}</span>
+                    </button>
+                  ))}
+                </div>
+                <div className="rc-hint">{vs.length > 1 ? 'Pick a victim, then tap a reward.' : 'Tap a reward to save the victim.'}</div>
+              </>
+            )}
+          </div>
         </div>
       </Tray>
-      <div className="stage">
-        <div className={`rescue-card stock${p.ultimate ? ' ult' : ''}`}>
-          <div className="rc-head">{fg.name} · rescue card</div>
-          {p.ultimate ? (
-            <div className="rc-ult">
-              <b>Ultimate</b>
-              <p>{fg.ultimate.text}</p>
-              <p>Each save: {fg.extraText}. Tap a victim to save them.</p>
-            </div>
-          ) : (
-            <>
-              <div className="slots">
-                {g.fg.slots.map((full, i) => (
-                  <button key={i} type="button" className={`slot${full ? ' full' : ''}${i === nextFree ? ' next' : ''}`} disabled={full} ref={haptic} onClick={() => who && send({ t: 'rescueOne', victim: who, slot: i })}>
-                    {full ? <span className="sticker gold sm">Saved</span> : <span className="sn">{i + 1}</span>}
-                    <span className="sr">{fg.slots[i].text}</span>
-                  </button>
-                ))}
-              </div>
-              <div className="rc-hint">Pick a victim, then tap a slot for its reward.</div>
-            </>
-          )}
-        </div>
-      </div>
     </>
   );
 }

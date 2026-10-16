@@ -76,9 +76,11 @@
 }
 
 /* lifted card */
+/* the picked-up card sits low on the board, leaving the map above it readable */
 .mat.lifted {
   inset: 10px;
   justify-content: center;
+  align-items: flex-end;
   gap: 12px;
 }
 .mat.lifted .side {
@@ -666,5 +668,69 @@
   }
   .tab-list {
     gap: 6px 8px;
+  }
+}
+
+/* rescue: the card lives in the tray, rewards in one compact row */
+.rescue-tray {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  height: 100%;
+  min-height: 0;
+}
+.tray .rescue-card {
+  position: static;
+  inset: auto;
+  transform: none;
+  width: 100%;
+  max-width: none;
+  margin: 0;
+  padding: 6px 8px 8px;
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+.tray .rescue-card .slots {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(50px, 1fr));
+  gap: 6px;
+  flex: 1;
+  min-height: 0;
+}
+.tray .rescue-card .slot {
+  min-height: 0;
+  padding: 4px 3px;
+}
+.tray .rescue-card .sr {
+  font-size: 11px;
+  line-height: 1.1;
+}
+.tray .rescue-card .rc-hint {
+  font-size: 12px;
+}
+@media (orientation: landscape) and (max-height: 560px) {
+  .tray .rescue-card {
+    padding: 4px 6px 6px;
+    gap: 4px;
+  }
+  .tray .rescue-card .rc-hint {
+    display: none;
+  }
+  .tray .rescue-card .rc-head {
+    font-size: 13px;
+    padding: 2px 6px;
+  }
+  .tray .rescue-card .slot {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 2px;
+  }
+  .tray .rescue-card .slot .sn {
+    font-size: 15px;
+    line-height: 1;
   }
 }

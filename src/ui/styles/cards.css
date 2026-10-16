@@ -482,3 +482,22 @@
     font-size: 12px;
   }
 }
+
+/* in a tight fan the covered cards show their spine name, not a clipped title */
+.hand.tight .acard:not(:last-child):not(.sel):not(.hover) .face .title {
+  visibility: hidden;
+}
+/* hand-size faces never spill: rule text and long effect words are cut cleanly */
+.hand .acard .ctext {
+  display: -webkit-box;
+  -webkit-line-clamp: 5;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.hand .acard .fx.txt {
+  display: block;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
