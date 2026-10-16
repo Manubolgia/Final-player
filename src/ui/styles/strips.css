@@ -402,3 +402,14 @@
   font: 400 12px/1 var(--f-display);
   color: var(--bone);
 }
+
+@media (orientation: landscape) and (max-height: 560px) {
+  /* six hearts and the coin must not reach the Time counter */
+  .hearts .ico {
+    width: 13px;
+    height: 13px;
+  }
+  .g-row {
+    gap: 6px;
+  }
+}

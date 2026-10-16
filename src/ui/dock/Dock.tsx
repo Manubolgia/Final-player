@@ -462,7 +462,6 @@ function MovePrompt({ g, p, send, bring, setBring, setPressed }: { g: GameState;
         keys={
           <>
             {p.canStop ? <Key onClick={() => send({ t: 'stop' })}>Stay here</Key> : null}
-            <span className="grow hint">Tap a lit space on the board.</span>
           </>
         }
       >
