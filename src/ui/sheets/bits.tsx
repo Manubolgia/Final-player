@@ -2,7 +2,7 @@
 
 import { Fragment, type ReactNode } from 'react';
 import type { Effect, KillerActionDef } from '../../game/types';
-import { Boot, Heart, HeartOutline, Knife } from '../pieces/icons';
+import { Boot, Heart, HeartBroken, HeartOutline, Knife } from '../pieces/icons';
 
 /** The step chevron the cards print between steps ("nearest > move > attack"). */
 export function Chev({ className = 'chev' }: { className?: string }) {
@@ -66,15 +66,15 @@ export function Hearts({ hp, max, label }: { hp: number; max: number; label?: st
   );
 }
 
-/** The Final Health token: face-down black (+1 die showing) until it's been flipped once, then white. */
+/** The Final Health token: a black coin with a heart while face down, a spent white one after. */
 export function FinalCoin({ tok, who }: { tok: 'black' | 'white'; who: string }) {
   return (
     <span
-      className={`coin ${tok}`}
+      className={`coin fh ${tok}`}
       role="img"
       aria-label={tok === 'black' ? `${who}'s Final Health token, still face down` : `${who} already came back once`}
     >
-      +1
+      {tok === 'black' ? <Heart className="fh-i" /> : <HeartBroken className="fh-i" />}
     </span>
   );
 }

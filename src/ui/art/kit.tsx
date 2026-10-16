@@ -4,7 +4,7 @@
 //
 // House style: an 80s one-colour VHS sleeve. Two or three spot inks from the
 // film's palette, plus ink black and bone. Thick ink outlines, hard shapes, no
-// gradients, no blur, no filters. Halftone is a <pattern> of circles only.
+// colour blends, no blur, no filter effects. Halftone is a <pattern> of circles only.
 
 import { useId, type ReactNode } from 'react';
 

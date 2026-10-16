@@ -2485,3 +2485,13 @@ html[data-text='large'] .sheet .script {
     transition: none;
   }
 }
+
+/* the Final Health token on the nameplates */
+.sheet .coin.fh {
+  width: 30px;
+  height: 30px;
+}
+.sheet .coin.fh .fh-i {
+  width: 16px;
+  height: 16px;
+}
