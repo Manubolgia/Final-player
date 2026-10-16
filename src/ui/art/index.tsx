@@ -2,6 +2,7 @@
 // one of its crops) as inline SVG. Unknown ids fall back to the first drawing.
 
 import { Art, type ArtProps, type Drawing } from './kit';
+import './art.css';
 import { KILLER_ART } from './killers';
 import { GIRL_ART } from './girls';
 import { PLACE_ART } from './places';
@@ -27,3 +28,14 @@ export const setTableKiller = (id: string): void => {
   onTable = id;
 };
 export const tableKiller = (): string => onTable;
+
+/** The band across the top of a Terror or Finale card: the killer's poster, cropped wide. */
+export function RevealArt({ killer }: { killer?: string }) {
+  const id = killer || tableKiller();
+  if (!id) return null;
+  return (
+    <div className="rc-art" aria-hidden="true">
+      <KillerArt id={id} crop="band" />
+    </div>
+  );
+}

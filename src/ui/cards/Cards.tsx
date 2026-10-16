@@ -211,6 +211,9 @@ export function ActionCard({ id, size = 'hand', sel, off, marked, hover, hit = -
   );
 }
 
+// the killer's silhouette band on Terror and Finale faces (src/ui/art)
+import { RevealArt } from '../art';
+
 export type RevealKind = 'terror' | 'minor' | 'event' | 'darkPower' | 'finale' | 'item';
 
 const BAND: Record<RevealKind, string> = {
@@ -222,11 +225,12 @@ const BAND: Record<RevealKind, string> = {
   item: 'Item',
 };
 
-/** A big card face, for reveals and inspection. */
-export function RevealCard({ kind, title, text, band, item, className }: { kind: RevealKind; title: string; text: string; band?: string; item?: ItemDef; className?: string }) {
+/** A big card face, for reveals and inspection. Terror and Finale cards print the killer across the top. */
+export function RevealCard({ kind, title, text, band, item, className, killer }: { kind: RevealKind; title: string; text: string; band?: string; item?: ItemDef; className?: string; killer?: string }) {
   return (
     <div className={`reveal-card k-${kind} ${className ?? ''}`}>
       <div className="band">{band ?? BAND[kind]}</div>
+      {kind === 'terror' || kind === 'finale' ? <RevealArt killer={killer} /> : null}
       <div className="rc-title">{title}</div>
       {item ? <ItemStats it={item} /> : null}
       <div className="rc-text">{text}</div>

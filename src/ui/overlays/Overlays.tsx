@@ -1,12 +1,13 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, type CSSProperties } from 'react';
 import type { GameState, LogEntry } from '../../game';
-import { FILMS, finalGirlDef, killerDef, locationDef } from '../../game/content';
+import { FILMS, KILLERS, finalGirlDef, killerDef, locationDef } from '../../game/content';
 import { eventDef, itemDef, terrorDef } from '../../game/engine/kernel';
 import { RevealCard, type RevealKind } from '../cards/Cards';
 import { DieFace, Eject, Rewind, Scroll } from '../pieces/icons';
 import { PipDie } from '../sheets/bits';
 import { liveView } from '../game/display';
 import { inLibrary, backToLibrary } from '../library';
+import { KillerArt, tableKiller } from '../art';
 
 /** The printed cards' "▸" shorthand, spelled out. */
 const words = (t: string): string => t.replace(/\s*\u25B8\s*/g, ', then ');
@@ -71,12 +72,40 @@ export function Reveal({ g, entry, onDone, auto }: { g: GameState; entry: LogEnt
   );
 }
 
-/** A title card across the board: TURN 2, PLANNING, HANS IS COMING. */
-export function TitleCard({ title, sub, onDone, ms }: { title: string; sub?: string; onDone: () => void; ms: number }) {
+/** The killer a "… is coming" title announces, if it is one. */
+function comingKiller(title: string): { id: string; name: string } | null {
+  const m = /^(.+) (?:is|are) coming$/i.exec(title);
+  if (!m) return null;
+  const k = KILLERS.find((x) => x.name.toLowerCase() === m[1].toLowerCase()) ?? (/birds/i.test(m[1]) ? KILLERS.find((x) => x.bodiless) : undefined);
+  return { id: k?.id ?? tableKiller(), name: m[1] };
+}
+
+/** A title card across the board: TURN 2, PLANNING, HANS IS COMING (his silhouette slides in). */
+export function TitleCard({ title, sub, onDone, ms, killer }: { title: string; sub?: string; onDone: () => void; ms: number; killer?: string }) {
   useEffect(() => {
     const t = setTimeout(onDone, ms);
     return () => clearTimeout(t);
   }, [onDone, ms]);
+  const coming = comingKiller(title);
+  const id = killer ?? coming?.id;
+  if (coming && id) {
+    const verb = title.slice(coming.name.length).trim();
+    return (
+      <div className="titlecard coming" onClick={onDone}>
+        <div className="tc-band">
+          <span className="tc-art">
+            <KillerArt id={id} crop="bust" />
+          </span>
+          <div className="tc-text">
+            <div className="tc-title" style={{ '--n': coming.name.length } as CSSProperties}>
+              <span className="who">{coming.name}</span> <span className="what">{verb}</span>
+            </div>
+            {sub ? <div className="tc-sub">{sub}</div> : null}
+          </div>
+        </div>
+      </div>
+    );
+  }
   return (
     <div className="titlecard" onClick={onDone}>
       <div className="tc-band">
@@ -124,54 +153,62 @@ export function EndScreen({ g, onRestart, onQuit, onLog }: { g: GameState; onRes
           </button>
         ) : null}
       </div>
-      <div className="receipt">
-        <div className="rh">Rental receipt</div>
-        <div className="rl">
-          <span>Film</span>
-          <span>{film?.name ?? k.name}</span>
-        </div>
-        <div className="rl">
-          <span>Killer</span>
-          <span>{k.name}</span>
-        </div>
-        <div className="rl">
-          <span>Location</span>
-          <span>{loc.name}</span>
-        </div>
-        <div className="rl">
-          <span>Starring</span>
-          <span>{fg.name}</span>
-        </div>
-        <div className="rl">
-          <span>Mode</span>
-          <span>{g.config.board === 'extreme' ? 'Extreme Horror' : 'Normal'}</span>
-        </div>
-        <div className="rule" />
-        <div className="rl">
-          <span>Turns</span>
-          <span>{g.turn}</span>
-        </div>
-        <div className="rl">
-          <span>Saved / dead</span>
-          <span>
-            {g.fg.saved} / {g.dead.length}
+      <div className="end-stack">
+        <div className="end-poster" aria-hidden="true">
+          <span className="end-cover">
+            <KillerArt id={k.id} />
           </span>
+          {won ? <span className="sticker gold end-survived">Survived</span> : null}
         </div>
-        <div className="rl">
-          <span>{k.name} health</span>
-          <span>{k.invulnerable || k.bodiless ? 'n/a' : `${view.khp} left`}</span>
+        <div className="receipt">
+          <div className="rh">Rental receipt</div>
+          <div className="rl">
+            <span>Film</span>
+            <span>{film?.name ?? k.name}</span>
+          </div>
+          <div className="rl">
+            <span>Killer</span>
+            <span>{k.name}</span>
+          </div>
+          <div className="rl">
+            <span>Location</span>
+            <span>{loc.name}</span>
+          </div>
+          <div className="rl">
+            <span>Starring</span>
+            <span>{fg.name}</span>
+          </div>
+          <div className="rl">
+            <span>Mode</span>
+            <span>{g.config.board === 'extreme' ? 'Extreme Horror' : 'Normal'}</span>
+          </div>
+          <div className="rule" />
+          <div className="rl">
+            <span>Turns</span>
+            <span>{g.turn}</span>
+          </div>
+          <div className="rl">
+            <span>Saved / dead</span>
+            <span>
+              {g.fg.saved} / {g.dead.length}
+            </span>
+          </div>
+          <div className="rl">
+            <span>{k.name} health</span>
+            <span>{k.invulnerable || k.bodiless ? 'n/a' : `${view.khp} left`}</span>
+          </div>
+          <div className="rl">
+            <span>Bloodlust</span>
+            <span>
+              {view.bl + 1} / {k.bloodlust.length}
+            </span>
+          </div>
+          <div className="rl">
+            <span>Terror cards</span>
+            <span>{g.killer.finaleRevealed ? 'Finale' : `${view.td} left`}</span>
+          </div>
+          <span className="sticker red">Be kind, rewind</span>
         </div>
-        <div className="rl">
-          <span>Bloodlust</span>
-          <span>
-            {view.bl + 1} / {k.bloodlust.length}
-          </span>
-        </div>
-        <div className="rl">
-          <span>Terror cards</span>
-          <span>{g.killer.finaleRevealed ? 'Finale' : `${view.td} left`}</span>
-        </div>
-        <span className={`sticker ${won ? 'gold' : 'red'}`}>{won ? 'Survivor' : 'Be kind, rewind'}</span>
       </div>
     </div>
   );

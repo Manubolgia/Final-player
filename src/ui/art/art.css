@@ -1,0 +1,23 @@
+/* Poster art pieces that sit inside other components. */
+
+.art {
+  display: block;
+}
+
+/* the killer band on a Terror or Finale reveal card */
+.reveal-card .rc-art {
+  margin: -10px 0 0;
+  height: 112px;
+  overflow: hidden;
+  border-bottom: 2.5px solid var(--ink);
+  background: var(--black-stock);
+}
+.reveal-card .rc-art .art {
+  width: 100%;
+  height: 100%;
+}
+@media (orientation: landscape) and (max-height: 560px) {
+  .reveal-card .rc-art {
+    height: 70px;
+  }
+}
