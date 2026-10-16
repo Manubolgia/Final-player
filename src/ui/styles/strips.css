@@ -379,3 +379,14 @@
     display: none;
   }
 }
+
+/* long names (The Poltergeist) shrink instead of being cut off */
+.k-name.long {
+  font-size: 17px;
+  letter-spacing: -0.01em;
+}
+@media (orientation: landscape) and (max-height: 560px) {
+  .k-name.long {
+    font-size: 15px;
+  }
+}
