@@ -179,3 +179,19 @@
     display: none;
   }
 }
+
+/* 44pt hit areas around the small printed chits and sleeves */
+.board-head .chit,
+.sleeve {
+  position: relative;
+}
+.board-head .chit::before {
+  content: '';
+  position: absolute;
+  inset: -4px;
+}
+.sleeve::before {
+  content: '';
+  position: absolute;
+  inset: -6px -10px;
+}

@@ -198,10 +198,16 @@
 }
 .film-st {
   position: absolute;
-  left: 50%;
+  left: 70px;
   bottom: 0;
-  transform: translate(-50%, 55%) rotate(-3deg);
+  transform: translateY(62%) rotate(-3deg);
   z-index: 2;
+  pointer-events: none;
+}
+@media (orientation: landscape) and (max-height: 560px) {
+  .film-st {
+    left: 12px;
+  }
 }
 
 /* Girl strip */

@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react';
 import type { GameState, LogEntry } from '../../game';
-import { finalGirlDef, killerDef, locationDef } from '../../game/content';
+import { FILMS, finalGirlDef, killerDef, locationDef } from '../../game/content';
 import { eventDef, itemDef, terrorDef } from '../../game/engine/kernel';
 import { RevealCard, type RevealKind } from '../cards/Cards';
-import { Eject, Rewind, Scroll } from '../pieces/icons';
+import { DieFace, Eject, Rewind, Scroll } from '../pieces/icons';
+import { PipDie } from '../sheets/bits';
 import { inLibrary, backToLibrary } from '../library';
 
 export function cardFor(g: GameState, e: LogEntry): { kind: RevealKind; title: string; text: string; band?: string; item?: ReturnType<typeof itemDef> } | null {
@@ -87,6 +88,7 @@ export function EndScreen({ g, onRestart, onQuit, onLog }: { g: GameState; onRes
   const k = killerDef(g.config.killer);
   const fg = finalGirlDef(g.config.finalGirl);
   const loc = locationDef(g.config.location);
+  const film = FILMS.find((f) => f.killer.id === g.config.killer);
   return (
     <div className={`end-screen${won ? ' win' : ''}`}>
       <div className="end-left">
@@ -107,7 +109,7 @@ export function EndScreen({ g, onRestart, onQuit, onLog }: { g: GameState; onRes
           </button>
           <button type="button" className="btn dark" onClick={onLog}>
             <span className="row1">
-              <Scroll className="glyph" /> Credits
+              <Scroll className="glyph" /> Screenplay
             </span>
           </button>
         </div>
@@ -121,6 +123,10 @@ export function EndScreen({ g, onRestart, onQuit, onLog }: { g: GameState; onRes
         <div className="rh">Rental receipt</div>
         <div className="rl">
           <span>Film</span>
+          <span>{film?.name ?? k.name}</span>
+        </div>
+        <div className="rl">
+          <span>Killer</span>
           <span>{k.name}</span>
         </div>
         <div className="rl">
@@ -151,14 +157,22 @@ export function Toast({ text }: { text: string }) {
 
 /** A transient strip of dice for rolls that happen outside your prompts (panic, killer cards). */
 export function DiceFlash({ faces, label }: { faces: number[]; label: string }) {
+  // horror dice show blank / card pair / star; the panic die shows pips
+  const panic = label === 'Panic';
   return (
     <div className="diceflash">
       <span className="df-l">{label}</span>
-      {faces.map((f, i) => (
-        <span key={i} className="die sm tumble" style={{ animationDelay: `${i * 60}ms` }}>
-          <span className="pips">{f}</span>
-        </span>
-      ))}
+      {faces.map((f, i) =>
+        panic ? (
+          <span key={i} className="tumble" style={{ animationDelay: `${i * 60}ms` }}>
+            <PipDie n={f} />
+          </span>
+        ) : (
+          <span key={i} className={`die sm tumble${f < 3 ? ' fail' : ''}`} style={{ animationDelay: `${i * 60}ms` }}>
+            <DieFace n={f} />
+          </span>
+        ),
+      )}
     </div>
   );
 }

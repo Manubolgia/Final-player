@@ -26,7 +26,7 @@ for (const o of orients) {
     if (!sessionStorage.getItem('fp-shots')) {
       sessionStorage.setItem('fp-shots', '1');
       localStorage.clear();
-      localStorage.setItem('final-player:prefs:v1', JSON.stringify({ speed: 'normal', tips: ['hand', 'move', 'deck'], seenSideways: false }));
+      localStorage.setItem('final-player:prefs:v1', JSON.stringify({ speed: 'normal', seenSideways: false }));
     }
   }, o);
   const shot = async (name) => {
