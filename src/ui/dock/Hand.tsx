@@ -83,7 +83,7 @@ export function Hand({ cards, sel = null, marked = [], off, onPick, passive, dim
 
   return (
     <div
-      className={`hand${passive ? ' passive' : ''}${dim ? ' dim' : ''}`}
+      className={`hand${passive ? ' passive' : ''}${dim ? ' dim' : ''}${step < cw * 0.8 ? ' tight' : ''}`}
       ref={box}
       onPointerDown={down}
       onPointerMove={move}
