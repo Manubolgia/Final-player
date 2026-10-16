@@ -131,7 +131,8 @@
   min-width: 0;
 }
 .tray > .keys .btn {
-  flex: none;
+  flex: 0 1 auto;
+  min-width: 0;
 }
 .tray > .keys .btn.primary {
   flex: 1 1 auto;
@@ -339,5 +340,48 @@
   }
   .tip-sticker.tip-deck {
     margin-bottom: -40px;
+  }
+}
+
+/* portrait: a footer on the board frame holds the film's sticker and the map tools,
+   so nothing sits on the map and the sticker never has to be cut short */
+.board-foot {
+  display: none;
+}
+@media (orientation: portrait) {
+  .board {
+    grid-template-rows: 44px minmax(0, 1fr) 40px;
+  }
+  .board-foot {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 4px 2px 0;
+    min-width: 0;
+  }
+  .board-foot .chit {
+    width: 36px;
+    height: 36px;
+    position: relative;
+  }
+  .board-foot .chit::before {
+    content: '';
+    position: absolute;
+    inset: -4px;
+  }
+  .board-foot .film-st {
+    position: static;
+    transform: rotate(-2deg);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    min-width: 0;
+  }
+  .board-head .chit.panic-t,
+  .board-head .chit.zoom-t {
+    display: none;
+  }
+  .dock > .stage {
+    margin-bottom: 42px;
   }
 }

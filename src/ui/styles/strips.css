@@ -379,18 +379,3 @@
     display: none;
   }
 }
-.board-head .film-st {
-  position: static;
-  transform: rotate(-3deg);
-  max-width: none;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  flex: 0 1 auto;
-  min-width: 0;
-}
-@media (orientation: landscape) and (max-height: 560px) {
-  .board-head .film-st {
-    display: none;
-  }
-}

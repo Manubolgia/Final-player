@@ -7,6 +7,9 @@ import { DieFace, Eject, Rewind, Scroll } from '../pieces/icons';
 import { PipDie } from '../sheets/bits';
 import { inLibrary, backToLibrary } from '../library';
 
+/** The printed cards' "▸" shorthand, spelled out. */
+const words = (t: string): string => t.replace(/\s*\u25B8\s*/g, ', then ');
+
 export function cardFor(g: GameState, e: LogEntry): { kind: RevealKind; title: string; text: string; band?: string; item?: ReturnType<typeof itemDef> } | null {
   if (e.anim?.kind !== 'card') return null;
   const { deck, id } = e.anim;
@@ -15,15 +18,15 @@ export function cardFor(g: GameState, e: LogEntry): { kind: RevealKind; title: s
     switch (deck) {
       case 'terror': {
         const t = terrorDef(g, id);
-        return { kind: t.minor ? 'minor' : 'terror', title: t.name, text: t.text, band: t.minor ? 'Minor Dark Power' : 'Terror' };
+        return { kind: t.minor ? 'minor' : 'terror', title: t.name, text: words(t.text), band: t.minor ? 'Minor Dark Power' : 'Terror' };
       }
       case 'event': {
         const ev = eventDef(g, id);
-        return { kind: 'event', title: ev.name, text: ev.text };
+        return { kind: 'event', title: ev.name, text: words(ev.text) };
       }
       case 'darkPower': {
         const d = k.darkPowers.find((x) => x.id === id)!;
-        return { kind: 'darkPower', title: d.name, text: d.text, band: d.epic ? 'Epic Dark Power' : 'Dark Power' };
+        return { kind: 'darkPower', title: d.name, text: words(d.text), band: d.epic ? 'Epic Dark Power' : 'Dark Power' };
       }
       case 'finale': {
         const f = k.finales.find((x) => x.id === id)!;

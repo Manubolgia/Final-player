@@ -195,20 +195,3 @@
   position: absolute;
   inset: -6px -10px;
 }
-
-/* portrait: the map tools sit on the board's bottom corner, leaving the header
-   for the turn tape and the film's objective sticker */
-@media (orientation: portrait) {
-  .board-head .chit.panic-t,
-  .board-head .chit.zoom-t {
-    position: absolute;
-    bottom: 10px;
-    z-index: 2;
-  }
-  .board-head .chit.zoom-t {
-    right: 10px;
-  }
-  .board-head .chit.panic-t {
-    right: 56px;
-  }
-}

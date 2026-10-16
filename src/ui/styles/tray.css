@@ -646,3 +646,25 @@
 .atab.shake {
   animation: shake 300ms steps(6);
 }
+
+.acard.pile {
+  position: relative;
+}
+.acard.pile .sticker {
+  position: absolute;
+  right: 6px;
+  top: 50%;
+  transform: translateY(-50%) rotate(-4deg);
+  font-size: 11px;
+  padding: 2px 5px;
+  max-width: 48%;
+  white-space: nowrap;
+}
+@media (orientation: portrait) {
+  .acard.pile {
+    min-height: 40px;
+  }
+  .tab-list {
+    gap: 6px 8px;
+  }
+}

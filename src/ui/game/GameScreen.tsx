@@ -318,7 +318,6 @@ export function GameScreen({ g, startAt, setG, prefs, setPrefs, onQuit, onRestar
               {active.length > 3 ? <span className="sleeve-more">+{active.length - 3}</span> : null}
             </span>
             <span className="grow spacer" />
-            {sticker ? <span className={`sticker sm film-st ${sticker.cls}`}>{sticker.text}</span> : null}
             <button type="button" className="chit panic-t" aria-label="Show every panic number" aria-pressed={prefs.panicAll} onClick={() => setPrefs({ ...prefs, panicAll: !prefs.panicAll })}>
               <b>1-6</b>
             </button>
@@ -342,6 +341,16 @@ export function GameScreen({ g, startAt, setG, prefs, setPrefs, onQuit, onRestar
             onTarget={onTarget}
             onInspect={(zone) => setSheet({ zone })}
           />
+          <div className="board-foot">
+            {sticker ? <span className={`sticker sm film-st ${sticker.cls}`}>{sticker.text}</span> : null}
+            <span className="grow" />
+            <button type="button" className="chit panic-t" aria-label="Show every panic number" aria-pressed={prefs.panicAll} onClick={() => setPrefs({ ...prefs, panicAll: !prefs.panicAll })}>
+              <b>1-6</b>
+            </button>
+            <button type="button" className="chit zoom-t" aria-label={zoom ? 'Zoom out' : 'Zoom in'} aria-pressed={zoom} onClick={() => setZoom(!zoom)}>
+              {zoom ? <ZoomOut /> : <Zoom />}
+            </button>
+          </div>
           {title && cur ? <TitleCard title={title.title} sub={title.sub} onDone={finish} ms={900 * sp} /> : null}
           {dicePlaying ? (
             <DiceFlash
