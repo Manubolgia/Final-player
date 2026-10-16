@@ -282,8 +282,8 @@
 .end-survived {
   position: absolute;
   z-index: 2;
-  left: -34px;
-  top: 30px;
+  left: -74px;
+  top: 64px;
   font-size: 24px;
   padding: 7px 12px 5px;
   box-shadow: 3px 3px 0 var(--ink);
@@ -324,7 +324,12 @@
   gap: 10px;
 }
 .receipt .rl span:first-child {
+  flex: none;
   text-transform: uppercase;
+}
+.receipt .rl span:last-child {
+  min-width: 0;
+  text-align: right;
 }
 .receipt .rule {
   border-top: 2px dashed var(--ink);
@@ -365,8 +370,8 @@
   }
   .end-survived {
     left: auto;
-    right: -14px;
-    top: 26px;
+    right: -18px;
+    top: 150px;
     font-size: 20px;
     z-index: 2;
   }
