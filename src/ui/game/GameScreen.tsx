@@ -43,6 +43,13 @@ function titleFor(g: GameState, e: LogEntry): { title: string; sub?: string } | 
   return null;
 }
 
+/** What a horror roll came to: stars (and 3-4s when they count), or a fail. */
+function verdictOf(g: GameState, faces: number[]): string {
+  const partials = !!(g.mods.partialsNext || g.mods.partialsPhase);
+  const n = faces.filter((f) => f >= 5 || (partials && f >= 3)).length;
+  return n === 0 ? 'Fail' : n === 1 ? '1 star' : `${n} stars`;
+}
+
 type TipId = 'hand' | 'move' | 'deck';
 const TIPS: Record<TipId, string> = {
   hand: 'Tap a card to pick it up',
@@ -162,8 +169,9 @@ export function GameScreen({ g, startAt, setG, prefs, setPrefs, onQuit, onRestar
     } else if (a?.kind === 'dice') {
       if (inAction && g.prompt?.type === 'roll' && g.log[g.log.length - 1]?.n === cur.n) at(0, finish);
       else {
+        // your own rolls get a proper beat: tumble, land, read the verdict
         sfx.dice();
-        at(720 * sp, finish);
+        at((inAction ? 1200 : 720) * sp, finish);
       }
     } else if (inAction || cur.phase === 'setup') at(cur.tone === 'killer' ? 160 * sp : 30, finish);
     else at((cur.tone === 'killer' || cur.tone === 'bad' ? 340 : cur.tone === 'phase' ? 200 : 170) * sp, finish);
@@ -335,7 +343,13 @@ export function GameScreen({ g, startAt, setG, prefs, setPrefs, onQuit, onRestar
             onInspect={(zone) => setSheet({ zone })}
           />
           {title && cur ? <TitleCard title={title.title} sub={title.sub} onDone={finish} ms={900 * sp} /> : null}
-          {dicePlaying ? <DiceFlash faces={dicePlaying} label={cur?.phase === 'panic' || /panic/i.test(cur?.text ?? '') ? 'Panic' : 'Roll'} /> : null}
+          {dicePlaying ? (
+            <DiceFlash
+              faces={dicePlaying}
+              label={cur?.phase === 'panic' || /panic/i.test(cur?.text ?? '') ? 'Panic' : 'Roll'}
+              verdict={cur?.phase === 'action' ? verdictOf(g, dicePlaying) : undefined}
+            />
+          ) : null}
         </div>
         <GirlStrip g={g} view={view} onOpen={() => setSheet('girl')} />
         <Dock g={g} send={send} busy={playback} bring={bring} setBring={setBring} setPressed={setPressed} />
