@@ -102,7 +102,7 @@ async function playFilm(page: Page, film: string) {
     if (i % 25 === 0) expect(errors).toEqual([]);
   }
   expect(errors).toEqual([]);
-  if (ended) console.log(`${film}: ${await page.locator('.end-screen p').first().textContent()} ${await page.locator('.end-screen .muted').textContent()}`);
+  if (ended) console.log(`${film}: ${await page.locator('.end-screen .outcome').textContent()}`);
   return ended;
 }
 
