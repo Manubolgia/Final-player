@@ -665,6 +665,18 @@
   flex: none;
   min-height: 48px;
 }
+/* in the portrait sheet every location shows at once: a two-column grid */
+.boxback.in-sheet .bb-locs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  overflow: visible;
+}
+.boxback.in-sheet .bb-locs .vs-chip {
+  min-width: 0;
+}
+.boxback.in-sheet .bb-locs .nm {
+  white-space: normal;
+}
 
 /* the rating: a segmented key, with the UNRATED sticker slapped on its corner */
 .vs-seg {
