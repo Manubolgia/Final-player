@@ -17,7 +17,7 @@ export function FinalCoin({ token }: { token: 'black' | 'white' }) {
   );
 }
 
-function filmSticker(g: GameState, view: DisplayView): { text: string; cls: string } | null {
+export function filmSticker(g: GameState, view: DisplayView): { text: string; cls: string } | null {
   if (g.config.killer === 'poltergeist') return { text: g.fg.items.some((i) => i.id === 'carolyn') ? 'Carolyn is with you' : 'Escape with Carolyn', cls: 'yellow' };
   if (g.film.birds) return { text: `Survivors ${g.film.birds.saved}/${g.film.birds.total}`, cls: 'black' };
   if (g.config.killer === 'drFright' && g.film.maple) {
@@ -87,9 +87,8 @@ export function KillerStrip({ g, view, onOpen }: { g: GameState; view: DisplayVi
       <span className={`dpcard${dpDef ? ' up' : ''}`} title={dpDef ? `Dark Power: ${dpDef.name}` : 'Dark Power: face down'}>
         <span className="dpmark" />
       </span>
-      <span className={`tdeck${g.killer.finaleRevealed ? ' fin' : ''}`} style={{ boxShadow: g.killer.finaleRevealed ? undefined : deckStack(view.td) }} title={g.killer.finaleRevealed ? `Finale: ${fin.name}` : `${view.td} Terror cards left`}>
+      <span className={`tdeck${g.killer.finaleRevealed ? ' fin' : view.td <= 3 ? ' soon' : ''}`} style={{ boxShadow: g.killer.finaleRevealed ? undefined : deckStack(view.td) }} title={g.killer.finaleRevealed ? `Finale: ${fin.name}` : `${view.td} Terror cards left${view.td <= 3 ? ', the Finale is near' : ''}`}>
         <span className="tnum">{g.killer.finaleRevealed ? 'FIN' : view.td}</span>
-        {!g.killer.finaleRevealed && view.td <= 3 ? <span className="sticker red sm soon">Finale soon</span> : null}
       </span>
       {sticker ? <span className={`sticker sm film-st ${sticker.cls}`}>{sticker.text}</span> : null}
     </button>

@@ -12,7 +12,7 @@ import { keepAwake } from '../fx/wakeLock';
 import type { Prefs } from '../persistence';
 import { Menu, Play, Scroll, Zoom, ZoomOut } from '../pieces/icons';
 import { GirlSheet, KillerSheet, LogSheet, MenuSheet, RulesSheet, ZoneSheet } from '../sheets';
-import { KillerStrip, GirlStrip } from '../strips/Strips';
+import { KillerStrip, GirlStrip, filmSticker } from '../strips/Strips';
 import { DiceFlash, EndScreen, Reveal, TitleCard, Toast, cardFor } from '../overlays/Overlays';
 import { liveView, snapView, type BoardFx, type DisplayView } from './display';
 
@@ -266,6 +266,11 @@ export function GameScreen({ g, startAt, setG, prefs, setPrefs, onQuit, onRestar
   const active = [...g.activeEvents.map((id) => ({ deck: 'event' as const, id })), ...g.activeTerror.map((id) => ({ deck: 'terror' as const, id }))];
   const dicePlaying = cur?.anim?.kind === 'dice' && !(cur.phase === 'action' && g.prompt?.type === 'roll' && g.log[g.log.length - 1]?.n === cur.n) ? cur.anim.faces : null;
 
+  // during playback the tape counter follows the moment being shown, not the live state
+  const shownTurn = cur?.turn ?? g.turn;
+  const shownPhase = cur?.phase ?? g.phase;
+  const sticker = filmSticker(g, view);
+
   // first-run tips: three paper stickers, each shown once
   const seen = prefs.tips ?? [];
   const tip: TipId | null =
@@ -293,10 +298,10 @@ export function GameScreen({ g, startAt, setG, prefs, setPrefs, onQuit, onRestar
             <button type="button" className="chit" aria-label="Menu" onClick={() => setSheet('menu')}>
               <Menu />
             </button>
-            <span className="tape" aria-label={`Turn ${g.turn}, ${PHASE_NAME[g.phase]} phase`}>
-              T{String(g.turn).padStart(2, '0')}
+            <span className="tape" aria-label={`Turn ${shownTurn}, ${PHASE_NAME[shownPhase]} phase`}>
+              T{String(shownTurn).padStart(2, '0')}
               <Play className="ico" />
-              {PHASE_SHORT[g.phase]}
+              {PHASE_SHORT[shownPhase]}
             </span>
             <span className="sleeves">
               {active.slice(0, 3).map((c) => (
@@ -305,10 +310,11 @@ export function GameScreen({ g, startAt, setG, prefs, setPrefs, onQuit, onRestar
               {active.length > 3 ? <span className="sleeve-more">+{active.length - 3}</span> : null}
             </span>
             <span className="grow spacer" />
+            {sticker ? <span className={`sticker sm film-st ${sticker.cls}`}>{sticker.text}</span> : null}
             <button type="button" className="chit panic-t" aria-label="Show every panic number" aria-pressed={prefs.panicAll} onClick={() => setPrefs({ ...prefs, panicAll: !prefs.panicAll })}>
               <b>1-6</b>
             </button>
-            <button type="button" className="chit" aria-label={zoom ? 'Zoom out' : 'Zoom in'} aria-pressed={zoom} onClick={() => setZoom(!zoom)}>
+            <button type="button" className="chit zoom-t" aria-label={zoom ? 'Zoom out' : 'Zoom in'} aria-pressed={zoom} onClick={() => setZoom(!zoom)}>
               {zoom ? <ZoomOut /> : <Zoom />}
             </button>
             <button type="button" className="chit" aria-label="Log" onClick={() => setSheet('log')}>

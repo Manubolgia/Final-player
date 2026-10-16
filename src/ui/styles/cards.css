@@ -311,7 +311,7 @@
 /* big reveal faces */
 .reveal-card {
   width: 240px;
-  min-height: 300px;
+  min-height: 250px;
   display: flex;
   flex-direction: column;
   gap: 10px;
