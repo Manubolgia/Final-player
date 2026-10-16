@@ -290,12 +290,13 @@
   gap: 8px;
   align-content: start;
 }
+/* two options: full-width keys stacked low, in the thumb zone */
 .options.pair {
-  grid-template-columns: 1fr 1fr;
-  align-content: center;
+  grid-template-columns: 1fr;
+  align-content: end;
 }
 .options.pair .opt {
-  min-height: 72px;
+  min-height: 54px;
   font-size: 17px;
   font-weight: 700;
 }
@@ -310,6 +311,7 @@
 }
 .options.list {
   grid-template-columns: 1fr;
+  align-content: end;
   padding-bottom: 8px;
 }
 .options.list .opt {

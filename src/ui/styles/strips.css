@@ -363,3 +363,34 @@
     font-size: 20px;
   }
 }
+
+/* the clock running out: the deck itself goes red instead of a sticker over the stats */
+.tdeck.soon {
+  border-color: var(--blood);
+  box-shadow: 0 0 0 2px var(--blood) !important;
+}
+.tdeck.soon .tnum {
+  color: var(--blood);
+  background: var(--bone);
+}
+/* portrait: the film's objective sticker lives in the board header, not over the stats */
+@media (orientation: portrait) {
+  .panel.killer .film-st {
+    display: none;
+  }
+}
+.board-head .film-st {
+  position: static;
+  transform: rotate(-3deg);
+  max-width: none;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex: 0 1 auto;
+  min-width: 0;
+}
+@media (orientation: landscape) and (max-height: 560px) {
+  .board-head .film-st {
+    display: none;
+  }
+}
