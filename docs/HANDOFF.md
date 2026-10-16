@@ -10,6 +10,49 @@ The work was paused on 15 October 2026, at the user's request ("Stop everything 
 
 **Where the loop stands:** redesign try 1 is built and on `main`. Round 1 grading is only partly done. Tries 2 and 3 are still available.
 
+## Update: 16 October 2026, redesign #2 (part merged)
+
+Working under a usage cap (stop at 50% of the five-hour window), I applied the cheapest high-value fixes from the round-1 reviews myself, without subagents.
+
+**Branches.** All of it is on `redesign-r2` and merged into `main` (merge `7191d12`). The `r2-board` and `r2-art` branches are still the stopped, barely started agent work.
+
+**Checks.** Every merge passed typecheck, the 50 unit tests, the build and all 9 end-to-end games.
+
+**Done (numbers refer to the issue list below):**
+- **Board (items 1 and 3), partly.**
+  - Spaces are tiles in each film's stock, with a place icon printed on them (`src/ui/board/places.ts`: about 55 glyphs mapped per zone).
+  - Name plates tuck under their tile.
+  - Panic numbers show only during a panic move, for the inspected space, or with the 1-6 toggle.
+  - Item decks are orange wrench badges with a count, crossed out once searched.
+  - The Sacred Groves stubs are gone.
+  - Lit move targets keep their icon.
+- **Tips (item 5).** The hand tip's `hand` class clashed with the hand fan's `.hand { height: 100% }`, which made the giant slab. Tips now use `tip-*` classes, are small, and the first real tap dismisses them while still going through. `shots.mjs` no longer pre-seeds them.
+- **Dice beat (item 6), partly.** Rolls that need no decision hold for 1.2s and stamp "1 star", "2 stars" or "Fail".
+- **Planning (item 9).** All piles show in a 2-column grid with cost coins, and the picked card floats over the other column.
+- **Stickers (item 10).** The Terror deck turns red as the Finale nears (no sticker). In portrait, the objective sticker moved into the board header, and the 1-6 and zoom chits moved to the map's bottom-right corner.
+- **Choices (item 8), partly.** Two-way choices and lists stack as full-width keys in the thumb zone.
+- **Tap targets (item 11).** Header chits and event sleeves have 44pt hit areas.
+- **Reveal (item 13), partly.**
+  - The continue prompt is a printed pull-tab.
+  - The turn tape follows the playback moment.
+  - Short reveal cards are less tall.
+- **End screen (item 15), partly.**
+  - The receipt names the film and the killer.
+  - The keys sit at the bottom in portrait.
+  - CREDITS is now SCREENPLAY.
+- **Smaller fixes (item 16).** The labelled Discard key, dice symbols (or pips for panic) in the dice flash at the board's foot, the move rack, and the objective sticker kept off the stats.
+
+**Still open:**
+- **Board:** the landmark shapes and film-idiom paths, a scored label solver with an overlap test (a few plates still touch on Groves and Maple), and notch-tab panic tiles.
+- **Poster art (item 4):** not started beyond the WIP branch.
+- **Decision objects (item 7):** they still cover the map. The lifted card should lift in place, and react should be decluttered.
+- **Prompt keys:** icons and meeple badges on the keys.
+- **Cards (item 12):** hand-size card layout.
+- **Death beat.**
+- **iPhone SE (item 14):** layout.
+- **End-screen recap.**
+- **Critic round 2:** not run yet. The official grade is still pending.
+
 ## Where the code is
 
 | Branch | State |
