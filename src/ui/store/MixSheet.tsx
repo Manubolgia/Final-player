@@ -4,7 +4,8 @@
 import { useState } from 'react';
 import { FINAL_GIRLS, KILLERS, LOCATIONS } from '../../game/content';
 import { SheetFrame } from '../sheets/Sheet';
-import { Emblem, Heart, MeepleIcon } from '../pieces/icons';
+import { Heart } from '../pieces/icons';
+import { GirlArt, KillerArt, PlaceArt } from '../art';
 import { sfx } from '../fx/sound';
 import { filmFor, girlOf, spaces, type Bill } from './bits';
 
@@ -27,8 +28,8 @@ export function MixSheet({ bill, onUse, onClose }: { bill: Bill; onUse: (b: Bill
             <div className="mix-grid" role="group" aria-label="Killer">
               {KILLERS.map((k) => (
                 <button key={k.id} type="button" className="vs-chip killer" aria-pressed={k.id === killer} onClick={tap(() => setKiller(k.id))}>
-                  <span className="tok">
-                    <Emblem name={k.icon} className="ico" />
+                  <span className="tok art-tok">
+                    <KillerArt id={k.id} crop="bust" />
                   </span>
                   <span className="nm">
                     {k.name}
@@ -52,8 +53,8 @@ export function MixSheet({ bill, onUse, onClose }: { bill: Bill; onUse: (b: Bill
             <div className="mix-grid" role="group" aria-label="Location">
               {LOCATIONS.map((l) => (
                 <button key={l.id} type="button" className="vs-chip loc" aria-pressed={l.id === location} onClick={tap(() => setLocation(l.id))}>
-                  <span className="tok">
-                    <Emblem name={l.icon} className="ico" />
+                  <span className="tok art-tok">
+                    <PlaceArt id={l.id} crop="bust" />
                   </span>
                   <span className="nm">
                     {l.name}
@@ -69,8 +70,8 @@ export function MixSheet({ bill, onUse, onClose }: { bill: Bill; onUse: (b: Bill
             <div className="mix-grid" role="group" aria-label="Final Girl">
               {FINAL_GIRLS.map((g) => (
                 <button key={g.id} type="button" className="vs-chip girl" aria-pressed={g.id === finalGirl} onClick={tap(() => setFinalGirl(g.id))}>
-                  <span className="tok">
-                    <MeepleIcon color="var(--girl)" size={24} />
+                  <span className="tok art-tok">
+                    <GirlArt id={g.id} crop="bust" />
                   </span>
                   <span className="nm">{g.name}</span>
                   <span className="hp num">

@@ -3,10 +3,11 @@
 
 import { useLayoutEffect, useRef } from 'react';
 import { BONUS_ITEMS, FILMS, LOCATIONS } from '../../game/content';
-import { Emblem, Heart, MeepleIcon, Play } from '../pieces/icons';
+import { Heart, Play } from '../pieces/icons';
+import { GirlArt, KillerArt, PlaceArt } from '../art';
 import { haptic } from '../fx/haptics';
 import { sfx } from '../fx/sound';
-import { Barcode, TickBox, girlOf, killerOf, locationOf, spaces, spineVars, titleParts, type Bill } from './bits';
+import { Barcode, FlipToken, girlOf, killerOf, locationOf, spaces, spineVars, titleParts, type Bill } from './bits';
 
 export interface BoxBackProps {
   bill: Bill;
@@ -53,6 +54,7 @@ export function BoxBack(p: BoxBackProps) {
   return (
     <section className={`boxback${inSheet ? ' in-sheet' : ' stock'}`} style={spineVars(film ? film.id : null)} aria-label={`${name}: box back`}>
       <header className="bb-head">
+        <PlaceArt id={location.id} crop="band" className="bb-place" />
         {inSheet ? null : (
           <h2 className="bb-name">
             {kicker ? <span className="k">{kicker}</span> : null}
@@ -60,8 +62,8 @@ export function BoxBack(p: BoxBackProps) {
             <span className="m">{main}</span>
           </h2>
         )}
-        <span className="bb-disc">
-          <Emblem name={killer.icon} className="bb-emblem" />
+        <span className="bb-cover">
+          <KillerArt id={killer.id} crop="bust" title={killer.name} />
         </span>
       </header>
 
@@ -93,8 +95,8 @@ export function BoxBack(p: BoxBackProps) {
                     p.setBill({ ...bill, location: l.id });
                   }}
                 >
-                  <span className="tok">
-                    <Emblem name={l.icon} className="ico" />
+                  <span className="tok art-tok">
+                    <PlaceArt id={l.id} crop="bust" />
                   </span>
                   <span className="nm">{l.name}</span>
                 </button>
@@ -117,8 +119,8 @@ export function BoxBack(p: BoxBackProps) {
                   p.setBill({ ...bill, finalGirl: g.id });
                 }}
               >
-                <span className="tok">
-                  <MeepleIcon color="var(--girl)" size={24} />
+                <span className="tok art-tok">
+                  <GirlArt id={g.id} crop="bust" />
                 </span>
                 <span className="nm">{g.name}</span>
                 <span className="hp num">
@@ -169,7 +171,7 @@ export function BoxBack(p: BoxBackProps) {
               p.setEpic(!p.epic);
             }}
           >
-            <TickBox on={hasEpic && p.epic} />
+            <FlipToken on={hasEpic && p.epic} />
             <span className="txt">
               <span className="lbl">Epic Dark Power</span>
               <small>{hasEpic ? 'The nastier one' : `None for ${killer.name}`}</small>
@@ -185,7 +187,7 @@ export function BoxBack(p: BoxBackProps) {
               p.setBonus(!p.bonus);
             }}
           >
-            <TickBox on={!!signature && p.bonus} />
+            <FlipToken on={!!signature && p.bonus} />
             <span className="txt">
               <span className="lbl">Signature items</span>
               <small>{signature ? signature.name : `None for ${girl.name}`}</small>

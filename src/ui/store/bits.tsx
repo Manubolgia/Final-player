@@ -1,4 +1,4 @@
-// Small printed pieces shared by the video store: the tick box, the rating
+// Small printed pieces shared by the video store: the flip token, the rating
 // badge, the VHS bill helpers and the orientation hook.
 
 import { useCallback, useSyncExternalStore, type CSSProperties } from 'react';
@@ -91,13 +91,17 @@ export function spineVars(filmId: string | null): CSSProperties {
   } as CSSProperties;
 }
 
-/** A printed tick box: bone square, ink border, chunky ink tick. */
-export function TickBox({ on }: { on: boolean }) {
+/** A punch-out token that flips over when the option is ticked. */
+export function FlipToken({ on }: { on: boolean }) {
   return (
-    <svg viewBox="0 0 24 24" className="vs-tickbox" aria-hidden="true">
-      <rect x="2" y="2" width="20" height="20" rx="3" fill="#efe6d2" stroke="#141213" strokeWidth="2.5" />
-      {on ? <path d="M5.8 12.6l4.1 4.3L18.6 6.4" fill="none" stroke="#141213" strokeWidth="3.4" strokeLinecap="square" strokeLinejoin="miter" /> : null}
-    </svg>
+    <span className={`vs-flip${on ? ' on' : ''}`} aria-hidden="true">
+      <span className="face back" />
+      <span className="face front">
+        <svg viewBox="0 0 24 24">
+          <path d="M5 12.6l4.4 4.6L19 7.4" fill="none" stroke="currentColor" strokeWidth="3.6" strokeLinecap="round" strokeLinejoin="round" />
+        </svg>
+      </span>
+    </span>
   );
 }
 
