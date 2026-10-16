@@ -2391,3 +2391,60 @@ html[data-text='large'] .sheet .script {
     height: 136px;
   }
 }
+
+/* menu toggles are flip tokens (ON printed on the green face), and choices are stamps */
+.sheet .switch {
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: var(--bone-2);
+  box-shadow: 0 3px 0 var(--ink);
+  transition: transform 300ms cubic-bezier(0.3, 1.3, 0.5, 1), background-color 0ms 150ms;
+}
+.sheet .switch .knob {
+  display: none;
+}
+.sheet .switch .sw-t {
+  position: static;
+  inset: auto;
+  transform: none;
+  font: 400 14px/1 var(--f-display);
+  text-transform: uppercase;
+  color: var(--ink-2);
+}
+.sheet .switch.on {
+  background: var(--exit);
+  transform: rotateY(180deg) rotate(-6deg);
+}
+.sheet .switch.on .sw-t {
+  color: var(--paper);
+  transform: scaleX(-1);
+}
+.sheet .seg {
+  border: 0;
+  border-radius: 0;
+  background: none;
+  box-shadow: none;
+  overflow: visible;
+  gap: 6px;
+}
+.sheet .seg button,
+.sheet .seg button + button {
+  border: 2px solid var(--ink);
+  border-radius: 4px;
+  box-shadow: 2px 2px 0 var(--ink);
+  min-width: 52px;
+}
+.sheet .seg button.on {
+  background: var(--blood);
+  color: var(--paper);
+  box-shadow: 2px 2px 0 var(--ink);
+  transform: rotate(-3deg);
+}
+@media (prefers-reduced-motion: reduce) {
+  .sheet .switch {
+    transition: none;
+  }
+}

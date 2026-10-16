@@ -5,6 +5,7 @@ import { eventDef, itemDef, terrorDef } from '../../game/engine/kernel';
 import { RevealCard, type RevealKind } from '../cards/Cards';
 import { DieFace, Eject, Rewind, Scroll } from '../pieces/icons';
 import { PipDie } from '../sheets/bits';
+import { liveView } from '../game/display';
 import { inLibrary, backToLibrary } from '../library';
 
 /** The printed cards' "▸" shorthand, spelled out. */
@@ -92,6 +93,7 @@ export function EndScreen({ g, onRestart, onQuit, onLog }: { g: GameState; onRes
   const fg = finalGirlDef(g.config.finalGirl);
   const loc = locationDef(g.config.location);
   const film = FILMS.find((f) => f.killer.id === g.config.killer);
+  const view = liveView(g);
   return (
     <div className={`end-screen${won ? ' win' : ''}`}>
       <div className="end-left">
@@ -145,8 +147,29 @@ export function EndScreen({ g, onRestart, onQuit, onLog }: { g: GameState; onRes
           <span>{g.config.board === 'extreme' ? 'Extreme Horror' : 'Normal'}</span>
         </div>
         <div className="rule" />
-        <div className="muted">
-          Turn {g.turn} · {g.fg.saved} saved · {g.dead.length} dead
+        <div className="rl">
+          <span>Turns</span>
+          <span>{g.turn}</span>
+        </div>
+        <div className="rl">
+          <span>Saved / dead</span>
+          <span>
+            {g.fg.saved} / {g.dead.length}
+          </span>
+        </div>
+        <div className="rl">
+          <span>{k.name} health</span>
+          <span>{k.invulnerable || k.bodiless ? 'n/a' : `${view.khp} left`}</span>
+        </div>
+        <div className="rl">
+          <span>Bloodlust</span>
+          <span>
+            {view.bl + 1} / {k.bloodlust.length}
+          </span>
+        </div>
+        <div className="rl">
+          <span>Terror cards</span>
+          <span>{g.killer.finaleRevealed ? 'Finale' : `${view.td} left`}</span>
         </div>
         <span className={`sticker ${won ? 'gold' : 'red'}`}>{won ? 'Survivor' : 'Be kind, rewind'}</span>
       </div>
