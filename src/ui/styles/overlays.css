@@ -275,3 +275,9 @@
     order: 5;
   }
 }
+
+/* the verdict lands on the dice tray a beat after the dice */
+.diceflash .verdict {
+  margin-left: 4px;
+  animation: slap 220ms cubic-bezier(0.2, 0.9, 0.3, 1.3) 420ms both;
+}

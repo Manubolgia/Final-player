@@ -156,7 +156,7 @@ export function Toast({ text }: { text: string }) {
 }
 
 /** A transient strip of dice for rolls that happen outside your prompts (panic, killer cards). */
-export function DiceFlash({ faces, label }: { faces: number[]; label: string }) {
+export function DiceFlash({ faces, label, verdict }: { faces: number[]; label: string; verdict?: string }) {
   // horror dice show blank / card pair / star; the panic die shows pips
   const panic = label === 'Panic';
   return (
@@ -173,6 +173,7 @@ export function DiceFlash({ faces, label }: { faces: number[]; label: string }) 
           </span>
         ),
       )}
+      {verdict ? <span className={`sticker sm verdict ${verdict === 'Fail' ? 'red' : 'gold'}`}>{verdict}</span> : null}
     </div>
   );
 }
