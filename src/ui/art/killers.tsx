@@ -152,47 +152,58 @@ const tent = Array.from({ length: 14 }, (_, i) => {
 
 export const geppetto: Drawing = {
   box: [0, 0, 240, 360],
-  crops: { bust: [52, 40, 136, 136], band: [0, 50, 240, 120] },
-  label: 'Geppetto the puppeteer working a marionette on strings',
+  crops: { bust: [52, 34, 136, 136], band: [0, 44, 240, 120] },
+  label: 'Geppetto the puppeteer, lit from below, working a marionette on strings',
   draw: (k) => (
     <>
+      <defs>
+        <Dots k={k} name="shade" color={INK} r={1.3} gap={5} />
+        <clipPath id={k.id('face')}>
+          <path d="M120 48c-20 0-28 16-28 38 0 18 6 38 16 50 4 5 8 8 12 8s8-3 12-8c10-12 16-32 16-50 0-22-8-38-28-38z" />
+        </clipPath>
+      </defs>
       <rect x={-10} y={-10} width={260} height={380} fill={G.red} />
       <path d={tent} fill={G.cream} />
       <Halo k={k} name="spot" cx={120} cy={104} r={66} color={G.yellow} ring={11} />
       <circle cx={120} cy={104} r={66} fill={G.yellow} {...L} />
-      {/* his body, leaning over us */}
-      <path d="M14 370l12-170c2-34 26-52 62-60h64c36 8 60 26 62 60l12 170z" fill={INK} {...L} />
-      <path d="M104 142l16 34 16-34" fill="none" stroke={G.cream} strokeWidth={3} />
-      <circle cx={120} cy={196} r={3} fill={G.cream} />
-      {/* rolled sleeves down to the control bar */}
-      <Limb d="M58 160c-18 12-26 30-22 46l22 8" w={24} fill={G.cream} />
-      <Limb d="M182 160c18 12 26 30 22 46l-22 8" w={24} fill={G.cream} />
-      {/* the control: a cross of yellow wood */}
-      <Limb d="M44 214h152" w={8} fill={G.yellow} />
-      <Limb d="M120 196v42" w={8} fill={G.yellow} />
-      {/* strings */}
-      <path d="M48 214l46 80M192 214l-46 80M120 238v18M84 214l26 122M156 214l-26 122" stroke={INK} strokeWidth={1.4} />
-      {/* knuckles on the bar */}
-      <path d="M50 204c0-8 8-12 14-10l10 4c6 2 8 8 6 14l-2 6c-2 6-8 8-14 6l-10-4c-6-2-6-8-4-16z" fill={G.cream} {...L} />
-      <path d="M190 204c0-8-8-12-14-10l-10 4c-6 2-8 8-6 14l2 6c2 6 8 8 14 6l10-4c6-2 6-8 4-16z" fill={G.cream} {...L} />
-      <path d="M62 202v12M70 204v12M178 202v12M170 204v12" stroke={INK} strokeWidth={1.6} />
-      {/* head */}
-      <path d="M97 80c-8-6-18-4-20 4-5 3-5 11 1 14-2 6 4 12 10 10 2 4 8 4 10 0zM143 80c8-6 18-4 20 4 5 3 5 11-1 14 2 6-4 12-10 10-2 4-8 4-10 0z" fill={G.cream} {...L} />
-      <path d="M94 94c0-30 12-44 26-44s26 14 26 44c0 26-11 42-26 42S94 120 94 94z" fill={G.cream} {...L} />
-      <path d="M90 96c-6 0-8 10-2 14M150 96c6 0 8 10 2 14" fill={G.cream} {...T} />
-      <path d="M98 78l18 6M142 78l-18 6" stroke={INK} strokeWidth={6} strokeLinecap="round" />
-      <path d="M98 78l18 6M142 78l-18 6" stroke={G.cream} strokeWidth={2.4} strokeLinecap="round" />
-      <circle cx={107} cy={95} r={9} fill={BONE} {...L} />
-      <circle cx={133} cy={95} r={9} fill={BONE} {...L} />
-      <circle cx={108} cy={100} r={2.4} fill={INK} />
-      <circle cx={132} cy={100} r={2.4} fill={INK} />
-      <path d="M116 95h8M101 90c2-3 4-4 7-4" stroke={INK} strokeWidth={2} />
-      <path d="M104 108c2 8 4 12 8 14M136 108c-2 8-4 12-8 14" fill="none" stroke={INK} strokeWidth={1.6} />
-      <path d="M120 100c5 8 7 14 2 18-3 1-6 0-7-2" fill="none" {...T} />
-      <path d="M98 122c6-8 16-7 22-2 6-5 16-6 22 2-4 8-14 8-22 4-8 4-18 4-22-4z" fill={G.cream} {...L} />
-      <path d="M108 128q12 9 24 0q-12 4-24 0z" fill={BONE} stroke={INK} strokeWidth={1.6} />
-      <path d="M113 129v3M118 130v3.5M123 130v3.5M128 129v3" stroke={INK} strokeWidth={1.1} />
-      <path d="M108 140h24l-12 8z" fill={G.red} {...T} />
+      {/* hunched over us: shoulders up by his ears */}
+      <path d="M12 370l10-160c2-30 14-58 40-70 14-6 26-4 38 4h40c12-8 24-10 38-4 26 12 38 40 40 70l10 160z" fill={INK} {...L} />
+      <path d="M30 196c2-26 12-46 32-54M210 196c-2-26-12-46-32-54" fill="none" stroke={G.yellow} strokeWidth={3} strokeLinecap="round" />
+      {/* sleeves down to the control */}
+      <Limb d="M56 158c-20 14-28 32-22 52" w={26} fill={INK} ink={2} />
+      <Limb d="M184 158c20 14 28 32 22 52" w={26} fill={INK} ink={2} />
+      <path d="M36 168c-6 10-8 22-6 32M204 168c6 10 8 22 6 32" fill="none" stroke={G.yellow} strokeWidth={2.4} strokeLinecap="round" />
+      <path d="M26 202h22l4 10H24zM192 202h22l2 10h-28z" fill={G.cream} {...T} />
+      {/* the control: a cross of yellow wood, strings, and the bony hands on it */}
+      <Limb d="M40 220h160" w={8} fill={G.yellow} />
+      <Limb d="M120 200v44" w={8} fill={G.yellow} />
+      <path d="M44 220l50 74M196 220l-50 74M120 244v12M86 220l24 116M154 220l-24 116" stroke={INK} strokeWidth={1.4} />
+      <path d="M34 206c4-6 16-6 22 0l2 10c-6 4-18 4-24 0z" fill={G.cream} {...T} />
+      <Limb d="M38 212c-2 6 0 12 4 14M45 210c-2 7 0 13 4 15M52 211c-2 6 0 11 3 13M58 214c4 1 6 4 5 8" w={4} fill={G.cream} ink={2} />
+      <path d="M206 206c-4-6-16-6-22 0l-2 10c6 4 18 4 24 0z" fill={G.cream} {...T} />
+      <Limb d="M202 212c2 6 0 12-4 14M195 210c2 7 0 13-4 15M188 211c2 6 0 11-3 13M182 214c-4 1-6 4-5 8" w={4} fill={G.cream} ink={2} />
+      {/* wild white hair behind the ears */}
+      <path d="M98 68L82 58l6 12-20-2 14 10-16 6 16 4-12 10 18-2-4 12 14-12zM142 68l16-10-6 12 20-2-14 10 16 6-16 4 12 10-18-2 4 12-14-12z" fill={G.cream} {...L} />
+      <path d="M92 90c-6-2-8 8-4 14 2 2 4 3 6 2M148 90c6-2 8 8 4 14-2 2-4 3-6 2" fill={G.cream} {...T} />
+      {/* the gaunt face, shadowed from above, lit from below */}
+      <path d="M120 48c-20 0-28 16-28 38 0 18 6 38 16 50 4 5 8 8 12 8s8-3 12-8c10-12 16-32 16-50 0-22-8-38-28-38z" fill={G.cream} {...L} />
+      <g clipPath={k.url('face')}>
+        <path d="M90 46h60v36c-10-6-20-8-30-8s-20 2-30 8z" fill={k.url('shade')} />
+        <path d="M100 106c3 10 7 18 12 24l-6-2c-4-6-6-14-6-22zM140 106c-3 10-7 18-12 24l6-2c4-6 6-14 6-22z" fill={INK} />
+      </g>
+      <path d="M97 87c3-6 14-7 19-1-1 8-15 10-19 1zM143 87c-3-6-14-7-19-1 1 8 15 10 19 1z" fill={INK} />
+      <circle cx={107} cy={89} r={9} fill="none" stroke={INK} strokeWidth={2.6} />
+      <circle cx={133} cy={89} r={9} fill="none" stroke={INK} strokeWidth={2.6} />
+      <path d="M116 89h8" stroke={INK} strokeWidth={2.4} />
+      <circle cx={108} cy={91} r={1.8} fill={G.yellow} />
+      <circle cx={132} cy={91} r={1.8} fill={G.yellow} />
+      <path d="M100 82c3-2 6-3 9-3" stroke={G.yellow} strokeWidth={1.6} strokeLinecap="round" />
+      <path d="M96 76l20 6M144 76l-20 6" stroke={INK} strokeWidth={4} strokeLinecap="round" />
+      <path d="M119 92l7 22c-2 5-8 5-10 2" fill="none" {...T} />
+      <path d="M104 124c6-5 12-5 16-1 4-4 10-4 16 1 4 4 3 10-1 12-4-5-9-7-15-5-6-2-11 0-15 5-4-2-5-8-1-12z" fill={G.cream} {...L} />
+      <path d="M107 136q13 9 26 0q-13 5-26 0z" fill={BONE} stroke={INK} strokeWidth={1.6} strokeLinejoin="round" />
+      <path d="M112 137.5v3M117 138.5v3.5M123 138.5v3.5M128 137.5v3" stroke={INK} strokeWidth={1.1} />
+      <path d="M108 146h24l-12 8z" fill={G.red} {...T} />
       {/* the marionette: a little girl on strings */}
       <Limb d="M108 282l-12 10 -2 4M132 282l12 10 2 4" w={5} fill={G.cream} ink={2.4} />
       <Limb d="M112 318l-4 18 2 18M128 318l4 18-2 18" w={5} fill={G.cream} ink={2.4} />
@@ -271,10 +282,12 @@ export const drFright: Drawing = {
       <path d="M110 50c4-6 24-6 28 0" fill="none" stroke={INK} strokeWidth={2} />
       {/* the claw glove, raised close to us */}
       <Limb d="M70 170c-20-18-30-38-26-62" w={28} fill={BONE} />
-      <path d="M26 96c-4-14 6-26 20-28 14-2 26 8 26 22l-4 16c-2 10-12 16-22 14l-10-2c-8-2-12-10-10-22z" fill={F.red} {...L} />
+      <path d="M26 100c-2-10 6-18 20-20 14-2 24 6 24 16l-4 14c-2 8-12 12-22 10l-10-2c-8-2-10-10-8-18z" fill={F.red} {...L} />
+      <Limb d="M32 94l-4-12M41 89l-3-15M51 88l-1-17M60 92l4-14" w={8} fill={F.red} ink={2.6} />
+      <Limb d="M64 104l10-4 6-8" w={8} fill={F.red} ink={2.6} />
       <path d="M30 82L4 28l6-2 30 50zM40 74L22 8h6l22 64zM52 72l-2-66h6l6 66zM62 78l14-60 6 2-10 62z" fill={F.steel} {...L} />
       <path d="M28 84l14-4M38 76l14-2M50 74h12M60 80l10 2" stroke={INK} strokeWidth={4} strokeLinecap="round" />
-      <path d="M36 100c6 2 14 2 22-2" fill="none" stroke={INK} strokeWidth={1.6} />
+      <path d="M34 104c6 2 14 2 22-2M36 96l2 4M45 93l1 4M54 93v4" fill="none" stroke={INK} strokeWidth={1.6} />
     </>
   ),
 };

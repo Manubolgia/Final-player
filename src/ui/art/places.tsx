@@ -183,6 +183,12 @@ const mapleLane = place('Maple Lane: a quiet street of houses under a streetligh
 
 const V = { sky: '#c47f2c', sun: '#efd9a4', rust: '#8e3b23', stone: '#b8a88a', leaf: '#1f4d3a', river: '#2b6e6a' };
 
+/** Broad leaves fanning out from the tops of the two trees: x, y, angle, length. */
+const fronds: [number, number, number, number][] = [
+  [58, 92, 200, 58], [58, 92, 235, 52], [58, 92, 275, 46], [58, 92, 315, 54], [58, 92, 345, 58], [58, 92, 20, 50],
+  [300, 92, 160, 58], [300, 92, 195, 54], [300, 92, 235, 50], [300, 92, 265, 46], [300, 92, 305, 52], [300, 92, -20, 56],
+];
+
 const sacredGroves = place('The Sacred Groves: a stepped temple ruin in the jungle', [100, 14, 160, 160], (k) => (
   <>
     <rect x={-10} y={-10} width={380} height={260} fill={V.sky} />
@@ -198,10 +204,16 @@ const sacredGroves = place('The Sacred Groves: a stepped temple ruin in the jung
     <path d="M110 170v26M124 144v26M138 118v26M222 118v26M236 144v26M250 170v26" stroke={INK} strokeWidth={1.4} />
     {/* vines over the stone */}
     <path d="M132 118c4 14-2 24 4 36s-2 20 2 30M228 118c-6 10 0 22-4 32s4 16 0 28M148 94c-2 8 2 14-2 22" fill="none" stroke={V.leaf} strokeWidth={4} strokeLinecap="round" />
-    {/* jungle on both sides */}
-    <path d="M-10 210V80c20-10 40-6 50 6 10-16 34-20 50-8 12-6 26-2 30 10-6 20-4 50 0 80l-20 42z" fill={V.leaf} {...L} />
-    <path d="M370 210V70c-20-10-42-6-52 6-12-14-34-16-48-4-12-4-24 2-28 14 8 22 6 52 0 84l18 40z" fill={V.leaf} {...L} />
-    <path d="M30 90c10 20 14 50 10 90M90 84c-4 30-2 60 6 90M330 80c-10 24-12 56-8 94M276 86c4 28 4 60-4 92" fill="none" stroke={INK} strokeWidth={1.8} />
+    {/* jungle on both sides: trunks and fans of broad leaves */}
+    <path d="M-10 210V100c20-6 40-2 56 8 14-6 30-4 44 6 12 20 14 50 6 80l-16 16zM370 210V96c-20-6-42-2-58 8-14-6-30-4-42 6-12 20-12 52-4 82l16 18z" fill={V.leaf} {...L} />
+    <path d="M40 210c2-40 6-80 18-118M316 210c-2-40-6-80-16-118" fill="none" stroke={INK} strokeWidth={6} strokeLinecap="round" />
+    <path d="M40 210c2-40 6-80 18-118M316 210c-2-40-6-80-16-118" fill="none" stroke={'#5e2614'} strokeWidth={2.5} strokeLinecap="round" />
+    {fronds.map(([x, y, a, l], i) => (
+      <g key={i} transform={`translate(${x} ${y}) rotate(${a})`}>
+        <path d={`M0 0C${l * 0.3} ${-l * 0.2} ${l * 0.75} ${-l * 0.16} ${l} 0C${l * 0.75} ${l * 0.16} ${l * 0.3} ${l * 0.2} 0 0z`} fill={i % 2 ? V.leaf : '#2d6a4f'} {...T} />
+        <path d={`M2 0H${l * 0.9}`} stroke={INK} strokeWidth={1.4} />
+      </g>
+    ))}
     {/* the river in front */}
     <path d="M-10 250v-44c80-12 160-12 240-4 50 4 100 2 140-6v54z" fill={V.river} {...L} />
     <path d="M40 222q12-5 24 0M150 232q12-5 24 0M260 218q12-5 24 0" fill="none" stroke={BONE} strokeWidth={2.2} strokeLinecap="round" />
