@@ -45,7 +45,7 @@ export function KillerStrip({ g, view, onOpen }: { g: GameState; view: DisplayVi
       </span>
       <span className="k-main">
         <span className="k-row">
-          <span className="k-name">{k.name}</span>
+          <span className={`k-name${k.name.length > 11 ? ' long' : ''}`}>{k.name}</span>
           {k.bodiless ? (
             <span className="stat">
               <Crow className="ico" />
