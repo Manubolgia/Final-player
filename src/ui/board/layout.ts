@@ -4,6 +4,7 @@
 
 import type { LocationDef, ZoneDef } from '../../game/types';
 import { discPx, faces, fitView, hashStr, LABEL_FONT, rand01, segDist, textWidth, zonePoint, type Edge, type Pt, type View } from './geometry';
+import { landmarkSet, type LandmarkSet } from './landmarks';
 
 export { LABEL_FONT };
 
@@ -80,6 +81,8 @@ export interface BoardLayout {
   decor: Decor[];
   /** What tiles must keep clear of, in screen px. */
   ob: { discs: Box[]; labels: Box[]; pads: Box[]; slots: Box[]; bounds: Box };
+  /** The board's printed landmarks, in board units. */
+  lm: LandmarkSet;
 }
 
 const LINE = 13;
@@ -214,7 +217,15 @@ function slotAt(side: SlotSide, r: number, out = 0): Box {
   return { x, y, w: SLOT_W, h: SLOT_H };
 }
 
-export function layoutBoard(loc: LocationDef, zones: ZoneDef[], edges: Edge[], ppu: number, aspect = loc.aspect, sideOverride: Record<string, string> = {}): BoardLayout {
+export interface LayoutOpts {
+  /** The Birds' board: power lines and crows. */
+  birds?: boolean;
+  /** Preferred plate side per space. */
+  side?: Record<string, string>;
+}
+
+export function layoutBoard(loc: LocationDef, zones: ZoneDef[], edges: Edge[], ppu: number, aspect = loc.aspect, opts: LayoutOpts = {}): BoardLayout {
+  const sideOverride = opts.side ?? {};
   const view = fitView(zones, aspect);
   const zl = new Map<string, ZoneLayout>();
   const pts = zones.map((z) => ({
@@ -222,7 +233,24 @@ export function layoutBoard(loc: LocationDef, zones: ZoneDef[], edges: Edge[], p
     p: zonePoint(z, aspect),
     r: discPx(z, ppu),
   }));
+  const home = pts.map((q) => ({ ...q.p }));
   relax(pts, view, ppu);
+  // board percent → board units, carried along with the nearest spaces where they were spread apart
+  const warp = (x: number, y: number): Pt => {
+    const p = { x, y: y / aspect };
+    let sw = 0;
+    let dx = 0;
+    let dy = 0;
+    pts.forEach((q, i) => {
+      const d2 = (home[i].x - p.x) ** 2 + (home[i].y - p.y) ** 2;
+      const w = 1 / (d2 + 1) ** 2;
+      sw += w;
+      dx += w * (q.p.x - home[i].x);
+      dy += w * (q.p.y - home[i].y);
+    });
+    return { x: p.x + dx / sw, y: p.y + dy / sw };
+  };
+  const lm = landmarkSet({ loc, view, warp, at: (id) => pts.find((q) => q.z.id === id)?.p, ky: 1 / aspect, birds: !!opts.birds });
   const at = new Map(pts.map((q) => [q.z.id, q]));
   // everything in screen px: tiles, and the badges printed on them (item decks
   // top-right, exit doors top-left, windows bottom-right), each with its owner
@@ -606,37 +634,22 @@ export function layoutBoard(loc: LocationDef, zones: ZoneDef[], edges: Edge[], p
     h: 18,
   }));
 
-  // scenery: deterministic points well clear of spaces and trails
+  // scenery: deterministic points well clear of spaces, trails, plates, pads, slots and landmarks
   const decor: Decor[] = [];
   const seed = hashStr(loc.id);
-  for (let i = 0; i < 90 && decor.length < 22; i++) {
+  const clear = [...tileBoxes, ...placed, ...padBoxes, ...slotBoxes].map((b) => ({ x: b.x - 5, y: b.y - 5, w: b.w + 10, h: b.h + 10 }));
+  for (let i = 0; i < 120 && decor.length < 22; i++) {
     const x = view.x0 + rand01(seed + i * 3.1) * view.w;
     const y = view.y0 + rand01(seed + i * 7.7) * view.h;
     const pt = { x, y };
     if (pts.some((q) => Math.hypot(q.p.x - x, q.p.y - y) < 9)) continue;
     if (edges.some((e) => segDist(pt, zl.get(e.a.id)!.p, zl.get(e.b.id)!.p) < 4.5)) continue;
-    if (tileBoxes.some((b) => x * ppu > b.x - 6 && x * ppu < b.x + b.w + 6 && y * ppu > b.y - 6 && y * ppu < b.y + b.h + 6)) continue;
-    if (
-      [...zl.values()].some((q) => {
-        const b = {
-          x: q.p.x * ppu + q.label.x - 4,
-          y: q.p.y * ppu + q.label.y - 4,
-          w: q.label.w + 8,
-          h: q.label.h + 8,
-        };
-        return x * ppu > b.x && x * ppu < b.x + b.w && y * ppu > b.y && y * ppu < b.y + b.h;
-      })
-    )
-      continue;
-    decor.push({
-      x,
-      y,
-      s: 0.8 + rand01(seed + i) * 0.5,
-      k: Math.floor(rand01(seed + i * 13) * 3),
-    });
+    if (clear.some((b) => x * ppu > b.x && x * ppu < b.x + b.w && y * ppu > b.y && y * ppu < b.y + b.h)) continue;
+    if (lm.keepOut(pt)) continue;
+    decor.push({ x, y, s: 0.8 + rand01(seed + i) * 0.5, k: Math.floor(rand01(seed + i * 13) * 3) });
   }
 
-  return { view, ppu, zones: zl, edges, tiles, decor, ob };
+  return { view, ppu, zones: zl, edges, tiles, decor, ob, lm };
 }
 
 export interface Arrow {

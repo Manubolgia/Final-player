@@ -6,6 +6,7 @@ import { boardInk, victimHex, type BoardInk } from '../film';
 import type { BoardFx, DisplayView } from '../game/display';
 import { edgesOf, fitView, isBlocked, textWidth, visibleZones, type View } from './geometry';
 import { LABEL_FONT, layoutBoard, panicArrows, PITCH, placeTiles, type BoardLayout, type ZoneLayout } from './layout';
+import { landmarkEls } from './Landmarks';
 import { placeGlyph } from './places';
 import { BIRD, TOKEN_CHIT } from './tokens';
 
@@ -78,7 +79,8 @@ export function Board(props: Props) {
 
   const rawPpu = size.w && size.h ? Math.min(size.w / win.w, size.h / win.h) : 0;
   const ppu = Math.round(rawPpu * 20) / 20;
-  const layout = useMemo(() => (ppu ? layoutBoard(loc, zones, edges, ppu, aspect) : null), [loc, zones, edges, ppu, aspect]);
+  const birds = g.config.killer === 'birds';
+  const layout = useMemo(() => (ppu ? layoutBoard(loc, zones, edges, ppu, aspect, { birds }) : null), [loc, zones, edges, ppu, aspect, birds]);
 
   // pointer: tap a target / inspect a space, long-press to inspect, drag to pan when zoomed
   const press = useRef<{ x: number; y: number; t: number; moved: boolean; timer: number; pan0: { dx: number; dy: number }; long: boolean } | null>(null);
@@ -189,7 +191,7 @@ const StaticLayer = memo(
   function StaticLayer({ g, loc, layout, ink }: { g: GameState; loc: LocationDef; layout: BoardLayout; ink: BoardInk; sig: string }) {
     const u = 1 / layout.ppu;
     const P = (id: string) => layout.zones.get(id)!.p;
-    const out: ReactNode[] = [];
+    const out: ReactNode[] = [...landmarkEls(layout.lm.shapes, ink, layout.ppu)];
 
     // scenery
     for (const [i, d] of layout.decor.entries()) {
@@ -231,12 +233,6 @@ const StaticLayer = memo(
           </g>,
         );
     }
-    if (ink.decorKind === 'planks') {
-      const v = layout.view;
-      for (let y = v.y0 + 3; y < v.y0 + v.h; y += 6)
-        out.push(<line key={`pl${y}`} x1={v.x0 - 50} x2={v.x0 + v.w + 50} y1={y} y2={y} stroke={ink.decor} strokeWidth={1.5} vectorEffect="non-scaling-stroke" />);
-    }
-
     // landmarks under the spaces: water, tents, sacred rings
     for (const [id, zl] of layout.zones) {
       const z = zl.z;
@@ -260,26 +256,28 @@ const StaticLayer = memo(
       if (z.sacred) out.push(<circle key={`s${id}`} cx={zl.p.x} cy={zl.p.y} r={r + 5 * u} fill="none" stroke={ink.house} strokeWidth={4} vectorEffect="non-scaling-stroke" />);
     }
 
-    // trails
+    // trails, printed in the film's idiom: dirt with pebbles, corridor boards, boardwalk planks,
+    // sidewalk slabs, streets with a centre line; a bridge's own connections are planks
     for (const e of layout.edges) {
       const a = P(e.a.id);
       const b = P(e.b.id);
       const street = !!e.a.street && !!e.b.street;
       const blocked = isBlocked(g, e.a.id, e.b.id);
+      const style = street ? 'street' : e.a.id === 'bridge' || e.b.id === 'bridge' ? 'planks' : ink.path;
+      const L = (props: React.SVGProps<SVGLineElement>) => <line x1={a.x} y1={a.y} x2={b.x} y2={b.y} strokeLinecap="round" vectorEffect="non-scaling-stroke" {...props} />;
+      const fillW = street ? 11 : style === 'boards' || style === 'planks' ? 6.5 : 5.5;
+      const seam: Record<string, React.SVGProps<SVGLineElement>> = {
+        dirt: { stroke: ink.seam, strokeWidth: 1.6, strokeDasharray: '0.5 6' },
+        boards: { stroke: ink.seam, strokeWidth: fillW, strokeDasharray: '1 4.5', strokeLinecap: 'butt' },
+        planks: { stroke: style === ink.path ? ink.seam : '#6e4a2a', strokeWidth: fillW, strokeDasharray: '1.2 3.6', strokeLinecap: 'butt' },
+        walk: { stroke: ink.seam, strokeWidth: fillW, strokeDasharray: '1 7', strokeLinecap: 'butt' },
+        street: { stroke: '#f2c230', strokeWidth: 1.5, strokeDasharray: '5 5', strokeLinecap: 'butt' },
+      };
       out.push(
         <g key={`e${e.a.id}-${e.b.id}`}>
-          <line x1={a.x} y1={a.y} x2={b.x} y2={b.y} stroke={INK} strokeWidth={street ? 12 : 9} strokeLinecap="round" vectorEffect="non-scaling-stroke" />
-          <line
-            x1={a.x}
-            y1={a.y}
-            x2={b.x}
-            y2={b.y}
-            stroke={street ? ink.street : ink.trail}
-            strokeWidth={street ? 8 : 5.5}
-            strokeLinecap="round"
-            strokeDasharray={blocked ? '6 4' : undefined}
-            vectorEffect="non-scaling-stroke"
-          />
+          <L stroke={INK} strokeWidth={fillW + 3.5} />
+          <L stroke={street ? ink.street : style === 'planks' && ink.path !== 'planks' ? '#b98a54' : ink.trail} strokeWidth={fillW} strokeDasharray={blocked ? '6 4' : undefined} />
+          {blocked ? null : <L {...seam[style]} />}
         </g>,
       );
       const mx = (a.x + b.x) / 2;
