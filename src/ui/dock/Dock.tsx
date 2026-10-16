@@ -196,7 +196,9 @@ function MainPrompt({ g, p, send }: { g: GameState; p: P<'main'>; send: (i: Inpu
     keys = (
       <>
         {strike ? null : (
-          <Key label="Discard for Time" className="icon" onClick={() => setMode('discard')} glyph={<span className="tplus"><Hourglass className="glyph" />+</span>} />
+          <Key label="Discard for Time" onClick={() => setMode('discard')} glyph={<Hourglass className="glyph" />} sub="for Time">
+            Discard
+          </Key>
         )}
         {p.items.length && !strike ? <Key onClick={() => setMode(mode === 'items' ? 'play' : 'items')} kind={mode === 'items' ? 'dark' : 'plain'}>Items {p.items.length}</Key> : null}
         {p.canRescue ? (
@@ -550,7 +552,6 @@ function PlanningPrompt({ g, p, send }: { g: GameState; p: P<'planning'>; send: 
     [g],
   );
   const [sel, setSel] = useState<string | null>(null);
-  const groups = [...new Set(piles.map((x) => x.cost))];
   const full = g.fg.hand.length >= HAND_LIMIT;
   const why = (x: { c: string; count: number; cost: number }) => (x.count <= 0 ? 'Out' : full ? 'Hand full' : x.cost > g.fg.time ? `Short ${x.cost - g.fg.time}` : null);
   const selPile = piles.find((x) => x.c === sel);
@@ -584,34 +585,42 @@ function PlanningPrompt({ g, p, send }: { g: GameState; p: P<'planning'>; send: 
       <div className="stage">
         <div className="mat tableau stock">
           <div className="tab-list scroll-y">
-            <div className="tab-h">Action tableau</div>
-            {groups.map((c) => (
-              <div key={c} className="tab-group">
-                <div className="tab-cost">
-                  <Hourglass className="ico" /> {c}
-                </div>
-                {piles
-                  .filter((x) => x.cost === c)
-                  .sort((a, b) => +(a.count <= 0) - +(b.count <= 0))
-                  .map((x) => {
-                    const w = why(x);
-                    return (
-                      <button key={x.c} type="button" className={`acard pile${sel === x.c ? ' on' : ''}${w ? ' off' : ''}`} data-timing={card(x.c).timing} onClick={() => setSel(sel === x.c ? null : x.c)}>
-                        <span className="pspine" />
-                        <span className="pname">{card(x.c).name}</span>
-                        <span className="pcount">×{x.count}</span>
-                        {w ? <span className="sticker sm">{w}</span> : <span className="pcost">{x.cost}</span>}
-                      </button>
-                    );
-                  })}
-              </div>
-            ))}
+            {[...piles]
+              .sort((a, b) => a.cost - b.cost || +(a.count <= 0) - +(b.count <= 0))
+              .map((x, i) => {
+                const w = why(x);
+                return (
+                  <button
+                    key={x.c}
+                    type="button"
+                    className={`acard pile${sel === x.c ? ' on' : ''}${w ? ' off' : ''}`}
+                    data-timing={card(x.c).timing}
+                    data-col={i % 2}
+                    onClick={() => setSel(sel === x.c ? null : x.c)}
+                  >
+                    <span className="pspine" />
+                    <span className="pname">{card(x.c).name}</span>
+                    <span className="pcount">×{x.count}</span>
+                    {w ? <span className="sticker sm">{w}</span> : <span className="pcost">{x.cost}</span>}
+                  </button>
+                );
+              })}
           </div>
-          <div className="tab-detail">{sel ? <ActionCard id={sel} size="mid" g={g} costOverride={selPile?.cost} /> : <p className="hint dark">Tap a pile to see the card. Zero-cost cards came back to your hand for free.</p>}</div>
+          {sel ? (
+            // the picked card floats over the other column
+            <div className={`tab-detail ${sortedCol(piles, sel) ? 'left' : 'right'}`}>
+              <ActionCard id={sel} size="mid" g={g} costOverride={selPile?.cost} />
+            </div>
+          ) : null}
         </div>
       </div>
     </>
   );
+}
+
+/** Which column (0 left, 1 right) a pile lands in once sorted by cost. */
+function sortedCol(piles: { c: string; cost: number; count: number }[], c: string): number {
+  return [...piles].sort((a, b) => a.cost - b.cost || +(a.count <= 0) - +(b.count <= 0)).findIndex((x) => x.c === c) % 2;
 }
 
 // ---- being attacked ------------------------------------------------------------------

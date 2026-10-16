@@ -109,7 +109,7 @@ export function layoutBoard(loc: LocationDef, zones: ZoneDef[], edges: Edge[], p
   // everything in screen px
   const discs: Box[] = pts.map(({ p, r }) => ({ x: p.x * ppu - r - 2, y: p.y * ppu - r - 2, w: r * 2 + 4, h: r * 2 + 5 }));
   // item-deck chits sit on the top-right of search spaces
-  for (const { z, p, r } of pts) if (z.search) discs.push({ x: p.x * ppu + r * 0.92 - 10, y: p.y * ppu - r * 0.95 - 12, w: 20, h: 24 });
+  for (const { z, p, r } of pts) if (z.search) discs.push({ x: p.x * ppu + r * 0.9 - 11, y: p.y * ppu - r * 0.9 - 11, w: 28, h: 28 });
   const segs: [Pt, Pt][] = edges.map((e) => {
     const a = at.get(e.a.id)!.p;
     const b = at.get(e.b.id)!.p;
@@ -127,14 +127,15 @@ export function layoutBoard(loc: LocationDef, zones: ZoneDef[], edges: Edge[], p
   const order = [...pts].sort((a, b) => crowd(b) - crowd(a) || a.p.y - b.p.y || a.p.x - b.p.x);
   for (const q of order) {
     const { z, p, r } = q;
+    const own = pts.indexOf(q);
     const lines = wrap(z.name, 74);
     const w = Math.ceil(Math.max(...lines.map((l) => textWidth(l, LABEL_FONT)))) + 8;
     const h = lines.length * LINE + 3;
     const cands: [string, number, number][] = [
-      ['S', -w / 2, r + 3],
-      ['N', -w / 2, -r - 3 - h],
-      ['E', r + 4, -h / 2],
-      ['W', -r - 4 - w, -h / 2],
+      ['S', -w / 2, r - 3],
+      ['N', -w / 2, -r + 3 - h],
+      ['E', r - 3, -h / 2],
+      ['W', -r + 3 - w, -h / 2],
       ['SE', r * 0.55, r * 0.7 + 2],
       ['SW', -r * 0.55 - w, r * 0.7 + 2],
       ['NE', r * 0.55, -r * 0.7 - 2 - h],
@@ -150,7 +151,10 @@ export function layoutBoard(loc: LocationDef, zones: ZoneDef[], edges: Edge[], p
       const box = { x: p.x * ppu + dx, y: p.y * ppu + dy, w, h };
       let score = (k === pref ? -1 : i) * 3;
       score += outside(box, bounds);
-      for (const d of discs) score += over(box, d) * 3;
+      discs.forEach((d, j) => {
+        // a plate may tuck under its own tile's rim; anything else counts
+        if (j !== own) score += over(box, d) * 3;
+      });
       for (const b of placed) score += over(box, b) * 5;
       for (const b of stands) score += over(box, b) * 1.5;
       score += onTrail(box, segs) * 18;

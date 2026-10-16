@@ -109,7 +109,7 @@ export function EndScreen({ g, onRestart, onQuit, onLog }: { g: GameState; onRes
           </button>
           <button type="button" className="btn dark" onClick={onLog}>
             <span className="row1">
-              <Scroll className="glyph" /> Credits
+              <Scroll className="glyph" /> Screenplay
             </span>
           </button>
         </div>

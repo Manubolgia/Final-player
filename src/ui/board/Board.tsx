@@ -6,6 +6,9 @@ import { boardInk, victimHex, type BoardInk } from '../film';
 import type { BoardFx, DisplayView } from '../game/display';
 import { edgesOf, fitView, isBlocked, visibleZones, type View } from './geometry';
 import { layoutBoard, panicArrows, placeTiles, type BoardLayout } from './layout';
+import { placeGlyph } from './places';
+
+const WRENCH = 'M21 7.5a5.5 5.5 0 01-7.3 5.2l-7.6 7.6a2.3 2.3 0 01-3.2-3.2l7.6-7.6A5.5 5.5 0 0117.7 2l-3.4 3.4.9 3.4 3.4.9z';
 import { TOKEN_CHIT } from './tokens';
 
 interface Props {
@@ -201,11 +204,7 @@ const StaticLayer = memo(
       else if (ink.decorKind === 'grove')
         out.push(
           <g key={`d${i}`}>
-            {d.k === 0 ? (
-              <rect x={d.x - s * 0.25} y={d.y - s * 0.6} width={s * 0.5} height={s * 1.1} rx={s * 0.15} fill={ink.house} stroke={INK} strokeWidth={1.2} vectorEffect="non-scaling-stroke" />
-            ) : (
-              <circle cx={d.x} cy={d.y} r={s * 0.85} fill={ink.decor} stroke={INK} strokeWidth={1.2} vectorEffect="non-scaling-stroke" />
-            )}
+            <circle cx={d.x} cy={d.y} r={s * (0.75 + d.k * 0.12)} fill={ink.decor} stroke={INK} strokeWidth={1.2} vectorEffect="non-scaling-stroke" />
           </g>,
         );
       else if (ink.decorKind === 'pennant' && i < 10)
@@ -289,13 +288,15 @@ const StaticLayer = memo(
       const z = zl.z;
       const r = zl.r * u;
       const sq = isSquare(z, loc);
-      const fill = z.exit ? '#cfe1c4' : '#efe6d2';
+      const fill = z.exit ? '#cfe1c4' : z.street ? '#d6d1c8' : ink.tile;
+      const glyph = placeGlyph(loc.id, z);
+      const gs = r * 1.2;
       out.push(
         <g key={`z${id}`}>
           {sq ? (
             <>
               <rect x={zl.p.x - r} y={zl.p.y - r + 2 * u} width={r * 2} height={r * 2} rx={3 * u} fill={INK} />
-              <rect x={zl.p.x - r} y={zl.p.y - r} width={r * 2} height={r * 2} rx={3 * u} fill={z.house ? '#e9d8c4' : fill} stroke={INK} strokeWidth={2.5} vectorEffect="non-scaling-stroke" />
+              <rect x={zl.p.x - r} y={zl.p.y - r} width={r * 2} height={r * 2} rx={3 * u} fill={fill} stroke={INK} strokeWidth={2.5} vectorEffect="non-scaling-stroke" />
             </>
           ) : (
             <>
@@ -303,6 +304,18 @@ const StaticLayer = memo(
               <circle cx={zl.p.x} cy={zl.p.y} r={r} fill={fill} stroke={INK} strokeWidth={2.5} vectorEffect="non-scaling-stroke" />
             </>
           )}
+          {glyph ? (
+            <path
+              d={glyph.d}
+              transform={`translate(${zl.p.x - gs / 2} ${zl.p.y - gs / 2}) scale(${gs / 24})`}
+              fill={glyph.line ? 'none' : ink.icon}
+              stroke={glyph.line ? ink.icon : 'none'}
+              strokeWidth={glyph.line ? 2.2 : 0}
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              fillRule="evenodd"
+            />
+          ) : null}
           {z.exit ? (
             <g transform={`translate(${zl.p.x - r * 0.95} ${zl.p.y - r * 0.95}) scale(${u})`}>
               <rect x={-9} y={-11} width={18} height={22} rx={2} fill="#3e7a3a" stroke={INK} strokeWidth={2} />
@@ -328,17 +341,20 @@ const StaticLayer = memo(
       const deck = g.itemDecks[deckId] ?? [];
       const searched = g.tokens.some((t) => t.zone === id && (t.id === 'searched' || t.id === 'mlFire'));
       const n = deck.length;
-      const stack = Math.min(4, Math.ceil(n / 2));
       out.push(
-        <g key={`deck${id}`} transform={`translate(${zl.p.x + zl.r * u * 0.92} ${zl.p.y - zl.r * u * 0.95}) scale(${u})`}>
-          {Array.from({ length: stack }, (_, i) => (
-            <rect key={i} x={-7 + (stack - i)} y={-9 + (stack - i)} width={15} height={19} rx={2} fill={i % 2 ? INK : '#94733f'} />
-          ))}
-          <rect x={-7} y={-9} width={15} height={19} rx={2} fill={n ? (deck[0].up ? '#c9a46a' : '#e8742a') : '#dccfb4'} stroke={INK} strokeWidth={1.8} strokeDasharray={n ? undefined : '3 2'} />
-          <text x={0.5} y={4.5} textAnchor="middle" className="deck-n">
-            {n}
-          </text>
-          {searched ? <path d="M-9 -11 L10 12 M10 -11 L-9 12" stroke="#b3161b" strokeWidth={3} /> : null}
+        <g key={`deck${id}`} transform={`translate(${zl.p.x + zl.r * u * 0.9} ${zl.p.y - zl.r * u * 0.9}) scale(${u})`}>
+          <circle cy={1.5} r={9.5} fill={INK} />
+          <circle r={9.5} fill={n ? '#e8742a' : '#dccfb4'} stroke={INK} strokeWidth={1.8} />
+          <path d={WRENCH} transform="translate(-6 -6) scale(0.5)" fill={INK} />
+          {n ? (
+            <g transform="translate(9 8)">
+              <circle r={6.5} fill="#efe6d2" stroke={INK} strokeWidth={1.4} />
+              <text y={3.6} textAnchor="middle" className="deck-n">
+                {n}
+              </text>
+            </g>
+          ) : null}
+          {searched ? <path d="M-8 -8 L8 8" stroke="#b3161b" strokeWidth={3} strokeLinecap="round" /> : null}
         </g>,
       );
     }
@@ -396,8 +412,9 @@ const StaticLayer = memo(
 function PanicLayer({ layout, view, panicAll, inspect, edge }: { layout: BoardLayout; view: DisplayView; panicAll: boolean; inspect: string | null; edge?: [string, string] }) {
   const u = 1 / layout.ppu;
   // only the tiles on show are placed, so they can spread out
-  const withVictims = new Set(view.victims.map((v) => v.zone));
-  const want = (from: string, to: string) => panicAll || withVictims.has(from) || inspect === from || (!!edge && edge[0] === from && edge[1] === to);
+  // panic numbers only when they matter: a panic move playing, the space you're inspecting, or "1-6" on
+  void view;
+  const want = (from: string, to: string) => panicAll || inspect === from || (!!edge && edge[0] === from && edge[1] === to);
   const key = panicAll ? 'all' : layout.tiles.filter((t) => want(t.from, t.to)).map((t) => `${t.from}>${t.to}`).join(',');
   const shown = useMemo(
     () => (panicAll ? layout.tiles : placeTiles(layout, panicArrows(layout.edges).filter((a) => key.split(',').includes(`${a.from.id}>${a.to.id}`)))),
@@ -436,6 +453,8 @@ function Trail({ layout, path }: { layout: BoardLayout; path: string[] }) {
 
 function Targets({ layout, base, targets, pressed, loc }: { layout: BoardLayout; base: View; targets: string[]; pressed: string | null; loc: LocationDef }) {
   const u = 1 / layout.ppu;
+  // lit spaces keep their printed place icon
+  const glyphs = new Map(targets.map((id) => [id, layout.zones.get(id) ? placeGlyph(loc.id, layout.zones.get(id)!.z) : null]));
   return (
     <g pointerEvents="none">
       <rect x={base.x0 - 200} y={base.y0 - 200} width={base.w + 400} height={base.h + 400} fill={INK} opacity={0.35} />
@@ -451,6 +470,18 @@ function Targets({ layout, base, targets, pressed, loc }: { layout: BoardLayout;
             ) : (
               <circle cx={zl.p.x} cy={zl.p.y} r={r} fill="#efe6d2" stroke={INK} strokeWidth={2.5} vectorEffect="non-scaling-stroke" />
             )}
+            {glyphs.get(id) ? (
+              <path
+                d={glyphs.get(id)!.d}
+                transform={`translate(${zl.p.x - r * 0.6} ${zl.p.y - r * 0.6}) scale(${(r * 1.2) / 24})`}
+                fill={glyphs.get(id)!.line ? 'none' : '#6b5434'}
+                stroke={glyphs.get(id)!.line ? '#6b5434' : 'none'}
+                strokeWidth={2.2}
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                fillRule="evenodd"
+              />
+            ) : null}
             <g transform={`translate(${zl.p.x} ${zl.p.y})`}>
               <circle className="lit-ring" r={r + 6 * u} fill="none" stroke="#f2c230" strokeWidth={3.5} strokeDasharray="5 4" vectorEffect="non-scaling-stroke" />
               {pressed === id ? <circle r={r + 10 * u} fill="none" stroke={INK} strokeWidth={4} vectorEffect="non-scaling-stroke" /> : null}

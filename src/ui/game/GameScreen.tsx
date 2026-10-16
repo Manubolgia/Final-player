@@ -334,7 +334,7 @@ export function GameScreen({ g, startAt, setG, prefs, setPrefs, onQuit, onRestar
         <GirlStrip g={g} view={view} onOpen={() => setSheet('girl')} />
         <Dock g={g} send={send} busy={playback} bring={bring} setBring={setBring} setPressed={setPressed} />
         {tip ? (
-          <div className={`tip-sticker ${tip}`} role="note">
+          <div className={`tip-sticker tip-${tip}`} role="note">
             {TIPS[tip]}
           </div>
         ) : null}

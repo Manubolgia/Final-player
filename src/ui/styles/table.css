@@ -293,28 +293,28 @@
   border-left: 0;
 }
 /* over the tray's title line, pointing down at the hand */
-.tip-sticker.hand {
+.tip-sticker.tip-hand {
   grid-area: tray;
   align-self: start;
   justify-self: center;
   margin-top: -6px;
 }
-.tip-sticker.hand::after {
+.tip-sticker.tip-hand::after {
   left: calc(50% - 6px);
   bottom: -8px;
   transform: rotate(45deg);
 }
 /* top of the map, clear of the lit spaces near you */
-.tip-sticker.move {
+.tip-sticker.tip-move {
   grid-area: board;
   align-self: start;
   justify-self: center;
   margin-top: 52px;
 }
-.tip-sticker.move::after {
+.tip-sticker.tip-move::after {
   display: none;
 }
-.tip-sticker.deck {
+.tip-sticker.tip-deck {
   grid-area: killer;
   align-self: end;
   justify-self: end;
@@ -322,7 +322,7 @@
   max-width: 210px;
   transform: rotate(2deg);
 }
-.tip-sticker.deck::after {
+.tip-sticker.tip-deck::after {
   right: 22px;
   top: -8px;
   transform: rotate(-135deg);
@@ -334,10 +334,10 @@
   }
 }
 @media (orientation: landscape) and (max-height: 560px) {
-  .tip-sticker.move {
+  .tip-sticker.tip-move {
     margin-top: 10px;
   }
-  .tip-sticker.deck {
+  .tip-sticker.tip-deck {
     margin-bottom: -40px;
   }
 }
