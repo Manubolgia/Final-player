@@ -72,6 +72,35 @@ Working under a usage cap (stop at 50% of the five-hour window), I applied the c
 
 Then run the full critic workflow (`critic-workflow.js`) for the final grade.
 
+## Update: 16 October 2026 (afternoon). Try 3 is done, so the critic loop is complete.
+
+**Result:** the three redesign tries are used up. Grades went from 6 and 5.5 (round 1) to **6.4** (round 2) to **6.9** (round 3). That is short of the 8/10 target.
+
+**Try 3** (merged to `main`, last merge `1e9cfdb`):
+- **Label solver.**
+  - Each space gets about 20 candidate plates: around its tile and beside it, in one or two lines, plus short forms like "NW Mid" or "Bay Window" used only to clear a collision.
+  - A greedy pass seats them, then up to 8 improvement passes re-seat each plate.
+  - `test/layout.test.ts` checks every board at both frame sizes. All are clean except 2 tight spots on Creech and 3 on Maple in portrait, which the test caps.
+- **Decision objects.**
+  - The rescue card sits in the tray.
+  - React shows one band.
+  - The lifted card is smaller and sits low on the board.
+- **Hand cards.** In a tight fan, covered cards hide their clipped titles, and rule text and effects are clamped.
+- **Menu and end screen.**
+  - Menu toggles are flip tokens, and speed and text are stamps.
+  - The end screen sits on dark walnut, with recap rows on the receipt.
+  - The Final Health coin shows "?".
+- **Header and strip.** The EVENT and TERROR chits are labelled, and the Dark Power card reads "DP".
+- **Test fix.** The e2e test now reads `.end-screen .outcome`; the old summary line was replaced by recap rows.
+
+**Round-3 review:** [`review-r3-lead.md`](redesign/review-r3-lead.md). The biggest remaining gaps, in order:
+1. Illustration. The `r2-art` WIP doesn't compile and isn't usable; start fresh.
+2. Meeples sitting on labels. The fix is a pawn pad per space included in the solver.
+3. Card text clipping.
+4. Search, the lifted card and the roll still covering the board.
+5. A printed prompt slip instead of text on the wood.
+6. A full truncation and overflow sweep with a test.
+
 ## Where the code is
 
 | Branch | State |
