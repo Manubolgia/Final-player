@@ -660,7 +660,7 @@ function TokenLayer({ g, layout, view, fx, splats }: { g: GameState; layout: Boa
     const zl = at(z);
     if (!zl) continue;
     const chit = g.tokens.some((t) => t.zone === z && !t.to && TOKEN_CHIT[t.id]);
-    const cy = zl.p.y + (zl.slot.y + zl.slot.h / 2 - (chit ? 7 : 0)) * u;
+    const cy = zl.p.y + (zl.slot.y + zl.slot.h / 2 - (chit ? 14 : 0)) * u;
     const shown = ids.slice(0, 3);
     shown.forEach((id, i) => {
       const x = zl.p.x + (zl.slot.x + zl.slot.w / 2 + (i - (shown.length - 1) / 2) * 16) * u;
