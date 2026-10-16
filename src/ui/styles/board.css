@@ -195,3 +195,20 @@
   position: absolute;
   inset: -6px -10px;
 }
+
+/* in-play cards in the header are labelled mini cards, not blank chits */
+.sleeve {
+  width: 44px;
+  height: 30px;
+  display: grid;
+  place-items: center;
+}
+.sleeve .sl-t {
+  font: 700 11px/1 var(--f-narrow);
+  text-transform: uppercase;
+  color: var(--event-ink, #141213);
+  transform: rotate(3deg);
+}
+.sleeve.terror .sl-t {
+  color: var(--bone);
+}

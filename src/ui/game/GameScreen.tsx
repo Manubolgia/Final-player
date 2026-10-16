@@ -313,7 +313,9 @@ export function GameScreen({ g, startAt, setG, prefs, setPrefs, onQuit, onRestar
             </span>
             <span className="sleeves">
               {active.slice(0, 3).map((c) => (
-                <button key={`${c.deck}${c.id}`} type="button" className={`sleeve ${c.deck}`} aria-label={c.deck === 'event' ? eventDef(g, c.id).name : terrorDef(g, c.id).name} onClick={() => setSheet(c)} />
+                <button key={`${c.deck}${c.id}`} type="button" className={`sleeve ${c.deck}`} aria-label={c.deck === 'event' ? eventDef(g, c.id).name : terrorDef(g, c.id).name} onClick={() => setSheet(c)}>
+                  <span className="sl-t">{c.deck === 'event' ? 'Event' : 'Terror'}</span>
+                </button>
               ))}
               {active.length > 3 ? <span className="sleeve-more">+{active.length - 3}</span> : null}
             </span>

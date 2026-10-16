@@ -85,7 +85,7 @@ export function KillerStrip({ g, view, onOpen }: { g: GameState; view: DisplayVi
         </span>
       </span>
       <span className={`dpcard${dpDef ? ' up' : ''}`} title={dpDef ? `Dark Power: ${dpDef.name}` : 'Dark Power: face down'}>
-        <span className="dpmark" />
+        <span className="dpmark">DP</span>
       </span>
       <span className={`tdeck${g.killer.finaleRevealed ? ' fin' : view.td <= 3 ? ' soon' : ''}`} style={{ boxShadow: g.killer.finaleRevealed ? undefined : deckStack(view.td) }} title={g.killer.finaleRevealed ? `Finale: ${fin.name}` : `${view.td} Terror cards left${view.td <= 3 ? ', the Finale is near' : ''}`}>
         <span className="tnum">{g.killer.finaleRevealed ? 'FIN' : view.td}</span>
