@@ -59,6 +59,18 @@ export interface BoardLayout {
 export const LABEL_FONT = '700 11px "Archivo Narrow", "Arial Narrow", sans-serif';
 const LINE = 13;
 
+const SIDE: Record<string, string> = { Top: 'Top', Middle: 'Mid', Big: 'Big', Bottom: 'Low' };
+/** "NW House (Middle)" → "NW Mid", "Bay Window Room" → "Bay Window", "The Smalleys' House" → "Smalleys'". */
+export function shortName(name: string): string {
+  return name
+    .replace(/ House \((Top|Middle|Big|Bottom)\)$/, (_, w: string) => ` ${SIDE[w]}`)
+    .replace(/^Outside \((\w+)\)$/, '$1')
+    .replace(/^The /, '')
+    .replace(/ (House|Room|Stand|Tent|Cabin|Center)$/, '')
+    .replace(/ and /, ' & ')
+    .replace(/^Groundskeeper's/, "Keeper's");
+}
+
 function wrap(name: string, max: number): string[] {
   const up = name.toUpperCase();
   if (textWidth(up, LABEL_FONT) <= max) return [up];
@@ -122,53 +134,102 @@ export function layoutBoard(loc: LocationDef, zones: ZoneDef[], edges: Edge[], p
   const stands: Box[] = pts.map(({ p, r }) => ({ x: p.x * ppu - r, y: p.y * ppu - r - 16, w: r * 2, h: 18 }));
   const placed: Box[] = [];
   const bounds: Box = { x: view.x0 * ppu + 2, y: view.y0 * ppu + 2, w: view.w * ppu - 4, h: view.h * ppu - 4 };
-  // crowded spaces first, so they get the best spots
-  const crowd = (q: (typeof pts)[number]) => pts.filter((o) => o !== q && Math.hypot(o.p.x - q.p.x, o.p.y - q.p.y) * ppu < 90).length;
-  const order = [...pts].sort((a, b) => crowd(b) - crowd(a) || a.p.y - b.p.y || a.p.x - b.p.x);
-  for (const q of order) {
+  // Candidate plates for every space (both wraps), scored against what never moves
+  // (tiles, badges, meeple spots, trails, the frame); then a greedy pass and a few
+  // improvement passes that re-seat each plate given where all the others ended up.
+  type Cand = { dx: number; dy: number; w: number; h: number; lines: string[]; box: Box; fixed: number };
+  const cands: Cand[][] = pts.map((q, own) => {
     const { z, p, r } = q;
-    const own = pts.indexOf(q);
-    const lines = wrap(z.name, 74);
-    const w = Math.ceil(Math.max(...lines.map((l) => textWidth(l, LABEL_FONT)))) + 8;
-    const h = lines.length * LINE + 3;
-    const cands: [string, number, number][] = [
-      ['S', -w / 2, r - 3],
-      ['N', -w / 2, -r + 3 - h],
-      ['E', r - 3, -h / 2],
-      ['W', -r + 3 - w, -h / 2],
-      ['SE', r * 0.55, r * 0.7 + 2],
-      ['SW', -r * 0.55 - w, r * 0.7 + 2],
-      ['NE', r * 0.55, -r * 0.7 - 2 - h],
-      ['NW', -r * 0.55 - w, -r * 0.7 - 2 - h],
-      ['S2', -w / 2, r + 14],
-      ['N2', -w / 2, -r - 14 - h],
-    ];
-    const pref = sideOverride[z.id];
-    let best: Box | null = null;
-    let bestScore = Infinity;
-    let bestAt: [number, number] = [cands[0][1], cands[0][2]];
-    cands.forEach(([k, dx, dy], i) => {
-      const box = { x: p.x * ppu + dx, y: p.y * ppu + dy, w, h };
-      let score = (k === pref ? -1 : i) * 3;
-      score += outside(box, bounds);
-      discs.forEach((d, j) => {
-        // a plate may tuck under its own tile's rim; anything else counts
-        if (j !== own) score += over(box, d) * 3;
+    const wraps = [wrap(z.name, 74)];
+    const alt = wrap(z.name, wraps[0].length > 1 ? 999 : 40);
+    if (alt.join('|') !== wraps[0].join('|')) wraps.push(alt);
+    // a shorter printed form, only used when it clears a collision (the tile's icon carries the rest)
+    const short = shortName(z.name);
+    if (short !== z.name) wraps.push(wrap(short, 74), wrap(short, 999));
+    const out: Cand[] = [];
+    const wrapsLong = short !== z.name ? wraps.length - 2 : 99;
+    wraps.forEach((lines, wi) => {
+      const w = Math.ceil(Math.max(...lines.map((l) => textWidth(l, LABEL_FONT)))) + 8;
+      const h = lines.length * LINE + 3;
+      const spots: [string, number, number][] = [
+        ['S', -w / 2, r - 3],
+        ['N', -w / 2, -r + 3 - h],
+        ['E', r - 3, -h / 2],
+        ['W', -r + 3 - w, -h / 2],
+        ['SE', r * 0.55, r * 0.7 + 2],
+        ['SW', -r * 0.55 - w, r * 0.7 + 2],
+        ['NE', r * 0.55, -r * 0.7 - 2 - h],
+        ['NW', -r * 0.55 - w, -r * 0.7 - 2 - h],
+        ['S2', -w / 2, r + 10],
+        ['N2', -w / 2, -r - 10 - h],
+        // shifted sideways, still touching their own tile
+        ['Sl', -w + r * 0.7, r - 3],
+        ['Sr', -r * 0.7, r - 3],
+        ['Nl', -w + r * 0.7, -r + 3 - h],
+        ['Nr', -r * 0.7, -r + 3 - h],
+        ['Eu', r - 3, -h + 4],
+        ['Ed', r - 3, -4],
+        ['Wu', -r + 3 - w, -h + 4],
+        ['Wd', -r + 3 - w, -4],
+      ];
+      const pref = sideOverride[z.id];
+      spots.forEach(([k, dx, dy], i) => {
+        const box = clampIn({ x: p.x * ppu + dx, y: p.y * ppu + dy, w, h }, bounds);
+        let fixed = (k === pref ? -1 : Math.min(i, 10)) * 3 + (i >= 10 ? 4 : 0) + wi * 6 + (wi >= wrapsLong ? 14 : 0);
+        fixed += outside({ x: p.x * ppu + dx, y: p.y * ppu + dy, w, h }, bounds);
+        discs.forEach((d, j) => {
+          // a plate may tuck under its own tile's rim; anything else counts
+          if (j !== own) fixed += over(box, d) * 9;
+        });
+        stands.forEach((b, j) => {
+          if (j !== own) fixed += over(box, b) * 3;
+        });
+        fixed += onTrail(box, segs) * 18;
+        out.push({ dx: box.x - p.x * ppu, dy: box.y - p.y * ppu, w, h, lines, box, fixed });
       });
-      for (const b of placed) score += over(box, b) * 5;
-      for (const b of stands) score += over(box, b) * 1.5;
-      score += onTrail(box, segs) * 18;
-      if (score < bestScore) {
-        bestScore = score;
-        best = box;
-        bestAt = [dx, dy];
+    });
+    return out;
+  });
+  const pick: number[] = pts.map(() => -1);
+  const cost = (i: number, c: Cand) => {
+    let sc = c.fixed;
+    pick.forEach((k, j) => {
+      if (j !== i && k >= 0) sc += over(c.box, cands[j][k].box) * 8;
+    });
+    return sc;
+  };
+  const best = (i: number) => {
+    let bi = 0;
+    let bs = Infinity;
+    cands[i].forEach((c, k) => {
+      const sc = cost(i, c);
+      if (sc < bs) {
+        bs = sc;
+        bi = k;
       }
     });
-    const box = clampIn(best!, bounds);
-    bestAt = [box.x - p.x * ppu, box.y - p.y * ppu];
-    placed.push(box);
-    zl.set(z.id, { z, p, r, label: { x: bestAt[0], y: bestAt[1], w, h, lines } });
+    return bi;
+  };
+  // crowded spaces first, so they get the best spots
+  const crowd = (q: (typeof pts)[number]) => pts.filter((o) => o !== q && Math.hypot(o.p.x - q.p.x, o.p.y - q.p.y) * ppu < 90).length;
+  const order = pts.map((_, i) => i).sort((a, b) => crowd(pts[b]) - crowd(pts[a]) || pts[a].p.y - pts[b].p.y || pts[a].p.x - pts[b].p.x);
+  for (const i of order) pick[i] = best(i);
+  for (let pass = 0; pass < 8; pass++) {
+    let moved = false;
+    for (const i of order) {
+      const k = best(i);
+      if (k !== pick[i]) {
+        pick[i] = k;
+        moved = true;
+      }
+    }
+    if (!moved) break;
   }
+  pts.forEach((q, i) => {
+    const c = cands[i][pick[i]];
+    placed.push(c.box);
+    zl.set(q.z.id, { z: q.z, p: q.p, r: q.r, label: { x: c.dx, y: c.dy, w: c.w, h: c.h, lines: c.lines } });
+  });
 
   const ob = { discs, labels: placed, stands, bounds };
   const tiles = placeTiles({ zones: zl, ppu, ob }, panicArrows(edges));
