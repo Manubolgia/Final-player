@@ -10,7 +10,7 @@ The work was paused on 15 October 2026, at the user's request ("Stop everything 
 
 **Where the loop stands:** redesign try 1 is built and on `main`. Round 1 grading is only partly done. Tries 2 and 3 are still available.
 
-## Update: 16 October 2026, redesign #2 (part merged)
+## Update: 16 October 2026, redesign #2 merged (try 2 of 3)
 
 Working under a usage cap (stop at 50% of the five-hour window), I applied the cheapest high-value fixes from the round-1 reviews myself, without subagents.
 
@@ -51,7 +51,26 @@ Working under a usage cap (stop at 50% of the five-hour window), I applied the c
 - **Death beat.**
 - **iPhone SE (item 14):** layout.
 - **End-screen recap.**
-- **Critic round 2:** not run yet. The official grade is still pending.
+- Not run: the critic panel for round 2. A single lead critic ran instead.
+
+**Critic round 2:** **6.4/10**, graded from contact sheets only (no live play, to save usage).
+- Full review: [`review-r2-lead.md`](redesign/review-r2-lead.md).
+- Part 4 (merge `8974a82`) already fixed some of its findings:
+  - The portrait board footer now holds the objective sticker and the 1-6 and zoom chits, so nothing sits on the map and nothing is truncated.
+  - END TURN no longer runs off-screen with three keys.
+  - Planning's SHORT stamps no longer clip.
+  - The "▸" shorthand is spelled out.
+  - The empty bring-along row is hidden.
+
+**Next (try 3, the last):** work through the issues in `review-r2-lead.md`, in this order:
+1. The label solver and overlap test.
+2. Poster art: start from the `r2-art` WIP or start fresh.
+3. Decision objects into the rail or tray, and lifting cards in place.
+4. The hand-size card layout.
+5. The printed-component replacements for the web-kit pieces.
+6. Staging the end screen.
+
+Then run the full critic workflow (`critic-workflow.js`) for the final grade.
 
 ## Where the code is
 
