@@ -10,6 +10,7 @@ import type { DisplayView } from '../game/display';
 import { Boot, Bolt, CardIcon, Crow, Emblem, Heart, Knife, Puppet, Question, Sacred, Scroll, Splat, Zoom } from '../pieces/icons';
 import { ActionSteps, cap, effectWords, FinalCoin, Head, Pips, Rich, Thumb } from './bits';
 import { Sheet } from './Sheet';
+import { KillerArt } from '../art';
 
 type Names = { killer: string; minions?: string };
 
@@ -22,7 +23,7 @@ export function KillerSheet({ g, view, onClose, onReveal }: { g: GameState; view
   const inPlay = g.activeEvents.length + g.activeTerror.length;
 
   return (
-    <Sheet title={k.name} tone="black" onClose={onClose}>
+    <Sheet title={k.name} tone="kraft" onClose={onClose}>
       <div className="ks">
         <Nameplate g={g} k={k} view={view} />
 
@@ -215,8 +216,8 @@ function Nameplate({ g, k, view }: { g: GameState; k: KillerDef; view: DisplayVi
   const birds = g.film.birds as { hidden: number; total: number; saved: number } | undefined;
   return (
     <div className="plate">
-      <span className="emblem">
-        <Emblem name={k.icon} />
+      <span className="emblem art-frame">
+        <KillerArt id={k.id} crop="bust" />
       </span>
       <div className="plate-id">
         <span className="plate-title">{k.title ? cap(k.title) : 'The Killer'}</span>

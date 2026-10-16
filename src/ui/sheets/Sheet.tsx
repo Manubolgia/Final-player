@@ -9,7 +9,7 @@ export interface SheetProps {
   title: string;
   onClose: () => void;
   /** Stock the sheet is printed on. */
-  tone?: 'bone' | 'black' | 'paper';
+  tone?: 'bone' | 'black' | 'paper' | 'kraft';
   children: ReactNode;
   /** Optional element shown at the right of the title row. */
   aside?: ReactNode;

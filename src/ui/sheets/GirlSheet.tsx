@@ -11,8 +11,8 @@ import type { DisplayView } from '../game/display';
 import { Backpack, CardIcon, Hand, Hourglass, Mask, MeepleIcon, Padlock, Wrench } from '../pieces/icons';
 import { FinalCoin, Head, Hearts, Rich } from './bits';
 import { Sheet } from './Sheet';
+import { GirlArt } from '../art';
 
-const GIRL = '#6e46a0';
 const KILLER = '#c1272d';
 
 export function GirlSheet({ g, view, onClose }: { g: GameState; view: DisplayView; onClose: () => void }) {
@@ -33,8 +33,8 @@ export function GirlSheet({ g, view, onClose }: { g: GameState; view: DisplayVie
     <Sheet title={fg.name} onClose={onClose}>
       <div className="gs">
         <div className="plate girl">
-          <span className="emblem girl">
-            <MeepleIcon color={GIRL} size={40} />
+          <span className="emblem girl art-frame">
+            <GirlArt id={fg.id} crop="head" />
           </span>
           <div className="plate-id">
             <span className="plate-title">Final Girl</span>

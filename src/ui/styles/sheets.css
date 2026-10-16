@@ -95,6 +95,28 @@ html[data-text='large'] .sheet {
   --s-drop: #000;
   --s-head-rule: var(--blood);
 }
+/* the Killer board: printed kraft board stock, bone panels, blood rules */
+.sheet.tone-kraft {
+  --s-bg: var(--kraft);
+  --s-ink: var(--ink);
+  --s-ink-2: #3f3222;
+  --s-rule: var(--ink);
+  --s-hair: var(--kraft-edge);
+  --s-panel: var(--bone);
+  --s-panel-edge: var(--bone-edge);
+  --s-drop: var(--ink);
+  --s-head-rule: var(--blood);
+}
+.sheet.tone-kraft .dp-tag {
+  color: var(--dp);
+}
+.sheet.tone-kraft .bl-loc .ico {
+  color: var(--dp);
+}
+.sheet.tone-kraft::before {
+  border-color: var(--ink);
+  border-style: dashed;
+}
 .sheet.tone-paper {
   --s-bg: var(--paper);
   --s-hair: var(--paper-edge);
@@ -786,6 +808,21 @@ html[data-text='large'] .sheet {
 .sheet .plate .emblem.girl {
   background: var(--bone-2);
 }
+/* the poster art in a die-cut window on the nameplate */
+.sheet .plate .emblem.art-frame {
+  width: 76px;
+  height: 76px;
+  overflow: hidden;
+  background: var(--black-stock);
+  border-width: 2.5px;
+  border-radius: 6px;
+  transform: rotate(-2deg);
+}
+.sheet .plate .emblem.art-frame .art {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
 .sheet .plate-id {
   display: flex;
   flex-direction: column;
@@ -845,11 +882,11 @@ html[data-text='large'] .sheet {
 }
 .sheet .bl-max .bl-box {
   border-style: dashed;
-  color: var(--on-black-2);
+  color: var(--s-ink-2);
 }
 .sheet .bl-max p {
   font: 500 14px/1.3 var(--f-ui);
-  color: var(--on-black-2);
+  color: var(--s-ink-2);
 }
 .sheet .bl-rows {
   position: relative;
@@ -864,9 +901,9 @@ html[data-text='large'] .sheet {
   width: 6px;
   top: 18px;
   bottom: 18px;
-  background: var(--black-stock-2);
-  border-left: 1.5px solid #000;
-  border-right: 1.5px solid #000;
+  background: var(--s-panel);
+  border-left: 1.5px solid var(--s-drop);
+  border-right: 1.5px solid var(--s-drop);
 }
 .sheet .bl-row {
   position: relative;
@@ -902,10 +939,10 @@ html[data-text='large'] .sheet {
   height: 32px;
   display: grid;
   place-items: center;
-  border: 2px solid var(--on-black-2);
+  border: 2px solid var(--s-ink-2);
   border-radius: 5px;
-  background: var(--black-stock-2);
-  color: var(--on-black-2);
+  background: var(--s-panel);
+  color: var(--s-ink-2);
   font: 700 13px/1 var(--f-narrow);
   text-transform: uppercase;
 }
@@ -943,7 +980,7 @@ html[data-text='large'] .sheet {
 .sheet .bl-stats .ico {
   width: 16px;
   height: 16px;
-  color: var(--on-black-2);
+  color: var(--s-ink-2);
 }
 .sheet .bl-stats b {
   font: 400 19px/1 var(--f-display);
@@ -951,10 +988,10 @@ html[data-text='large'] .sheet {
 }
 .sheet .bl-row.past .bl-stats,
 .sheet .bl-row.past .bl-fx {
-  color: var(--on-black-2);
+  color: var(--s-ink-2);
 }
 .sheet .bl-row.here .bl-stats b {
-  color: var(--paper);
+  color: var(--s-ink);
 }
 .sheet .bl-fx {
   display: flex;
@@ -966,8 +1003,8 @@ html[data-text='large'] .sheet {
 .sheet .bl-fx .fx {
   font: 700 13px/1.1 var(--f-narrow);
   padding: 3px 7px;
-  background: var(--black-stock-2);
-  border: 1.5px solid var(--on-black-2);
+  background: var(--s-panel);
+  border: 1.5px solid var(--s-ink-2);
   border-radius: 4px;
 }
 .sheet .dp-tag {
@@ -989,7 +1026,7 @@ html[data-text='large'] .sheet {
   align-items: flex-start;
   gap: 4px;
   font: 500 13px/1.3 var(--f-ui);
-  color: var(--on-black-2);
+  color: var(--s-ink-2);
 }
 .sheet .bl-loc .ico {
   width: 13px;
@@ -1028,7 +1065,7 @@ html[data-text='large'] .sheet {
   color: var(--ink);
   border: 2px solid var(--ink);
   border-radius: 6px;
-  box-shadow: 0 3px 0 var(--bone-edge), 0 5px 0 #000;
+  box-shadow: 0 3px 0 var(--bone-edge), 0 5px 0 var(--s-drop);
   overflow: hidden;
 }
 .sheet .kc-band {
@@ -1301,10 +1338,10 @@ html[data-text='large'] .sheet {
   height: 32px;
   display: grid;
   place-items: center;
-  border: 2px solid var(--on-black-2);
+  border: 2px solid var(--s-ink-2);
   border-radius: 4px;
-  background: var(--black-stock-2);
-  color: var(--on-black-2);
+  background: var(--s-panel);
+  color: var(--s-ink-2);
   font: 700 12px/1 var(--f-narrow);
 }
 .sheet .wrath.killer .wr-track li.past,
@@ -1355,13 +1392,13 @@ html[data-text='large'] .sheet {
   grid-template-columns: 28px minmax(0, 1fr);
   gap: 8px;
   font: 500 14px/1.38 var(--f-ui);
-  color: var(--on-black-2);
+  color: var(--s-ink-2);
 }
 .sheet .wr-levels li .vcr {
   text-align: right;
 }
 .sheet .wr-levels li.here {
-  color: var(--on-black);
+  color: var(--s-ink);
   font-weight: 600;
 }
 .sheet .wr-levels li.here .vcr {
@@ -1379,7 +1416,7 @@ html[data-text='large'] .sheet {
   background: #8a4b24;
   border: 2px solid var(--ink);
   border-radius: 8px;
-  box-shadow: inset 0 0 0 4px #8a4b24, inset 0 0 0 5.5px var(--ink), 0 3px 0 #000;
+  box-shadow: inset 0 0 0 4px #8a4b24, inset 0 0 0 5.5px var(--ink), 0 3px 0 var(--s-drop);
   overflow: hidden;
 }
 .sheet .br {
@@ -1393,7 +1430,7 @@ html[data-text='large'] .sheet {
 }
 .sheet .br-note {
   font: 500 14px/1.4 var(--f-ui);
-  color: var(--on-black-2);
+  color: var(--s-ink-2);
 }
 
 /* Terror played */
