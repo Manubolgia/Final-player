@@ -743,19 +743,16 @@ function SearchPrompt({ g, p, send }: { g: GameState; p: P<'search'>; send: (i: 
           </>
         }
       >
-        <p className="hint">Tap the item you keep. The other goes back on the deck: on top face up, or at the bottom face down.</p>
-      </Tray>
-      <div className="stage">
-        <div className="scrim" />
-        <div className="mat search">
+        {/* the drawn items sit in the tray, so the board stays in view */}
+        <div className="search-tray">
           {p.drawn.map((id, i) => (
             <div key={`${id}-${i}`} className="keepwrap">
-              <ItemCard it={itemDef(g, id)} sel={keep === i} onClick={() => setKeep(i)} />
+              <ItemCard it={itemDef(g, id)} sel={keep === i} onClick={() => setKeep(i)} small />
               {keep === i ? <span className="keep-stamp">Keep</span> : null}
             </div>
           ))}
         </div>
-      </div>
+      </Tray>
     </>
   );
 }

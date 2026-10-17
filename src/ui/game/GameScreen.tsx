@@ -364,6 +364,7 @@ export function GameScreen({ g, startAt, setG, prefs, setPrefs, onQuit, onRestar
         </div>
         <GirlStrip g={g} view={view} onOpen={() => setSheet('girl')} />
         <Dock g={g} send={send} busy={playback} bring={bring} setBring={setBring} setPressed={setPressed} />
+        {cur?.anim?.kind === 'card' ? <Reveal key={cur.n} g={g} entry={cur} onDone={finish} auto={fast} /> : null}
         {tip ? (
           <div className={`tip-sticker tip-${tip}`} role="note">
             {TIPS[tip]}
@@ -371,7 +372,6 @@ export function GameScreen({ g, startAt, setG, prefs, setPrefs, onQuit, onRestar
         ) : null}
       </div>
 
-      {cur?.anim?.kind === 'card' ? <Reveal key={cur.n} g={g} entry={cur} onDone={finish} auto={fast} /> : null}
       {toast ? <Toast text={toast} /> : null}
       {done ? <EndScreen g={g} onRestart={onRestart} onQuit={onQuit} onLog={() => setSheet('log')} /> : null}
 
