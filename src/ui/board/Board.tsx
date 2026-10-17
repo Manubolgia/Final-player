@@ -4,12 +4,13 @@ import { locationDef } from '../../game/content';
 import type { LocationDef, ZoneDef } from '../../game/types';
 import { boardInk, victimHex, type BoardInk } from '../film';
 import type { BoardFx, DisplayView } from '../game/display';
-import { edgesOf, fitView, isBlocked, visibleZones, type View } from './geometry';
-import { layoutBoard, panicArrows, placeTiles, type BoardLayout } from './layout';
+import { edgesOf, fitView, isBlocked, textWidth, visibleZones, type View } from './geometry';
+import { LABEL_FONT, layoutBoardCached, panicArrows, PITCH, placeTiles, type BoardLayout, type ZoneLayout } from './layout';
+import { landmarkEls } from './Landmarks';
 import { placeGlyph } from './places';
+import { BIRD, TOKEN_CHIT } from './tokens';
 
 const WRENCH = 'M21 7.5a5.5 5.5 0 01-7.3 5.2l-7.6 7.6a2.3 2.3 0 01-3.2-3.2l7.6-7.6A5.5 5.5 0 0117.7 2l-3.4 3.4.9 3.4 3.4.9z';
-import { TOKEN_CHIT } from './tokens';
 
 interface Props {
   g: GameState;
@@ -78,7 +79,8 @@ export function Board(props: Props) {
 
   const rawPpu = size.w && size.h ? Math.min(size.w / win.w, size.h / win.h) : 0;
   const ppu = Math.round(rawPpu * 20) / 20;
-  const layout = useMemo(() => (ppu ? layoutBoard(loc, zones, edges, ppu, aspect) : null), [loc, zones, edges, ppu, aspect]);
+  const birds = g.config.killer === 'birds';
+  const layout = useMemo(() => (ppu ? layoutBoardCached(loc, zones, edges, ppu, aspect, { birds }) : null), [loc, zones, edges, ppu, aspect, birds]);
 
   // pointer: tap a target / inspect a space, long-press to inspect, drag to pan when zoomed
   const press = useRef<{ x: number; y: number; t: number; moved: boolean; timer: number; pan0: { dx: number; dy: number }; long: boolean } | null>(null);
@@ -189,7 +191,7 @@ const StaticLayer = memo(
   function StaticLayer({ g, loc, layout, ink }: { g: GameState; loc: LocationDef; layout: BoardLayout; ink: BoardInk; sig: string }) {
     const u = 1 / layout.ppu;
     const P = (id: string) => layout.zones.get(id)!.p;
-    const out: ReactNode[] = [];
+    const out: ReactNode[] = [...landmarkEls(layout.lm.shapes, ink, layout.ppu)];
 
     // scenery
     for (const [i, d] of layout.decor.entries()) {
@@ -197,7 +199,14 @@ const StaticLayer = memo(
       if (ink.decorKind === 'pine')
         out.push(
           <g key={`d${i}`} transform={`translate(${d.x} ${d.y})`}>
-            <path d={`M0 ${-s * 1.3} L${s * 0.75} ${-s * 0.2} L${-s * 0.75} ${-s * 0.2}Z M0 ${-s * 0.7} L${s * 0.95} ${s * 0.6} L${-s * 0.95} ${s * 0.6}Z`} fill={ink.decor} stroke={INK} strokeWidth={1.2} vectorEffect="non-scaling-stroke" strokeLinejoin="round" />
+            <path
+              d={`M0 ${-s * 1.3} L${s * 0.75} ${-s * 0.2} L${-s * 0.75} ${-s * 0.2}Z M0 ${-s * 0.7} L${s * 0.95} ${s * 0.6} L${-s * 0.95} ${s * 0.6}Z`}
+              fill={ink.decor}
+              stroke={INK}
+              strokeWidth={1.2}
+              vectorEffect="non-scaling-stroke"
+              strokeLinejoin="round"
+            />
           </g>,
         );
       else if (ink.decorKind === 'hedge') out.push(<circle key={`d${i}`} cx={d.x} cy={d.y} r={s * 0.75} fill={ink.decor} stroke={INK} strokeWidth={1.2} vectorEffect="non-scaling-stroke" />);
@@ -212,16 +221,18 @@ const StaticLayer = memo(
           <g key={`d${i}`} transform={`translate(${d.x} ${d.y})`}>
             <path d={`M${-s * 1.5} ${-s * 0.4} Q0 ${s * 0.2} ${s * 1.5} ${-s * 0.4}`} fill="none" stroke={INK} strokeWidth={1} vectorEffect="non-scaling-stroke" />
             {[-1, 0, 1].map((k) => (
-              <path key={k} d={`M${k * s - s * 0.35} ${-s * 0.2 + Math.abs(k) * -s * 0.12} L${k * s + s * 0.35} ${-s * 0.2 + Math.abs(k) * -s * 0.12} L${k * s} ${s * 0.5}Z`} fill={k === 0 ? '#f2b705' : '#c8272d'} stroke={INK} strokeWidth={1} vectorEffect="non-scaling-stroke" />
+              <path
+                key={k}
+                d={`M${k * s - s * 0.35} ${-s * 0.2 + Math.abs(k) * -s * 0.12} L${k * s + s * 0.35} ${-s * 0.2 + Math.abs(k) * -s * 0.12} L${k * s} ${s * 0.5}Z`}
+                fill={k === 0 ? '#f2b705' : '#c8272d'}
+                stroke={INK}
+                strokeWidth={1}
+                vectorEffect="non-scaling-stroke"
+              />
             ))}
           </g>,
         );
     }
-    if (ink.decorKind === 'planks') {
-      const v = layout.view;
-      for (let y = v.y0 + 3; y < v.y0 + v.h; y += 6) out.push(<line key={`pl${y}`} x1={v.x0 - 50} x2={v.x0 + v.w + 50} y1={y} y2={y} stroke={ink.decor} strokeWidth={1.5} vectorEffect="non-scaling-stroke" />);
-    }
-
     // landmarks under the spaces: water, tents, sacred rings
     for (const [id, zl] of layout.zones) {
       const z = zl.z;
@@ -240,20 +251,33 @@ const StaticLayer = memo(
             />
           </g>,
         );
-      if (loc.id === 'carnivalOfBlood' && z.landmark) out.push(<circle key={`t${id}`} cx={zl.p.x} cy={zl.p.y} r={r * 1.9} fill="url(#tentStripes)" stroke={INK} strokeWidth={1.5} vectorEffect="non-scaling-stroke" />);
+      if (loc.id === 'carnivalOfBlood' && z.landmark)
+        out.push(<circle key={`t${id}`} cx={zl.p.x} cy={zl.p.y} r={r * 1.9} fill="url(#tentStripes)" stroke={INK} strokeWidth={1.5} vectorEffect="non-scaling-stroke" />);
       if (z.sacred) out.push(<circle key={`s${id}`} cx={zl.p.x} cy={zl.p.y} r={r + 5 * u} fill="none" stroke={ink.house} strokeWidth={4} vectorEffect="non-scaling-stroke" />);
     }
 
-    // trails
+    // trails, printed in the film's idiom: dirt with pebbles, corridor boards, boardwalk planks,
+    // sidewalk slabs, streets with a centre line; a bridge's own connections are planks
     for (const e of layout.edges) {
       const a = P(e.a.id);
       const b = P(e.b.id);
       const street = !!e.a.street && !!e.b.street;
       const blocked = isBlocked(g, e.a.id, e.b.id);
+      const style = street ? 'street' : e.a.id === 'bridge' || e.b.id === 'bridge' ? 'planks' : ink.path;
+      const L = (props: React.SVGProps<SVGLineElement>) => <line x1={a.x} y1={a.y} x2={b.x} y2={b.y} strokeLinecap="round" vectorEffect="non-scaling-stroke" {...props} />;
+      const fillW = street ? 11 : style === 'boards' || style === 'planks' ? 6.5 : 5.5;
+      const seam: Record<string, React.SVGProps<SVGLineElement>> = {
+        dirt: { stroke: ink.seam, strokeWidth: 1.6, strokeDasharray: '0.5 6' },
+        boards: { stroke: ink.seam, strokeWidth: fillW, strokeDasharray: '1 4.5', strokeLinecap: 'butt' },
+        planks: { stroke: style === ink.path ? ink.seam : '#6e4a2a', strokeWidth: fillW, strokeDasharray: '1.2 3.6', strokeLinecap: 'butt' },
+        walk: { stroke: ink.seam, strokeWidth: fillW, strokeDasharray: '1 7', strokeLinecap: 'butt' },
+        street: { stroke: '#f2c230', strokeWidth: 1.5, strokeDasharray: '5 5', strokeLinecap: 'butt' },
+      };
       out.push(
         <g key={`e${e.a.id}-${e.b.id}`}>
-          <line x1={a.x} y1={a.y} x2={b.x} y2={b.y} stroke={INK} strokeWidth={street ? 12 : 9} strokeLinecap="round" vectorEffect="non-scaling-stroke" />
-          <line x1={a.x} y1={a.y} x2={b.x} y2={b.y} stroke={street ? ink.street : ink.trail} strokeWidth={street ? 8 : 5.5} strokeLinecap="round" strokeDasharray={blocked ? '6 4' : undefined} vectorEffect="non-scaling-stroke" />
+          <L stroke={INK} strokeWidth={fillW + 3.5} />
+          <L stroke={street ? ink.street : style === 'planks' && ink.path !== 'planks' ? '#b98a54' : ink.trail} strokeWidth={fillW} strokeDasharray={blocked ? '6 4' : undefined} />
+          {blocked ? null : <L {...seam[style]} />}
         </g>,
       );
       const mx = (a.x + b.x) / 2;
@@ -376,12 +400,15 @@ const StaticLayer = memo(
       );
     }
 
-    // printed tokens
-    const stackAt = new Map<string, number>();
+    // printed tokens: on their connection, or in their space's token slot (a small pile)
+    const pileAt = new Map<string, number>();
     for (const [i, t] of g.tokens.entries()) {
       const c = TOKEN_CHIT[t.id];
       const zl = layout.zones.get(t.zone);
       if (!c || !zl) continue;
+      const lines = c.lines ?? [c.label];
+      const w = Math.ceil(Math.max(...lines.map((l) => textWidth(l, LABEL_FONT)))) + 10;
+      const h = lines.length > 1 ? 24 : 18;
       let x: number;
       let y: number;
       if (t.to && layout.zones.get(t.to)) {
@@ -389,18 +416,20 @@ const StaticLayer = memo(
         x = (zl.p.x + q.x) / 2;
         y = (zl.p.y + q.y) / 2;
       } else {
-        const k = stackAt.get(t.zone) ?? 0;
-        stackAt.set(t.zone, k + 1);
-        x = zl.p.x - zl.r * u - 4 * u;
-        y = zl.p.y - zl.r * u * 0.2 + k * 20 * u;
+        const k = pileAt.get(t.zone) ?? 0;
+        pileAt.set(t.zone, k + 1);
+        x = zl.p.x + (zl.slot.x + zl.slot.w / 2 + k * 4) * u;
+        y = zl.p.y + (zl.slot.y + zl.slot.h / 2 + k * 4) * u;
       }
-      const w = c.label.length * 6.4 + 10;
       out.push(
         <g key={`tk${i}`} transform={`translate(${x} ${y}) scale(${u})`}>
-          <rect x={t.to ? -w / 2 : -w} y={-9} width={w} height={18} rx={3} fill={c.fill} stroke={INK} strokeWidth={1.6} />
-          <text x={t.to ? 0 : -w / 2} y={4} textAnchor="middle" className="chit-t" fill={c.ink ?? INK}>
-            {c.label}
-          </text>
+          <rect x={-w / 2 + 1.5} y={-h / 2 + 1.5} width={w} height={h} rx={3} fill={INK} />
+          <rect x={-w / 2} y={-h / 2} width={w} height={h} rx={3} fill={c.fill} stroke={INK} strokeWidth={1.6} />
+          {lines.map((ln, li) => (
+            <text key={li} x={0} y={lines.length > 1 ? -1.5 + li * 10.5 : 4} textAnchor="middle" className="chit-t" fill={c.ink ?? INK}>
+              {ln}
+            </text>
+          ))}
         </g>,
       );
     }
@@ -415,9 +444,20 @@ function PanicLayer({ layout, view, panicAll, inspect, edge }: { layout: BoardLa
   // panic numbers only when they matter: a panic move playing, the space you're inspecting, or "1-6" on
   void view;
   const want = (from: string, to: string) => panicAll || inspect === from || (!!edge && edge[0] === from && edge[1] === to);
-  const key = panicAll ? 'all' : layout.tiles.filter((t) => want(t.from, t.to)).map((t) => `${t.from}>${t.to}`).join(',');
+  const key = panicAll
+    ? 'all'
+    : layout.tiles
+        .filter((t) => want(t.from, t.to))
+        .map((t) => `${t.from}>${t.to}`)
+        .join(',');
   const shown = useMemo(
-    () => (panicAll ? layout.tiles : placeTiles(layout, panicArrows(layout.edges).filter((a) => key.split(',').includes(`${a.from.id}>${a.to.id}`)))),
+    () =>
+      panicAll
+        ? layout.tiles
+        : placeTiles(
+            layout,
+            panicArrows(layout.edges).filter((a) => key.split(',').includes(`${a.from.id}>${a.to.id}`)),
+          ),
     [layout, key, panicAll], // eslint-disable-line react-hooks/exhaustive-deps
   );
   if (!shown.length) return null;
@@ -487,7 +527,11 @@ function Targets({ layout, base, targets, pressed, loc }: { layout: BoardLayout;
               {pressed === id ? <circle r={r + 10 * u} fill="none" stroke={INK} strokeWidth={4} vectorEffect="non-scaling-stroke" /> : null}
             </g>
             <g transform={`translate(${zl.p.x} ${zl.p.y}) scale(${u})`}>
-              <path transform="translate(-8 -8) scale(0.66)" fill={INK} d="M8 2c1.7 0 2.7 1.8 2.7 4.3S9.5 11 8 11 5.3 8.8 5.3 6.3 6.3 2 8 2zm-.2 10.3c1.4 0 2.3.9 2.3 2.3S9 17 7.8 17s-2.3-1-2.3-2.4.9-2.3 2.3-2.3zM16 7c1.7 0 2.7 1.8 2.7 4.3S17.5 16 16 16s-2.7-2.2-2.7-4.7S14.3 7 16 7zm-.2 10.3c1.4 0 2.3.9 2.3 2.3S17 22 15.8 22s-2.3-1-2.3-2.4.9-2.3 2.3-2.3z" />
+              <path
+                transform="translate(-8 -8) scale(0.66)"
+                fill={INK}
+                d="M8 2c1.7 0 2.7 1.8 2.7 4.3S9.5 11 8 11 5.3 8.8 5.3 6.3 6.3 2 8 2zm-.2 10.3c1.4 0 2.3.9 2.3 2.3S9 17 7.8 17s-2.3-1-2.3-2.4.9-2.3 2.3-2.3zM16 7c1.7 0 2.7 1.8 2.7 4.3S17.5 16 16 16s-2.7-2.2-2.7-4.7S14.3 7 16 7zm-.2 10.3c1.4 0 2.3.9 2.3 2.3S17 22 15.8 22s-2.3-1-2.3-2.4.9-2.3 2.3-2.3z"
+              />
             </g>
             <g transform={`translate(${zl.p.x} ${zl.p.y}) scale(${u})`} className="zlabel">
               <rect x={zl.label.x} y={zl.label.y} width={zl.label.w} height={zl.label.h} rx={3} fill={INK} />
@@ -508,108 +552,172 @@ function Meeple({ x, y, size, color, u, base, className, style }: { x: number; y
   const s = size * u;
   return (
     <g className={`tok ${className ?? ''}`} style={{ transform: `translate(${x}px, ${y}px)`, ...style }}>
-      {base ? <ellipse cx={0} cy={s * 0.46} rx={s * 0.42} ry={s * 0.12} fill={INK} /> : null}
+      {base ? <ellipse cx={0} cy={s * 0.42} rx={s * 0.4} ry={s * 0.11} fill={INK} /> : null}
       <use href="#meeple" x={-s / 2 + s * 0.07} y={-s / 2 + s * 0.08} width={s} height={s} fill={INK} />
       <use href="#meeple" x={-s / 2} y={-s / 2} width={s} height={s} fill={color} stroke={INK} strokeWidth={1.4} paintOrder="stroke" vectorEffect="non-scaling-stroke" />
     </g>
   );
 }
 
+/** Piece sizes on a pawn pad, in screen px. */
+const KILLER_S = 27;
+const GIRL_S = 25;
+const VICTIM_S = 17;
+
+type Piece = { key: string; kind: 'killer' | 'girl' | 'victim' | 'puppet'; color?: string };
+
+/** Where the i-th of n pieces stands on a pad, px from the disc centre (x) . */
+const padX = (zl: ZoneLayout, i: number, n: number) => (zl.pad.align === 'c' ? (i - (n - 1) / 2) * PITCH : zl.pad.align === 'r' ? zl.pad.x0 + i * PITCH : zl.pad.x0 - i * PITCH);
+
 function TokenLayer({ g, layout, view, fx, splats }: { g: GameState; layout: BoardLayout; view: DisplayView; fx: BoardFx; splats: string[] }) {
   const u = 1 / layout.ppu;
   const at = (id: string) => layout.zones.get(id);
+  const back: ReactNode[] = [];
   const items: ReactNode[] = [];
+  const front: ReactNode[] = [];
 
   for (const z of new Set(splats)) {
     const zl = at(z);
     if (!zl) continue;
-    items.push(
-      <g key={`sp${z}`} transform={`translate(${zl.p.x + 2 * u} ${zl.p.y + 8 * u}) scale(${u})`} pointerEvents="none">
-        <path transform="translate(-11 -11) scale(0.92)" fill="#b3161b" stroke={INK} strokeWidth={1.2} d="M12 3l1.6 4.2L17.5 4l-1.2 4.6 4.7-.3-3.6 3 3.9 2.6-4.6.9 1.7 4.3-4-2.4-.9 4.3-1.7-4.1L8.7 20l.6-4.6-4.6.6 3.4-3.2-3.9-2.4 4.6-.6L7 5.5l3.9 2.7z" />
+    back.push(
+      <g key={`sp${z}`} transform={`translate(${zl.p.x + 2 * u} ${zl.p.y + 4 * u}) scale(${u})`} pointerEvents="none">
+        <path
+          transform="translate(-11 -11) scale(0.92)"
+          fill="#b3161b"
+          stroke={INK}
+          strokeWidth={1.2}
+          d="M12 3l1.6 4.2L17.5 4l-1.2 4.6 4.7-.3-3.6 3 3.9 2.6-4.6.9 1.7 4.3-4-2.4-.9 4.3-1.7-4.1L8.7 20l.6-4.6-4.6.6 3.4-3.2-3.9-2.4 4.6-.6L7 5.5l3.9 2.7z"
+        />
       </g>,
     );
   }
 
-  // victims, grouped by the zone they're shown in
-  const shown = new Map<string, { id: string; role?: string }[]>();
-  for (const v of view.victims) {
-    const z = fx.runners?.[v.id] ?? v.zone;
-    if (!shown.has(z)) shown.set(z, []);
-    shown.get(z)!.push(v);
+  // everything that stands on a space's pawn pad: the Killer, the Final Girl, victims, puppets
+  const pads = new Map<string, Piece[]>();
+  const put = (zone: string, p: Piece) => {
+    if (!pads.has(zone)) pads.set(zone, []);
+    pads.get(zone)!.push(p);
+  };
+  const killerShown = !g.film.birds && !g.film.maple?.offBoard;
+  if (killerShown) put(fx.killerAt ?? view.kz, { key: 'killer', kind: 'killer' });
+  put(fx.fgAt ?? view.fz, { key: 'fg', kind: 'girl' });
+  const vs = [...view.victims].sort((a, b) => +!!b.role - +!!a.role);
+  for (const v of vs) put(fx.runners?.[v.id] ?? v.zone, { key: `v${v.id}`, kind: 'victim', color: victimHex(v.role) });
+  const birds = new Map<string, string[]>();
+  for (const m of view.minions) {
+    const z = fx.minionAt?.id === m.id ? fx.minionAt.zone : m.zone;
+    if (g.film.birds) {
+      if (!birds.has(z)) birds.set(z, []);
+      birds.get(z)!.push(m.id);
+    } else put(z, { key: `m${m.id}`, kind: 'puppet' });
   }
-  for (const [z, vs] of shown) {
+  for (const [z, ps] of pads) {
     const zl = at(z);
     if (!zl) continue;
-    vs.sort((a, b) => +!!b.role - +!!a.role);
-    const draw = vs.length > 3 ? vs.slice(0, 2) : vs;
-    const n = draw.length + (vs.length > 3 ? 1 : 0);
-    draw.forEach((v, i) => {
-      const x = zl.p.x + (i - (n - 1) / 2) * 11 * u;
-      const y = zl.p.y + 5 * u;
-      items.push(<Meeple key={`v${v.id}`} x={x} y={y} size={18} color={victimHex(v.role)} u={u} className="victim" />);
+    // as many side by side as the pad holds (three, or two in a tight spot); past that
+    // the last spot is a ×N chit for the rest. The Killer and the Final Girl always stand.
+    const cap = zl.pad.cap;
+    const many = ps.length > cap;
+    const room = Math.max(ps.filter((p) => p.kind === 'killer' || p.kind === 'girl').length, cap - 1);
+    const drawn = many ? ps.slice(0, room) : ps;
+    const rest = ps.slice(drawn.length);
+    const n = drawn.length + (many ? 1 : 0);
+    const foot = zl.p.y + zl.pad.foot * u;
+    drawn.forEach((pc, i) => {
+      const x = zl.p.x + padX(zl, i, n) * u;
+      if (pc.kind === 'killer') items.push(<Meeple key="killer" x={x} y={foot - KILLER_S * 0.5 * u} size={KILLER_S} color={KILLER} u={u} base className="killer" />);
+      else if (pc.kind === 'girl') front.push(<Meeple key="fg" x={x} y={foot - GIRL_S * 0.5 * u} size={GIRL_S} color={GIRL} u={u} className="girl" />);
+      else if (pc.kind === 'victim') back.push(<Meeple key={pc.key} x={x} y={foot - VICTIM_S * 0.5 * u} size={VICTIM_S} color={pc.color!} u={u} className="victim" />);
+      else
+        back.push(
+          <g key={pc.key} className="tok" style={{ transform: `translate(${x}px, ${foot - 9 * u}px)` }}>
+            <rect x={-7 * u + 1.5 * u} y={-8 * u + 1.5 * u} width={14 * u} height={16 * u} rx={2 * u} fill={INK} />
+            <rect x={-7 * u} y={-8 * u} width={14 * u} height={16 * u} rx={2 * u} fill="#c9a46a" stroke={INK} strokeWidth={1.6} vectorEffect="non-scaling-stroke" />
+            <path
+              transform={`scale(${u * 0.5}) translate(-12 -12)`}
+              fill={INK}
+              d="M4 2h16v2h-3v3.2a3 3 0 11-2 0V4H9v3.2a3 3 0 11-2 0V4H4zm8 8a3 3 0 110 6 3 3 0 010-6zm-1 7h2l2 5h-2l-1-2.5L11 22H9z"
+            />
+          </g>,
+        );
     });
-    if (vs.length > 3) {
-      const x = zl.p.x + (n - 1 - (n - 1) / 2) * 11 * u;
-      items.push(
-        <g key={`vn${z}`} transform={`translate(${x} ${zl.p.y + 5 * u}) scale(${u})`}>
-          <rect x={-9} y={-8} width={20} height={16} rx={3} fill="#f2c230" stroke={INK} strokeWidth={1.5} />
-          <text x={1} y={4} textAnchor="middle" className="tile-t">
-            ×{vs.length - 2}
+    if (many) {
+      const x = zl.p.x + padX(zl, n - 1, n) * u;
+      front.push(
+        <g key={`more${z}`} transform={`translate(${x} ${foot - 9 * u}) scale(${u})`}>
+          <rect x={-10.5} y={-7.5} width={22} height={16} rx={3} fill={INK} />
+          <rect x={-12} y={-9} width={22} height={16} rx={3} fill={rest.every((r) => r.kind === 'victim') ? '#f2c230' : '#c9a46a'} stroke={INK} strokeWidth={1.5} />
+          <text x={-1} y={3} textAnchor="middle" className="tile-t">
+            ×{rest.length}
           </text>
         </g>,
       );
     }
   }
 
-  // minions and birds
-  const mz = new Map<string, { id: string; hp: number }[]>();
-  for (const m of view.minions) {
-    const z = fx.minionAt?.id === m.id ? fx.minionAt.zone : m.zone;
-    if (!mz.has(z)) mz.set(z, []);
-    mz.get(z)!.push(m);
-  }
-  for (const [z, ms] of mz) {
+  // birds sit in the token slot (perched on a printed chit if one is there)
+  for (const [z, ids] of birds) {
     const zl = at(z);
     if (!zl) continue;
-    ms.forEach((m, i) => {
-      if (g.film.birds) {
-        const x = zl.p.x + (zl.r + 10 + i * 13) * u;
-        items.push(
-          <g key={`b${m.id}`} className="tok" style={{ transform: `translate(${x}px, ${zl.p.y - 2 * u}px)` }}>
-            <circle r={8 * u} fill="#4a5560" stroke={INK} strokeWidth={1.6} vectorEffect="non-scaling-stroke" />
-            <path transform={`scale(${u * 0.6}) translate(-12 -12)`} fill="#efe6d2" d="M2 9c3-1 6 0 8 3 1-4 4-7 8-7l4 1-3 1c1 3-1 7-5 9l-2 4-1-3c-3 0-6-2-9-8z" />
-          </g>,
-        );
-      } else {
-        const x = zl.p.x - (zl.r + 10 + i * 14) * u;
-        items.push(
-          <g key={`m${m.id}`} className="tok" style={{ transform: `translate(${x}px, ${zl.p.y}px)` }}>
-            <rect x={-7 * u} y={-8 * u} width={14 * u} height={16 * u} rx={2 * u} fill="#c9a46a" stroke={INK} strokeWidth={1.6} vectorEffect="non-scaling-stroke" />
-            <path transform={`scale(${u * 0.5}) translate(-12 -12)`} fill={INK} d="M4 2h16v2h-3v3.2a3 3 0 11-2 0V4H9v3.2a3 3 0 11-2 0V4H4zm8 8a3 3 0 110 6 3 3 0 010-6zm-1 7h2l2 5h-2l-1-2.5L11 22H9z" />
-          </g>,
-        );
-      }
-    });
-  }
-
-  // the Final Girl and the Killer
-  const fz = at(fx.fgAt ?? view.fz);
-  if (fz) items.push(<Meeple key="fg" x={fz.p.x - 9 * u} y={fz.p.y - 15 * u} size={28} color={GIRL} u={u} className="girl" />);
-  const killerShown = !g.film.birds && !g.film.maple?.offBoard;
-  const kz = at(fx.killerAt ?? view.kz);
-  if (killerShown && kz) items.push(<Meeple key="killer" x={kz.p.x + 11 * u} y={kz.p.y - 17 * u} size={32} color={KILLER} u={u} base className="killer" />);
-
-  // a death in progress
-  if (fx.dying) {
-    const zl = at(fx.dying);
-    if (zl)
+    const chit = g.tokens.some((t) => t.zone === z && !t.to && TOKEN_CHIT[t.id]);
+    const cy = zl.p.y + (zl.slot.y + zl.slot.h / 2 - (chit ? 14 : 0)) * u;
+    const shown = ids.slice(0, 3);
+    shown.forEach((id, i) => {
+      const x = zl.p.x + (zl.slot.x + zl.slot.w / 2 + (i - (shown.length - 1) / 2) * 16) * u;
       items.push(
-        <g key="dying" transform={`translate(${zl.p.x} ${zl.p.y + 5 * u})`}>
-          <g className="tip">
-            <use href="#meeple" x={-9 * u} y={-9 * u} width={18 * u} height={18 * u} fill="#f2c230" stroke={INK} strokeWidth={1.4} paintOrder="stroke" vectorEffect="non-scaling-stroke" />
+        <g key={`b${id}`} className="tok bird" style={{ transform: `translate(${x}px, ${cy}px)` }}>
+          <g transform={`scale(${u})`}>
+            <circle cy={1.5} r={9} fill={INK} />
+            <circle r={9} fill="#efe6d2" stroke={INK} strokeWidth={1.6} />
+            <path d={BIRD} transform="scale(0.66) translate(-12 -12.6)" fill={INK} />
           </g>
         </g>,
       );
+    });
+    if (ids.length > 3) {
+      const x = zl.p.x + (zl.slot.x + zl.slot.w + 4) * u;
+      items.push(
+        <g key={`bn${z}`} transform={`translate(${x} ${cy}) scale(${u})`}>
+          <text x={0} y={4} className="tile-t" fill="#efe6d2">
+            ×{ids.length}
+          </text>
+        </g>,
+      );
+    }
   }
-  return <g pointerEvents="none">{items}</g>;
+
+  // a death in progress: the victim tips over on its pad
+  if (fx.dying) {
+    const zl = at(fx.dying);
+    if (zl) {
+      const n = Math.min(zl.pad.cap - 1, pads.get(fx.dying)?.length ?? 0);
+      const x = zl.p.x + padX(zl, n, n + 1) * u;
+      const y = zl.p.y + zl.pad.foot * u - VICTIM_S * 0.5 * u;
+      front.push(
+        <g key="dying" transform={`translate(${x} ${y})`}>
+          <g className="tip">
+            <use
+              href="#meeple"
+              x={-(VICTIM_S / 2) * u}
+              y={-(VICTIM_S / 2) * u}
+              width={VICTIM_S * u}
+              height={VICTIM_S * u}
+              fill="#f2c230"
+              stroke={INK}
+              strokeWidth={1.4}
+              paintOrder="stroke"
+              vectorEffect="non-scaling-stroke"
+            />
+          </g>
+        </g>,
+      );
+    }
+  }
+  return (
+    <g pointerEvents="none">
+      {back}
+      {items}
+      {front}
+    </g>
+  );
 }

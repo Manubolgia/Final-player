@@ -12,8 +12,7 @@ export interface Pt {
 
 export const zonePoint = (z: ZoneDef, aspect: number): Pt => ({ x: z.x, y: z.y / aspect });
 
-export const visibleZones = (g: GameState, loc: LocationDef): ZoneDef[] =>
-  loc.zones.filter((z) => !z.hidden || g.tokens.some((t) => t.id === 'helicopter'));
+export const visibleZones = (g: GameState, loc: LocationDef): ZoneDef[] => loc.zones.filter((z) => !z.hidden || g.tokens.some((t) => t.id === 'helicopter'));
 
 export interface View {
   x0: number;
@@ -104,9 +103,60 @@ export function segDist(p: Pt, a: Pt, b: Pt): number {
   return Math.hypot(p.x - (a.x + t * dx), p.y - (a.y + t * dy));
 }
 
+/** Glyph advances of the board's label face (Archivo Narrow 700, 11 px), measured once in the browser. */
+const LABEL_ADV: Record<string, number> = {
+  A: 6.51,
+  B: 6.51,
+  C: 6.51,
+  D: 6.51,
+  E: 6.02,
+  F: 5.51,
+  G: 7.02,
+  H: 6.51,
+  I: 2.51,
+  J: 5.02,
+  K: 6.51,
+  L: 5.51,
+  M: 7.51,
+  N: 6.51,
+  O: 7.02,
+  P: 6.02,
+  Q: 7.02,
+  R: 6.51,
+  S: 6.02,
+  T: 5.51,
+  U: 6.51,
+  V: 6.02,
+  W: 8.51,
+  X: 6.02,
+  Y: 6.02,
+  Z: 5.51,
+  ' ': 2.51,
+  '&': 6.51,
+  '-': 3,
+  "'": 2.14,
+  ',': 2.51,
+  '.': 2.51,
+  '(': 3,
+  ')': 3,
+  '×': 5.27,
+  '+': 5.27,
+  '?': 5.51,
+  '!': 3,
+  '/': 2.51,
+};
+export const LABEL_FONT = '700 11px "Archivo Narrow", "Arial Narrow", sans-serif';
+/** The plates' letter-spacing (0.02em). */
+const LABEL_TRACK = 0.22;
+
 let measureCtx: CanvasRenderingContext2D | null = null;
-/** Width of text in screen px for a CSS font shorthand. */
+/**
+ * Width of text in screen px for a CSS font shorthand. Board labels use a
+ * fixed table, so the layout is the same before the web font loads, on every
+ * phone, and in the tests.
+ */
 export function textWidth(text: string, font: string): number {
+  if (font === LABEL_FONT) return [...text.toUpperCase()].reduce((w, ch) => w + (LABEL_ADV[ch] ?? (/\d/.test(ch) ? 5.02 : 6.5)) + LABEL_TRACK, 0);
   try {
     measureCtx ??= document.createElement('canvas').getContext('2d');
     if (measureCtx) {
