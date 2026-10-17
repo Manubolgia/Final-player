@@ -390,12 +390,11 @@ function RollPrompt({ g, p, send }: { g: GameState; p: P<'roll'>; send: (i: Inpu
           )
         }
       >
-        <Hand cards={g.fg.hand} marked={mode === 'convert' ? picked : []} dim={mode !== 'convert'} passive={mode !== 'convert'} onPick={pickCard} />
-      </Tray>
-      <div className="stage">
-        <div className="scrim" />
-        <div className="mat rollmat">
-          {cardId ? <ActionCard id={cardId} size="mid" hit={hitRow} g={g} className="ref" /> : null}
+        {mode === 'convert' ? (
+          <Hand cards={g.fg.hand} marked={picked} onPick={pickCard} />
+        ) : (
+          // the dice land in the tray under your thumb; the board stays in view
+          <div className="roll-tray">
           <div className="dicetray">
             <div className="dice">
               {p.dice.map((d, i) => {
@@ -439,7 +438,41 @@ function RollPrompt({ g, p, send }: { g: GameState; p: P<'roll'>; send: (i: Inpu
               ) : null}
             </div>
           ) : null}
-        </div>
+          </div>
+        )}
+      </Tray>
+      <div className="stage">
+        {mode === 'convert' ? (
+          <>
+            <div className="scrim" />
+            <div className="mat rollmat">
+              {cardId ? <ActionCard id={cardId} size="mid" hit={hitRow} g={g} className="ref" /> : null}
+          <div className="dicetray">
+            <div className="dice">
+              {p.dice.map((d, i) => {
+                const win = d >= 5 || p.converted.includes(i) || (p.auto34 && (d === 3 || d === 4));
+                const near = !win && (d === 3 || d === 4);
+                const cls = ['die', 'tumble', win ? 'win' : near ? (p.convertible ? 'near' : '') : 'fail', die === i || picked.includes(i) ? 'picked' : '', p.dice.length > 4 ? 'sm' : ''].filter(Boolean).join(' ');
+                return (
+                  <button key={`${i}-${d}`} type="button" className={cls} onClick={() => tapDie(i)} ref={haptic} aria-label={`Die ${d}${win ? ', success' : near ? ', can be bought' : ', blank'}`} style={{ animationDelay: `${i * 60}ms` }}>
+                    <DieFace n={win && d < 5 ? 6 : d} />
+                    {p.converted.includes(i) ? <span className="won sticker gold sm">paid</span> : null}
+                  </button>
+                );
+              })}
+            </div>
+            <div className="succ">
+              <b>{s}</b> {s === 1 ? 'SUCCESS' : 'SUCCESSES'}
+            </div>
+            {hint ? <div className="dt-hint">{hint}</div> : null}
+          </div>
+            </div>
+          </>
+        ) : cardId ? (
+          <div className="mat rollref">
+            <ActionCard id={cardId} size="mid" hit={hitRow} g={g} className="ref" />
+          </div>
+        ) : null}
       </div>
     </>
   );

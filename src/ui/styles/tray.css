@@ -761,3 +761,39 @@
     -webkit-line-clamp: 2;
   }
 }
+
+/* rolls: a kraft dice tray in the hand tray, the played card small in the board's corner */
+.roll-tray {
+  height: 100%;
+  min-height: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+.roll-tray .dicetray {
+  background: var(--kraft);
+  color: var(--ink);
+  box-shadow: 3px 3px 0 var(--ink);
+  min-width: 0;
+  flex: 0 1 auto;
+}
+.roll-tray .dicetray .succ,
+.roll-tray .dicetray .dt-hint {
+  color: var(--ink);
+}
+.roll-tray .mods {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.mat.rollref {
+  inset: auto 10px 10px auto;
+  pointer-events: none;
+}
+.mat.rollref .acard.mid {
+  --cw: 112px;
+}
+.roll-tray .dicetray .succ b {
+  color: var(--ink);
+}
