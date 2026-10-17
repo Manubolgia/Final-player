@@ -72,6 +72,42 @@ Working under a usage cap (stop at 50% of the five-hour window), I applied the c
 
 Then run the full critic workflow (`critic-workflow.js`) for the final grade.
 
+## Update: 17 October 2026, finishing pass (merged to `main`, last `9f3b7ad`)
+
+Three agents ran in parallel worktrees and burned the five-hour window in under an hour (weekly usage went from 71% to 84%). Their committed work was merged and checked. The play-surfaces agent saved nothing, so its items were redone inline.
+
+**Done in this pass:**
+- **Poster art** (from `fin-art`), in `src/ui/art/*`.
+  - Six killers, twelve Final Girls and five locations.
+  - Shown on the tapes and box back, the Killer strip, both sheet nameplates, the Terror card, the chapter title card and the end screen (the poster behind the receipt).
+  - The Killer sheet is printed as a kraft board, the strips were reworked, and the title collisions are cleared.
+- **Board** (from `fin-board`).
+  - Pieces stand on pawn pads kept off place names.
+  - Landmarks under the spaces, such as the camp lake.
+  - Paths drawn in each film's idiom.
+  - Streets are kept straight and crowded spaces get more room.
+  - Birds perch above a chit.
+  - Board layouts are cached per frame size.
+  - The layout test grew; the suite is now 100 tests.
+- **Inline:**
+  - The search items sit in the tray.
+  - Revealed Terror and Event cards cover only the board area.
+  - Horror rolls land in a kraft dice tray in the hand tray, with the played card small in the board's corner.
+
+**Checks:** 100 unit tests, the build and all 9 end-to-end games pass.
+
+**Still open** (from `review-r3-lead.md`; not re-graded since round 3):
+- **Hand cards:** spine names can still clip ("WEAK ATTACI"), and text cards need an icon summary at hand size.
+- **Lifted card:** still shown on the stage, not raised in place in the hand.
+- **Prompts:**
+  - Choice and move keys should use icons and meeple badges.
+  - Small hands should scale up.
+  - The killer-phase busy tray should show screenplay beats.
+- **Landscape stickers:** check that they no longer sit on the girl strip after the strip rework.
+- **A final critic grade:** run `docs/redesign/critic-workflow.js`, or a single screenshot-only critic, which is cheaper.
+
+**Usage note for the next session:** run at most one agent at a time, and check the five-hour and weekly meters between steps. In a cloud session, `list_events` with `kinds: ["rate_limit_event"]` on the session shows `five_hour` and `seven_day` utilization.
+
 ## Update: 16 October 2026 (afternoon). Try 3 is done, so the critic loop is complete.
 
 **Result:** the three redesign tries are used up. Grades went from 6 and 5.5 (round 1) to **6.4** (round 2) to **6.9** (round 3). That is short of the 8/10 target.
